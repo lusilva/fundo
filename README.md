@@ -1,5 +1,5 @@
 # fundo
-## Find nearby events that interest you without getting bogged down by those who don't. 
+#### Find nearby events that interest you without getting bogged down by those who don't. 
 
 This is a project for RCOS (Rensselaer Center for Open Source), built with Meteor and React.
 
@@ -21,4 +21,18 @@ fundo is a web application which will allow users to discover nearby events. It'
 
 - [ ] Week 12: Release to the public. Be happy.
 
+### Build Instructions
+
+To run fundo locally on your own computer, first install Meteor.
+
+You will need a settings.json file in the root directory to access the various
+services, which will contain API keys. You will need an API key from Eventful.
+More information about this can be found here:
+http://docs.meteor.com/#/full/meteor_settings.
+
+```
+git clone https://github.com/michael-han/fun.do.git
+cd fun.do
+meteor run --settings settings.json
+```
 

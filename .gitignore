@@ -9,3 +9,5 @@ node_modules
 
 # Webstorm IDE config files
 .idea
+
+settings.json
