@@ -121,16 +121,14 @@ Home = React.createClass({
     },
 
     _getHomePageHero() {
-        let window = window || {innerWidth: 0};
         let styles = {
             root: {
-                backgroundColor: Colors.cyan500,
+                backgroundColor: Colors.lightBlue500,
                 overflow: 'hidden'
             },
             svgLogo: {
-                marginLeft: window.innerWidth * 0.5 - 130,
-                width: 420,
-                height: 157
+                margin: '0 auto',
+                display: 'block'
             },
             tagline: {
                 margin: '16px auto 0 auto',
@@ -164,25 +162,26 @@ Home = React.createClass({
 
         styles.h2 = this.mergeStyles(styles.h1, styles.h2);
 
-        if (window !== 'undefined' && this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
+        if (this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
             styles.tagline = this.mergeStyles(styles.tagline, styles.taglineWhenLarge);
             styles.h1 = this.mergeStyles(styles.h1, styles.h1WhenLarge);
-            styles.h2 = this.mergeStyles(styles.h2, styles.h2WhenLarge);
         }
 
         let header = Meteor.isClient ? (
             <h1 style={styles.h1} className="cd-headline letters rotate-2">
                 <span style={styles.nowrap}>
-                    <span>fundo is </span>
-                    <span className="cd-words-wrapper">
-                        <span className="is-visible animated-word">planning</span>
-                        <span className="animated-word">festivals</span>
+                    <span> Find nearby </span>
+                    <span style={{color: '#ff0000' }} className="cd-words-wrapper">
+                        <span className="is-visible animated-word">festivals</span>
                         <span className="animated-word">comedy</span>
                         <span className="animated-word">concerts</span>
+                        <span className="animated-word">museums</span>
+                        <span className="animated-word">conferences</span>
+                        <span className="animated-word">fundraisers</span>
+                        <span className="animated-word">hiking</span>
+                        <span className="animated-word">organizations</span>
                     </span>
                 </span>
-                < br/>
-                <span style={styles.nowrap}>made easy</span>
             </h1> ) : (
             <h1 style={styles.h1}>fundo is music <br /> made easy </h1>
 
@@ -190,7 +189,7 @@ Home = React.createClass({
 
         return (
             <FullWidthSection style={styles.root}>
-                {/* <img style={styles.svgLogo} src="images/material-ui-logo.svg" /> */}
+                <img style={styles.svgLogo} src="images/fundo.png" />
                 <div style={styles.tagline}>
                     { header }
                 </div>

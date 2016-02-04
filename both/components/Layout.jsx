@@ -28,18 +28,30 @@ let MyRawTheme = {
 
 
 Layout = React.createClass({
-    childContextTypes : {
+    childContextTypes: {
         muiTheme: React.PropTypes.object
     },
 
     getChildContext() {
         return {
-            muiTheme: ThemeManager.getMuiTheme(MyRawTheme, { userAgent: 'all'})
+            muiTheme: ThemeManager.getMuiTheme(MyRawTheme, {userAgent: 'all'})
         };
     },
 
     render() {
-        return <div>{this.props.children}</div>;
+        return (
+            <html>
+            <head>
+                <title>fundo - Event Recommendation Made Easy</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet'
+                      type='text/css'/>
+            </head>
+            <body>
+                {this.props.children}
+            </body>
+            </html>
+        );
     }
 });
 
