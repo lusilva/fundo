@@ -21,18 +21,29 @@ fundo is a web application which will allow users to discover nearby events. It'
 
 - [ ] Week 12: Release to the public. Be happy.
 
+
+### The stack & features
+- ES6 modules
+- Meteor
+- React.js
+- react-router with server-rendering (you can disable it by editing `server/entry.js`)
+- Webpack (bundle your app / assets and send them to Meteor)
+- Hot-reload with no page refresh in development mode
+- Optimize your code in production mode
+- Give access to NPM by using packages.json
+
 ### Build Instructions
 
-To run fundo locally on your own computer, first install Meteor.
+1. Install [Meteor](https://www.meteor.com/install)
+2. Create settings.json file in the root directory, and add your eventful API key. More info [here.](http://docs.meteor.com/#/full/meteor_settings)
+3. Run `meteor run`, which will install all dependencies and start up the meteor server.
+4. Go to `localhost:3000` in your web browser.
 
-You will need a settings.json file in the root directory to access the various
-services, which will contain API keys. You will need an API key from Eventful.
-More information about this can be found here:
-http://docs.meteor.com/#/full/meteor_settings.
+#### Run in production mode
+`meteor run --production`
 
-```
-git clone https://github.com/michael-han/fun.do.git
-cd fun.do
-meteor run --settings settings.json
-```
+#### Build for production
+`meteor build .`
 
+
+Thanks to [thereactivestack's kickstart project](https://github.com/thereactivestack/kickstart-simple), which this project is based upon.

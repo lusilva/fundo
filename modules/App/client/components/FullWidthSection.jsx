@@ -1,7 +1,8 @@
-const {ClearFix, Mixins, Styles} = mui;
+/* global React, mui */
 
-let {StylePropable, StyleResizable} = Mixins;
-let DesktopGutter = Styles.Spacing.desktopGutter;
+const { ClearFix, Mixins, Styles } = mui;
+const { StylePropable, StyleResizable } = Mixins;
+const DesktopGutter = Styles.Spacing.desktopGutter;
 
 const FullWidthSection = React.createClass({
 
@@ -73,11 +74,10 @@ const FullWidthSection = React.createClass({
             <ClearFix
                 {...other}
                 style={this.mergeStyles(
-          styles.root,
-          style,
-          this.isDeviceSize(StyleResizable.statics.Sizes.SMALL) && styles.rootWhenSmall,
-          this.isDeviceSize(StyleResizable.statics.Sizes.LARGE) && styles.rootWhenLarge)}
-            >
+                    styles.root,
+                  style,
+                  this.isDeviceSize(StyleResizable.statics.Sizes.SMALL) && styles.rootWhenSmall,
+                  this.isDeviceSize(StyleResizable.statics.Sizes.LARGE) && styles.rootWhenLarge)}>
                 {content}
             </ClearFix>
         );

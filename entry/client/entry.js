@@ -3,6 +3,9 @@ import 'App/methods';
 
 import './routes';
 
+import React from 'react';
+window.React = React;
+
 // To activate the unit tests:
 // - meteor add sanjo:jasmine
 // - meteor add velocity:html-reporter
