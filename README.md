@@ -1,5 +1,5 @@
 # fundo
-## Find nearby events that interest you without getting bogged down by those who don't. 
+#### Find nearby events that interest you without getting bogged down by those who don't. 
 
 This is a project for RCOS (Rensselaer Center for Open Source), built with Meteor and React.
 
@@ -22,3 +22,28 @@ fundo is a web application which will allow users to discover nearby events. It'
 - [ ] Week 12: Release to the public. Be happy.
 
 
+### The stack & features
+- ES6 modules
+- Meteor
+- React.js
+- react-router with server-rendering (you can disable it by editing `server/entry.js`)
+- Webpack (bundle your app / assets and send them to Meteor)
+- Hot-reload with no page refresh in development mode
+- Optimize your code in production mode
+- Give access to NPM by using packages.json
+
+### Build Instructions
+
+1. Install [Meteor](https://www.meteor.com/install)
+2. Create settings.json file in the root directory, and add your eventful API key. More info [here.](http://docs.meteor.com/#/full/meteor_settings)
+3. Run `meteor run`, which will install all dependencies and start up the meteor server.
+4. Go to `localhost:3000` in your web browser.
+
+#### Run in production mode
+`meteor run --production`
+
+#### Build for production
+`meteor build .`
+
+
+Thanks to [thereactivestack's kickstart project](https://github.com/thereactivestack/kickstart-simple), which this project is based upon.
