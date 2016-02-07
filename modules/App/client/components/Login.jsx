@@ -1,6 +1,3 @@
-
-import React from 'react';
-
 const Login = React.createClass({
     componentDidMount() {
         ////////////____Input Focus___//////////////////

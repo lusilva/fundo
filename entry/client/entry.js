@@ -3,10 +3,6 @@ import 'App/methods';
 
 import './routes';
 
-Accounts.ui.config({
-  passwordSignupFields: 'USERNAME_ONLY'
-});
-
 // To activate the unit tests:
 // - meteor add sanjo:jasmine
 // - meteor add velocity:html-reporter

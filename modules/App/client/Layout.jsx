@@ -1,9 +1,9 @@
-import { Component, PropTypes } from 'react';
+
 import Helmet from 'react-helmet';
 
-export default class Layout extends Component {
+export default class Layout extends React.Component {
   static propTypes = {
-    children: PropTypes.any.isRequired
+    children: React.PropTypes.any.isRequired
   };
 
   render() {

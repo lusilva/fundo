@@ -1,5 +1,4 @@
-import React from 'react';
-import {ClearFix, Mixins, Styles} from 'material-ui';
+const {ClearFix, Mixins, Styles} = mui;
 
 let {StylePropable, StyleResizable} = Mixins;
 let DesktopGutter = Styles.Spacing.desktopGutter;
