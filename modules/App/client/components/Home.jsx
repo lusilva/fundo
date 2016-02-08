@@ -91,12 +91,6 @@ const Home = React.createClass({
             label: {
                 color: lightBaseTheme.palette.primary1Color
             },
-            githubStyle: {
-                margin: '16px 32px 0px 8px'
-            },
-            demoStyle: {
-                margin: '16px 32px 0px 32px'
-            },
             h1: {
                 color: Colors.darkWhite,
                 fontWeight: Typography.fontWeightLight,
@@ -124,10 +118,12 @@ const Home = React.createClass({
             <FullWidthSection style={styles.root}>
                 <img style={styles.svgLogo} src={require('../img/fundo.png')}/>
                 <div style={styles.tagline}>
-                    <h1 style={styles.h1}>Find nearby <span style={{color: "#ff0000"}}>
-                            {this.heroTextSelection[this.state.heroTextIndex]}
-                        </span>
-                    </h1>
+                    <span style={styles.nowrap}>
+                        <h1 style={styles.h1}>Find nearby <span style={{color: "#ff0000"}}>
+                                {this.heroTextSelection[this.state.heroTextIndex]}
+                            </span>
+                        </h1>
+                    </span>
                 </div>
             </FullWidthSection>
         );
@@ -135,12 +131,8 @@ const Home = React.createClass({
 
     /** @inheritdoc */
     render() {
-        const style = {
-            paddingTop: Spacing.desktopKeylineIncrement
-        };
-
         return (
-            <div style={style}>
+            <div>
                 {this._getHomePageHero()}
             </div>
         );

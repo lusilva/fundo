@@ -22,5 +22,6 @@ thereactivestack:blazetoreact
 webpack:webpack
 accounts-password
 nfl:react-helmet
-markoshust:material-ui
 react-runtime
+local:material-ui
+qnub:accounts-react-material-ui

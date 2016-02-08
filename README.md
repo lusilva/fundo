@@ -39,7 +39,7 @@ fundo is a web application which will allow users to discover nearby events. It'
 3. Run `meteor run`, which will install all dependencies and start up the meteor server.
 4. Go to `localhost:3000` in your web browser.
 
-#### Run in production mode
+#### Run in production mode (with SSR enabled)
 `meteor run --production`
 
 #### Build for production
