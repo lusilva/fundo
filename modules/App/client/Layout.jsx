@@ -2,8 +2,8 @@ import Helmet from 'react-helmet';
 import { History, Link } from 'react-router';
 import Theme from './theme';
 import Paths from './paths';
-const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, Utils } = mui;
-const { ThemeManager, Colors, Spacing, Typography } = Styles;
+const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem} = mui;
+const { ThemeManager, Spacing, Typography } = Styles;
 
 
 const Layout = React.createClass({
@@ -37,9 +37,10 @@ const Layout = React.createClass({
 
 
         return {
-            showLeftNav: false,
+            showLeftNav: true,
             tabIndex: tabIndex,
-            appBarTitle: null
+            appBarTitle: null,
+            open: false
         }
     },
 
@@ -66,7 +67,7 @@ const Layout = React.createClass({
 
     _onLeftIconButtonTouchTap(event) {
         if (this.state.showLeftNav) {
-            this.refs.sideNav.toggle();
+            this.setState({open: true});
             event.preventDefault();
         }
     },
@@ -100,12 +101,14 @@ const Layout = React.createClass({
                 top: 0,
                 right: 0,
                 zIndex: 4,
-                width: '100%'
+                width: '100%',
+                backgroundColor: Theme.palette.primary1Color
             },
             container: {
                 position: 'absolute',
                 right: (Spacing.desktopGutter / 2) + 48,
-                bottom: 0
+                bottom: 0,
+                backgroundColor: Theme.palette.primary1Color
             },
             span: {
                 fontWeight: Typography.fontWeightLight,
@@ -156,16 +159,37 @@ const Layout = React.createClass({
         );
     },
 
+    _onMenuItemClick(value, index) {
+        this.history.pushState(this.state, value.path);
+        this.setState({tabIndex: index.toString(), open: false});
+    },
+
     _getAppBar() {
+        let paths = Meteor.userId() ? Paths.loggedIn : Paths.loggedOut;
         return (
-            <AppBar title={this.state.appBarTitle}
-                    onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}/>
+            <div>
+                <AppBar title={this.state.appBarTitle}
+                        onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}/>
+                <LeftNav docked={false} width={250} open={this.state.open}
+                         onRequestChange={open => this.setState({open})}>
+                    {_.map(paths, function (value, index) {
+                        return (
+                            <MenuItem key={index}
+                                      onTouchTap={this._onMenuItemClick.bind(this, value, index)}
+                                      checked={this.state.tabIndex === index.toString()}
+                            >
+                                {value.title}
+                            </MenuItem>
+                        );
+                    }.bind(this))}
+                </LeftNav>
+            </div>
         );
     },
 
     render() {
         const style = {
-            paddingTop: Spacing.desktopKeylineIncrement
+            paddingTop: this.state.showLeftNav ? '0' : Spacing.desktopKeylineIncrement
         };
 
         return (

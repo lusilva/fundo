@@ -79,6 +79,7 @@ const Home = React.createClass({
     _getHomePageHero() {
         let styles = {
             root: {
+                backgroundColor: Theme.palette.primary1Color,
                 overflow: 'hidden',
                 fontFamily: Theme.fontFamily
             },
@@ -92,9 +93,9 @@ const Home = React.createClass({
                 maxWidth: 575
             },
             h1: {
-                color: Theme.palette.textColor,
+                color: Theme.palette.alternateTextColor,
                 fontWeight: Typography.fontWeightLight,
-                fontSize: 30
+                fontSize: 26
             },
             nowrap: {
                 whiteSpace: 'nowrap'
@@ -119,8 +120,9 @@ const Home = React.createClass({
                 <img style={styles.svgLogo} src={require('../img/fundo.png')}/>
                 <div style={styles.tagline}>
                     <span style={styles.nowrap}>
-                        <h1 style={styles.h1}>{'is '}
-                            <span style={{color: Theme.palette.alternateTextColor}}>
+                        <h1 style={styles.h1}>
+                            {'is '}
+                            <span style={{color: 'white'}}>
                                 {this.heroTextSelection[this.state.heroTextIndex]}
                             </span>
                             {' made easy'}

@@ -34,7 +34,7 @@ const Login = React.createClass({
                 display: 'inline-block',
                 width: '100%',
                 fontWeight: '200',
-                color: Theme.palette.primary1Color
+                color: Theme.palette.textColor
             },
             formset: {
                 padding: '25px',
@@ -45,7 +45,8 @@ const Login = React.createClass({
                 width: '100%',
                 marginTop: '15px',
                 fontSize: '16px',
-                fontWeight: '400'
+                fontWeight: '400',
+                color: Theme.palette.alternateTextColor
             }
         }
     },
@@ -56,13 +57,15 @@ const Login = React.createClass({
 
         return (
                 <Card style={styles.card}>
-                    <h1 style={styles.h1}>Login</h1>
+                    <h1 style={styles.h1}>LOGIN</h1>
                     <div style={styles.formset}>
                         <TextField floatingLabelText="Email"/><br/>
                         <TextField floatingLabelText="Password" type="password"/><br/>
                         <br />
                         <RaisedButton label="Login" style={styles.loginBtn}
-                                      backgroundColor={Theme.palette.primary2Color}/>
+                                      backgroundColor={Theme.palette.primary2Color}
+                                      labelColor={Theme.palette.alternateTextColor}
+                        />
                     </div>
                     <div className="forgot">
                         <form className="forgot log-form">
