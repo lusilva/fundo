@@ -101,7 +101,7 @@ const Home = React.createClass({
                 whiteSpace: 'nowrap'
             },
             taglineWhenLarge: {
-                marginTop: 32
+                marginTop: 16
             },
             h1WhenLarge: {
                 fontSize: 56

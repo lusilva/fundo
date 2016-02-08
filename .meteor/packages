@@ -24,3 +24,5 @@ accounts-password
 nfl:react-helmet
 react-runtime
 local:material-ui
+email
+local:accounts-react-material-ui
