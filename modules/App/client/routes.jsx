@@ -5,8 +5,6 @@ import Layout from './Layout';
 import Home from './components/Home';
 import Login from './components/Login';
 
-Session.set('activePath', 0);
-
 export default (
     <Route path="/" component={Layout} onEnter={validate}>
         <IndexRoute component={Home}/>
@@ -20,11 +18,12 @@ function validate(nextState, transition) {
 
     let paths = isLoggedIn ? Paths.loggedIn : Paths.loggedOut;
 
-    _.forEach(paths, function(value, index) {
-        if (value.path == nextState.location.pathname) {
-            Session.set('activePath', index)
-        }
-    });
+    if (Meteor.isClient && Session)
+        _.forEach(paths, function (value, index) {
+            if (value.path == nextState.location.pathname) {
+                Session.set('activePath', index)
+            }
+        });
 }
 
 

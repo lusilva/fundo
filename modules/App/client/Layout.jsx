@@ -1,5 +1,5 @@
 import Helmet from 'react-helmet';
-import { History } from 'react-router';
+import { History, Link } from 'react-router';
 import Theme from './theme';
 import Paths from './paths';
 const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, Utils } = mui;
@@ -31,9 +31,14 @@ const Layout = React.createClass({
     },
 
     getInitialState() {
+        let tabIndex = null;
+        if (Meteor.isClient && Session)
+            tabIndex = Session.get('activePath');
+
+
         return {
             showLeftNav: false,
-            tabIndex: Session.get('activePath') || null,
+            tabIndex: tabIndex,
             appBarTitle: null
         }
     },
@@ -42,11 +47,14 @@ const Layout = React.createClass({
         this._windowResizeHandler();
         $(window).resize(this._windowResizeHandler);
 
-        Tracker.autorun(function () {
-            let tabIndex = Session.get('activePath');
-            if (typeof null != tabIndex && tabIndex.toString() !== this.state.tabIndex)
-                this.setState({tabIndex: tabIndex.toString()});
-        }.bind(this));
+        // Add this here as a guard against SSR since Session doesn't exist in the server.
+        if (Meteor.isClient && Session) {
+            Tracker.autorun(function () {
+                let tabIndex = Session.get('activePath');
+                if (typeof null != tabIndex && tabIndex.toString() !== this.state.tabIndex)
+                    this.setState({tabIndex: tabIndex.toString()});
+            }.bind(this));
+        }
     },
 
     _windowResizeHandler() {
@@ -66,6 +74,22 @@ const Layout = React.createClass({
     _onTabChange(value, e, tab) {
         this.history.pushState(this.state, tab.props.path);
         this.setState({tabIndex: value});
+    },
+
+    _onIconSelect() {
+        this.setState({tabIndex: '0'});
+    },
+
+    _getIcon(styles) {
+        if (this.state.tabIndex == '0')
+            return null;
+        return (
+            <Link to='/' onClick={this._onIconSelect}>
+                <span style={this.prepareStyles(styles.span)}>
+                    <img src={require('./img/fundo-xsmall.png')}/>
+                </span>
+            </Link>
+        );
     },
 
     _getTabs() {
@@ -108,6 +132,7 @@ const Layout = React.createClass({
                     rounded={false}
                     style={styles.root}>
 
+                    {this._getIcon(styles)}
                     {/*<span style={this.prepareStyles(styles.span)}> &Sigma;&Chi; at Rensselaer </span>*/}
 
                     <div style={this.prepareStyles(styles.container)}>

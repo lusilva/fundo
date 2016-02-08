@@ -1,8 +1,6 @@
 const { Styles, Utils } = mui;
 const { Colors, Spacing, zIndex} = Styles;
 
-console.log(Colors.yellow500);
-
 export default {
     spacing: Spacing,
     zIndex: zIndex,
@@ -15,7 +13,7 @@ export default {
         accent1Color: Colors.yellow500,
         accent2Color: Colors.deepPurple100,
         accent3Color: Colors.grey500,
-        textColor: Colors.yellow500,
+        textColor: Colors.yellow800,
         alternateTextColor: Colors.yellow100,
         canvasColor: Colors.deepPurple700,
         borderColor: Colors.deepPurple300,
