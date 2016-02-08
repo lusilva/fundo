@@ -1,6 +1,7 @@
 /* global React, mui */
 
 import FullWidthSection from './FullWidthSection';
+import Theme from '../theme';
 
 // Import components from Material-UI
 const { Mixins, Styles } = mui;
@@ -38,6 +39,8 @@ const Home = React.createClass({
     // Needed to clear the interval after the component unmounts
     intervalId: null,
 
+    intervalTimeMS: 2000,
+
     /**
      * Returns the initial state of this component.
      * @returns {{heroTextIndex: number}}
@@ -59,7 +62,7 @@ const Home = React.createClass({
             this.setState({
                 heroTextIndex: (nextIndex >= this.heroTextSelection.length ? 0 : nextIndex)
             });
-        }.bind(this), 1000);
+        }.bind(this), this.intervalTimeMS);
     },
 
     /** @inheritdoc */
@@ -76,8 +79,8 @@ const Home = React.createClass({
     _getHomePageHero() {
         let styles = {
             root: {
-                backgroundColor: Colors.lightBlue500,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                fontFamily: Theme.fontFamily
             },
             svgLogo: {
                 margin: '0 auto',
@@ -88,11 +91,8 @@ const Home = React.createClass({
                 textAlign: 'center',
                 maxWidth: 575
             },
-            label: {
-                color: lightBaseTheme.palette.primary1Color
-            },
             h1: {
-                color: Colors.darkWhite,
+                color: Theme.palette.textColor,
                 fontWeight: Typography.fontWeightLight,
                 fontSize: 30
             },
@@ -119,9 +119,11 @@ const Home = React.createClass({
                 <img style={styles.svgLogo} src={require('../img/fundo.png')}/>
                 <div style={styles.tagline}>
                     <span style={styles.nowrap}>
-                        <h1 style={styles.h1}>Find nearby <span style={{color: "#ff0000"}}>
+                        <h1 style={styles.h1}>{'is '}
+                            <span style={{color: Theme.palette.alternateTextColor}}>
                                 {this.heroTextSelection[this.state.heroTextIndex]}
                             </span>
+                            {' made easy'}
                         </h1>
                     </span>
                 </div>

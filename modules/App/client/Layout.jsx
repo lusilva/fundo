@@ -1,7 +1,10 @@
 import Helmet from 'react-helmet';
-import { History } from 'react-router'
-const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins } = mui;
+import { History } from 'react-router';
+import Theme from './theme';
+import Paths from './paths';
+const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, Utils } = mui;
 const { ThemeManager, Colors, Spacing, Typography } = Styles;
+
 
 const Layout = React.createClass({
     propTypes: {
@@ -23,14 +26,14 @@ const Layout = React.createClass({
     getChildContext() {
         // Need to set the userAgent here for SSR in production.
         return {
-            muiTheme: ThemeManager.getMuiTheme(Styles.LightRawTheme, {userAgent: 'all'})
+            muiTheme: ThemeManager.getMuiTheme(Theme, {userAgent: 'all'})
         };
     },
 
     getInitialState() {
         return {
             showLeftNav: false,
-            tabIndex: Session.get('tabIndex') || null,
+            tabIndex: Session.get('activePath') || null,
             appBarTitle: null
         }
     },
@@ -38,6 +41,12 @@ const Layout = React.createClass({
     componentDidMount() {
         this._windowResizeHandler();
         $(window).resize(this._windowResizeHandler);
+
+        Tracker.autorun(function () {
+            let tabIndex = Session.get('activePath');
+            if (typeof null != tabIndex && tabIndex.toString() !== this.state.tabIndex)
+                this.setState({tabIndex: tabIndex.toString()});
+        }.bind(this));
     },
 
     _windowResizeHandler() {
@@ -62,7 +71,6 @@ const Layout = React.createClass({
     _getTabs() {
         let styles = {
             root: {
-                backgroundColor: Colors.lightBlue500,
                 position: 'fixed',
                 height: 64,
                 top: 0,
@@ -76,7 +84,6 @@ const Layout = React.createClass({
                 bottom: 0
             },
             span: {
-                color: Colors.yellow500,
                 fontWeight: Typography.fontWeightLight,
                 left: 45,
                 top: 22,
@@ -88,21 +95,11 @@ const Layout = React.createClass({
                 bottom: 0
             },
             tab: {
-                backgroundColor: Colors.lightBlue500,
-                color: Colors.yellow500,
                 height: 64
             }
         };
 
-        let tabs = !Meteor.userId() ?
-            [
-                { title: "Login", path: "/login" },
-                { title: "Register", path: "/register" }
-
-            ] :
-            [
-                // TODO: Logged in paths go here
-            ];
+        let tabs = Meteor.userId() ? Paths.loggedIn : Paths.loggedOut;
 
         return (
             <div>
@@ -137,7 +134,6 @@ const Layout = React.createClass({
     _getAppBar() {
         return (
             <AppBar title={this.state.appBarTitle}
-                    style={{backgroundColor: Colors.lightBlue500}}
                     onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}/>
         );
     },
@@ -146,7 +142,7 @@ const Layout = React.createClass({
         const style = {
             paddingTop: Spacing.desktopKeylineIncrement
         };
-        console.log(style);
+
         return (
             <AppCanvas>
                 <Helmet
@@ -156,7 +152,11 @@ const Layout = React.createClass({
                             { name: 'description', content: 'Intelligent Event Recommendations' },
                             { name: 'viewport', content: 'width=device-width, initial-scale=1' }
                         ]
-                    }/>
+                    }
+                    link={[
+                        {"rel": "stylesheet", "href": "https://fonts.googleapis.com/css?family=Roboto:400,300,500"}
+                    ]}
+                />
                 {this.state.showLeftNav ? this._getAppBar() : this._getTabs()}
                 <div style={style}>
                     {this.props.children}

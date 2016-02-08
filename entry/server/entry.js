@@ -1,9 +1,6 @@
 import 'App/methods';
 import 'App/server/publications';
 
-import ReactI from 'react';
-React = ReactI;
-
 // Do server-rendering only in proudction mode
 if (process.env.NODE_ENV === 'production') {
   // Load Webpack infos for SSR

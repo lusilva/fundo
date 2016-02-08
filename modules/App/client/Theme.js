@@ -1,0 +1,25 @@
+const { Styles, Utils } = mui;
+const { Colors, Spacing, zIndex} = Styles;
+
+console.log(Colors.yellow500);
+
+export default {
+    spacing: Spacing,
+    zIndex: zIndex,
+    fontFamily: 'Roboto, sans-serif',
+    palette: {
+        //#512da8
+        primary1Color: Colors.deepPurple700,
+        primary2Color: Colors.deepPurple900,
+        primary3Color: Colors.yellow50,
+        accent1Color: Colors.yellow500,
+        accent2Color: Colors.deepPurple100,
+        accent3Color: Colors.grey500,
+        textColor: Colors.yellow500,
+        alternateTextColor: Colors.yellow100,
+        canvasColor: Colors.deepPurple700,
+        borderColor: Colors.deepPurple300,
+        disabledColor: Utils.ColorManipulator.fade(Colors.deepPurple700, 0.6),
+        pickerHeaderColor: Colors.cyan500
+    }
+};
