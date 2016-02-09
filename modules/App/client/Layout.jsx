@@ -112,8 +112,8 @@ const Layout = React.createClass({
             },
             span: {
                 fontWeight: Typography.fontWeightLight,
-                left: 45,
-                top: 22,
+                left: 25,
+                top: 5,
                 position: 'absolute',
                 fontSize: 26
             },
@@ -136,7 +136,6 @@ const Layout = React.createClass({
                     style={styles.root}>
 
                     {this._getIcon(styles)}
-                    {/*<span style={this.prepareStyles(styles.span)}> &Sigma;&Chi; at Rensselaer </span>*/}
 
                     <div style={this.prepareStyles(styles.container)}>
                         <Tabs
@@ -207,6 +206,7 @@ const Layout = React.createClass({
                     ]}
                 />
                 {this.state.showLeftNav ? this._getAppBar() : this._getTabs()}
+                <Accounts.ui.Dialogs />
                 <div style={style}>
                     {this.props.children}
                 </div>
