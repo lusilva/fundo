@@ -1,6 +1,10 @@
 const { Styles, Utils } = mui;
 const { Colors, Spacing, zIndex} = Styles;
 
+
+/**
+ * The main theme for the entire application.
+ */
 export default {
     spacing: Spacing,
     zIndex: zIndex,

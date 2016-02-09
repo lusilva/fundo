@@ -6,7 +6,7 @@ import Theme from '../theme';
 // Import components from Material-UI
 const { Mixins, Styles } = mui;
 const { StylePropable, StyleResizable } = Mixins;
-const { Colors, Spacing, Typography, lightBaseTheme } = Styles;
+const { Typography } = Styles;
 
 /**
  * The Home page React component, responsible for rendering the home page.
@@ -39,6 +39,7 @@ const Home = React.createClass({
     // Needed to clear the interval after the component unmounts
     intervalId: null,
 
+    // The time between word changes
     intervalTimeMS: 2000,
 
     /**

@@ -5,12 +5,21 @@ import { History } from 'react-router';
 
 const { Card } = mui;
 
+/**
+ * The login view with the login form.
+ *
+ * @class
+ * @extends React.Component
+ */
 const Login = React.createClass({
 
+    // Allows for navigating to the dashboard upon form submission.
     mixins: [
         History
     ],
 
+    // Add the dark purple background to the body, and remove it when
+    // going to another page.
     componentDidMount() {
         document.body.classList.add('dark-background');
     },
@@ -19,7 +28,7 @@ const Login = React.createClass({
         document.body.classList.remove('dark-background');
     },
 
-
+    // Gets the styles for the card and font.
     _getStyles() {
         return {
             card: {
@@ -50,6 +59,7 @@ const Login = React.createClass({
         }
     },
 
+    // Handles the redirect upon successful login.
     _handleRedirect() {
         this.history.pushState(this.state, '/dashboard');
     },
@@ -62,6 +72,7 @@ const Login = React.createClass({
             <Card style={styles.card}>
                 <h1 style={styles.h1}>LOGIN</h1>
                 <div style={styles.formset}>
+                    {/* Get the login form from fundo/packages/meteor-accounts-react-material-ui */}
                    <Accounts.ui.LoginFormSet redirect={this._handleRedirect} login={true}/>
                 </div>
             </Card>

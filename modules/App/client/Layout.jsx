@@ -5,7 +5,12 @@ import Paths from './paths';
 const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem} = mui;
 const { ThemeManager, Spacing, Typography } = Styles;
 
-
+/**
+ * The main Layout for the entire app.
+ *
+ * @class
+ * @extends React.Component
+ */
 const Layout = React.createClass({
     propTypes: {
         children: React.PropTypes.any.isRequired
