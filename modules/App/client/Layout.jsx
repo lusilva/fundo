@@ -61,6 +61,15 @@ const Layout = React.createClass({
                     this.setState({tabIndex: tabIndex.toString()});
             }.bind(this));
         }
+
+        Tracker.autorun(function () {
+            let loggedIn = !!Meteor.userId();
+            if (loggedIn && _.indexOf(Paths.loggedOut, window.location.pathname)) {
+                this.history.pushState(this.state, '/dashboard');
+            } else if (!loggedIn && _.indexOf(Paths.loggedIn, window.location.pathname)) {
+                this.history.pushState(this.state, '/');
+            }
+        }.bind(this));
     },
 
     _windowResizeHandler() {

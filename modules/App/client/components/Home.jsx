@@ -2,6 +2,7 @@
 
 import FullWidthSection from './FullWidthSection';
 import Theme from '../theme';
+import { History } from 'react-router';
 
 // Import components from Material-UI
 const { Mixins, Styles } = mui;
@@ -17,7 +18,8 @@ const Home = React.createClass({
 
     mixins: [
         StylePropable,
-        StyleResizable
+        StyleResizable,
+        History
     ],
 
     // The list of words that the hero text will cycle through
@@ -28,10 +30,9 @@ const Home = React.createClass({
         'sports',
         'family',
         'nightlife',
-        'organizations',
         'conferences',
         'food',
-        'sales',
+        'shopping',
         'museums',
         'movies',
         'hiking'

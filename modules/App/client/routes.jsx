@@ -50,5 +50,3 @@ function validateUser(nextState, transition) {
             }
         });
 }
-
-
