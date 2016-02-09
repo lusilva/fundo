@@ -12,7 +12,7 @@ export default {
         // #5c6bc0
         primary1Color: Colors.indigo400,
         primary2Color: Colors.deepPurple400,
-        primary3Color: Colors.white,
+        primary3Color: Colors.indigo900,
         accent1Color: Colors.yellow500,
         accent2Color: Colors.indigo600,
         accent3Color: Colors.grey500,

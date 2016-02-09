@@ -28,7 +28,6 @@ const Register = React.createClass({
                 textAlign: 'center',
                 marginTop: '24px',
                 height: '500px',
-                background: Theme.palette.primary3Color,
                 position: 'absolute',
                 left: '0',
                 right: '0',
@@ -60,7 +59,7 @@ const Register = React.createClass({
 
         return (
             <Card style={styles.card}>
-                <h1 style={styles.h1}>REGISTER</h1>
+                <h1 style={styles.h1}>Register</h1>
                 <div style={styles.formset}>
                     <Accounts.ui.LoginFormSet redirect={this._handleRedirect} register={true}/>
                 </div>

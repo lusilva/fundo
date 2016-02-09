@@ -37,7 +37,6 @@ const Login = React.createClass({
                 textAlign: 'center',
                 marginTop: '24px',
                 height: '500px',
-                background: Theme.palette.primary3Color,
                 position: 'absolute',
                 left: '0',
                 right: '0',
@@ -70,7 +69,7 @@ const Login = React.createClass({
 
         return (
             <Card style={styles.card}>
-                <h1 style={styles.h1}>LOGIN</h1>
+                <h1 style={styles.h1}>Login</h1>
                 <div style={styles.formset}>
                     {/* Get the login form from fundo/packages/meteor-accounts-react-material-ui */}
                    <Accounts.ui.LoginFormSet redirect={this._handleRedirect} login={true}/>

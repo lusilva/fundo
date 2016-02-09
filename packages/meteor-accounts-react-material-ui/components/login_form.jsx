@@ -89,7 +89,9 @@ Accounts.ui._loginForm = React.createClass({
     if (passwordSignupFields() === "USERNAME_AND_OPTIONAL_EMAIL" && email === '')
       return true;
 
-    if (email.indexOf('@') !== -1) {
+    var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (re.test(email)) {
       return true;
     } else {
       this.showMessage(t9n("error.emailInvalid"));
@@ -156,6 +158,17 @@ Accounts.ui._loginForm = React.createClass({
     ));
   },
 
+  getPasswordVerificationField(){
+    return (this.getField(
+      'passwordVerification',
+      'passwordVerification',
+      'Verify Password',
+      'Verify Password',
+      this.state.passMessage,
+      'password'
+    ));
+  },
+
   getNewPasswordField(){
     return (this.getField(
       'newPassword',
@@ -199,6 +212,7 @@ Accounts.ui._loginForm = React.createClass({
       }
 
       loginFields.push(this.getPasswordField());
+      loginFields.push(this.getPasswordVerificationField())
     }
 
     if (this.state.formVariant == LOGIN_FORM_STATES.PASSWORD_RESET) {
@@ -297,6 +311,7 @@ Accounts.ui._loginForm = React.createClass({
     const email = this.refs.email ? this.refs.email.getValue().trim() : null;
     // notably not trimmed. a password could (?) start or end with a space
     const password = this.refs.password.getValue();
+    const passwordVerify = this.refs.passwordVerification.getValue();
 
     if (username !== null) {
       if (!this.validateUsername(username)) {
@@ -316,6 +331,10 @@ Accounts.ui._loginForm = React.createClass({
 
     if (!this.validatePassword(password)) {
       this.showMessage(t9n("error.pwTooShort"));
+
+      return;
+    } else if (password !== passwordVerify) {
+      this.showMessage("Passwords don't match");
 
       return;
     } else {

@@ -64,9 +64,9 @@ const Layout = React.createClass({
 
         Tracker.autorun(function () {
             let loggedIn = !!Meteor.userId();
-            if (loggedIn && _.indexOf(Paths.loggedOut, window.location.pathname)) {
+            if (loggedIn && _.indexOf(Paths.loggedOut, window.location.pathname) > -1) {
                 this.history.pushState(this.state, '/dashboard');
-            } else if (!loggedIn && _.indexOf(Paths.loggedIn, window.location.pathname)) {
+            } else if (!loggedIn && _.indexOf(Paths.loggedIn, window.location.pathname) > -1) {
                 this.history.pushState(this.state, '/');
             }
         }.bind(this));
@@ -96,7 +96,7 @@ const Layout = React.createClass({
     },
 
     _getIcon(styles) {
-        if (this.state.tabIndex == '0')
+        if (!Meteor.userId() && this.state.tabIndex == '0')
             return null;
         return (
             <Link to='/' onClick={this._onIconSelect}>
@@ -184,13 +184,23 @@ const Layout = React.createClass({
                 <AppBar title={this.state.appBarTitle}
                         onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}/>
                 <LeftNav docked={false} width={250} open={this.state.open}
+                         style={{backgroundColor: Theme.palette.primary1Color,
+                                color: Theme.palette.alternateTextColor}}
                          onRequestChange={open => this.setState({open})}>
+                    <Paper zDepth={0}
+                           style={{backgroundColor: Theme.palette.primary3Color,
+                                color: Theme.palette.alternateTextColor,
+                                height: '64px', textAlign: 'center'}}>
+                            <img src={require('./img/fundo-xsmall.png')} style={{padding: '5px'}}/>
+                    </Paper>
                     {_.map(paths, function (value, index) {
+                        let color = this.state.tabIndex == index ?
+                            Theme.palette.alternateTextColor :
+                            Theme.palette.canvasColor;
                         return (
                             <MenuItem key={index}
-                                      onTouchTap={this._onMenuItemClick.bind(this, value, index)}
-                                      checked={this.state.tabIndex === index.toString()}
-                            >
+                                      style={{color: color, fontSize: '20px', padding: '10px 0'}}
+                                      onTouchTap={this._onMenuItemClick.bind(this, value, index)}>
                                 {value.title}
                             </MenuItem>
                         );

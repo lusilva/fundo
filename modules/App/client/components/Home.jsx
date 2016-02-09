@@ -28,14 +28,15 @@ const Home = React.createClass({
         'concerts',
         'comedy',
         'sports',
-        'family',
         'nightlife',
         'conferences',
-        'food',
         'shopping',
         'museums',
         'movies',
-        'hiking'
+        'hiking',
+        'music',
+        'dating',
+        'restaurants'
     ],
     // Needed to clear the interval after the component unmounts
     intervalId: null,
