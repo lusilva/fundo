@@ -2,6 +2,10 @@ Accounts.ui.LoginFormSet = React.createClass({
   render(){
     const options = {};
 
+    if (this.props.register) {
+      options.register = this.props.register;
+    }
+
     if (this.props.login) {
       options.login = this.props.login;
     }

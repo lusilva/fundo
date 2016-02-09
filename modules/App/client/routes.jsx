@@ -4,12 +4,14 @@ import Paths from './paths';
 import Layout from './Layout';
 import Home from './components/Home';
 import Login from './components/Login';
+import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 
 export default (
     <Route path="/" component={Layout}>
         <IndexRoute component={Home} onEnter={validate}/>
         <Route path="/login" component={Login} onEnter={validate}/>
+        <Route path="/register" component={Register} onEnter={validate}/>
         <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
     </Route>
 );

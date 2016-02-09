@@ -36,7 +36,9 @@ Accounts.ui._loginForm = React.createClass({
       emailMessage: '',
       passMessage: '',
       waiting: false,
-      formVariant: this.props.user ? LOGIN_FORM_STATES.PASSWORD_CHANGE : LOGIN_FORM_STATES.SIGN_IN,
+      formVariant: this.props.user ?
+        LOGIN_FORM_STATES.PASSWORD_CHANGE :
+        (this.props.register ? LOGIN_FORM_STATES.SIGN_UP : LOGIN_FORM_STATES.SIGN_IN),
       services: []
     };
   },
@@ -56,9 +58,15 @@ Accounts.ui._loginForm = React.createClass({
   },
 
   componentWillReceiveProps(nextProps){
-    if (!nextProps.user && this.state.formVariant != LOGIN_FORM_STATES.SIGN_IN) {
+    if (!nextProps.user && this.state.formVariant != LOGIN_FORM_STATES.SIGN_IN && this.props.login) {
       this.setState({
         formVariant: LOGIN_FORM_STATES.SIGN_IN
+      });
+    }
+
+    if (this.props.register) {
+      this.setState({
+        formVariant: LOGIN_FORM_STATES.SIGN_UP
       });
     }
 
@@ -447,6 +455,7 @@ Accounts.ui._loginForm = React.createClass({
         className="accounts-ui__button accounts-ui__button_variant_form">
         <MUI.RaisedButton
           ref="signUpButton"
+          style={{width: '250px', margin: '50px 20px'}}
           secondary={true}
           label={t9n('signUp')}
           disabled={this.state.waiting}
@@ -501,6 +510,21 @@ Accounts.ui._loginForm = React.createClass({
             {signInButton}
             {passwordResetSwitch}
             {passwordResetButton}
+          </div>
+
+          <MUI.RefreshIndicator
+            size={40}
+            left={this.loaderPosition()}
+            top={120}
+            status={this.state.waiting ? 'loading' : 'hide'}/>
+        </div>
+      );
+    } else if (this.props.register) {
+      return (
+        <div className="accounts-ui__form">
+          {this.fields()}
+          <div className="accounts-ui__form-buttons">
+            {signUpButton}
           </div>
 
           <MUI.RefreshIndicator

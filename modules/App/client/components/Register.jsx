@@ -5,7 +5,7 @@ import { History } from 'react-router';
 
 const { Card } = mui;
 
-const Login = React.createClass({
+const Register = React.createClass({
 
     mixins: [
         History
@@ -60,13 +60,13 @@ const Login = React.createClass({
 
         return (
             <Card style={styles.card}>
-                <h1 style={styles.h1}>LOGIN</h1>
+                <h1 style={styles.h1}>REGISTER</h1>
                 <div style={styles.formset}>
-                   <Accounts.ui.LoginFormSet redirect={this._handleRedirect} login={true}/>
+                    <Accounts.ui.LoginFormSet redirect={this._handleRedirect} register={true}/>
                 </div>
             </Card>
         );
     }
 });
 
-export default Login;
+export default Register;

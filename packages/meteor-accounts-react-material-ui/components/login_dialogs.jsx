@@ -63,7 +63,6 @@ Accounts.ui.Dialogs = React.createClass({
 
     if (message){
       this.setState({message});
-      this.refs.snackbar.show();
     }
   },
 
@@ -76,7 +75,7 @@ Accounts.ui.Dialogs = React.createClass({
   },
 
   updateDisabled() {
-    if (this.refs.dialog.isOpen()){
+    if (this.state.dialogOpen){
       this.setState({updateDisabled: this.refs.newPassword.getValue() === ''});
     }
   },
@@ -84,20 +83,21 @@ Accounts.ui.Dialogs = React.createClass({
   render(){
 
     const actions = [
-      {
-        text: t9n('cancel'),
-        onTouchTap: this.cancel
-      },
-      {
-        text: t9n('changePassword'),
-        onTouchTap: this.resetPassword,
-        disabled: this.state.updateDisabled
-      }
+      <MUI.FlatButton
+        label={t9n('cancel')}
+        onTouchTap={this.cancel}
+      />,
+      <MUI.FlatButton
+        label={t9n('changePassword')}
+        secondary={true}
+        onTouchTap={this.resetPassword}
+        disabled={this.state.updateDisabled}
+      />
     ];
+
 
     return(<div className="accounts-ui__dialogs">
       <MUI.Dialog
-        ref="dialog"
         title={t9n('changePassword')}
         actions={actions}
         autoDetectWindowHeight={true}
@@ -108,17 +108,11 @@ Accounts.ui.Dialogs = React.createClass({
               key="newPassword"
               ref="newPassword"
               type="password"
-              hintText={t9n('Enter password')}
               floatingLabelText={t9n('newPassword')}
+              errorText={this.state.message}
               onChange={this.updateDisabled}/>
           </div>
       </MUI.Dialog>
-
-      <MUI.Snackbar
-        key="snackbar"
-        ref="snackbar"
-        message={this.state.message}
-        autoHideDuration={2000}/>
     </div>);
   }
 });

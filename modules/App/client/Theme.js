@@ -6,8 +6,8 @@ export default {
     zIndex: zIndex,
     fontFamily: 'Roboto, sans-serif',
     palette: {
-        //#512da8
-        primary1Color: Colors.deepPurple700,
+        // #7e57c2
+        primary1Color: Colors.deepPurple400,
         primary2Color: Colors.deepPurple900,
         primary3Color: Colors.yellow50,
         accent1Color: Colors.yellow500,
