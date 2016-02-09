@@ -1,6 +1,7 @@
 /* global React, mui */
 
 import FullWidthSection from './FullWidthSection';
+import Theme from '../theme';
 
 // Import components from Material-UI
 const { Mixins, Styles } = mui;
@@ -38,6 +39,8 @@ const Home = React.createClass({
     // Needed to clear the interval after the component unmounts
     intervalId: null,
 
+    intervalTimeMS: 2000,
+
     /**
      * Returns the initial state of this component.
      * @returns {{heroTextIndex: number}}
@@ -59,7 +62,7 @@ const Home = React.createClass({
             this.setState({
                 heroTextIndex: (nextIndex >= this.heroTextSelection.length ? 0 : nextIndex)
             });
-        }.bind(this), 1000);
+        }.bind(this), this.intervalTimeMS);
     },
 
     /** @inheritdoc */
@@ -76,8 +79,9 @@ const Home = React.createClass({
     _getHomePageHero() {
         let styles = {
             root: {
-                backgroundColor: Colors.lightBlue500,
-                overflow: 'hidden'
+                backgroundColor: Theme.palette.primary1Color,
+                overflow: 'hidden',
+                fontFamily: Theme.fontFamily
             },
             svgLogo: {
                 margin: '0 auto',
@@ -88,25 +92,16 @@ const Home = React.createClass({
                 textAlign: 'center',
                 maxWidth: 575
             },
-            label: {
-                color: lightBaseTheme.palette.primary1Color
-            },
-            githubStyle: {
-                margin: '16px 32px 0px 8px'
-            },
-            demoStyle: {
-                margin: '16px 32px 0px 32px'
-            },
             h1: {
-                color: Colors.darkWhite,
+                color: Theme.palette.alternateTextColor,
                 fontWeight: Typography.fontWeightLight,
-                fontSize: 30
+                fontSize: 26
             },
             nowrap: {
                 whiteSpace: 'nowrap'
             },
             taglineWhenLarge: {
-                marginTop: 32
+                marginTop: 16
             },
             h1WhenLarge: {
                 fontSize: 56
@@ -124,10 +119,15 @@ const Home = React.createClass({
             <FullWidthSection style={styles.root}>
                 <img style={styles.svgLogo} src={require('../img/fundo.png')}/>
                 <div style={styles.tagline}>
-                    <h1 style={styles.h1}>Find nearby <span style={{color: "#ff0000"}}>
-                            {this.heroTextSelection[this.state.heroTextIndex]}
-                        </span>
-                    </h1>
+                    <span style={styles.nowrap}>
+                        <h1 style={styles.h1}>
+                            {'is '}
+                            <span style={{color: 'white'}}>
+                                {this.heroTextSelection[this.state.heroTextIndex]}
+                            </span>
+                            {' made easy'}
+                        </h1>
+                    </span>
                 </div>
             </FullWidthSection>
         );
@@ -135,12 +135,8 @@ const Home = React.createClass({
 
     /** @inheritdoc */
     render() {
-        const style = {
-            paddingTop: Spacing.desktopKeylineIncrement
-        };
-
         return (
-            <div style={style}>
+            <div>
                 {this._getHomePageHero()}
             </div>
         );
