@@ -25,6 +25,8 @@ const Layout = React.createClass({
 
     intervalId: null,
 
+    handles: [],
+
     mixins: [
         Mixins.StylePropable,
         History
@@ -53,23 +55,25 @@ const Layout = React.createClass({
     },
 
     componentDidMount() {
+
+        _.each(this.handles, function(handle) {
+            handle.stop();
+        });
+
         this._windowResizeHandler();
         $(window).resize(this._windowResizeHandler);
 
         // Add this here as a guard against SSR since Session doesn't exist in the server.
         if (Meteor.isClient && Session) {
-            Tracker.autorun(function () {
+            this.handles.push(Tracker.autorun(function () {
                 let tabIndex = Session.get('activePath');
                 if (typeof null != tabIndex && tabIndex.toString() !== this.state.tabIndex)
                     this.setState({tabIndex: tabIndex.toString()});
-            }.bind(this));
+            }.bind(this)));
         }
 
-        Tracker.autorun(function () {
-            let currentPathValid = _.indexOf(getPathsForUser(), window.location.pathname) > -1;
-            if (!currentPathValid)
-                return;
-
+        this.handles.push(Tracker.autorun(function () {
+            console.log('autorun!');
             if (userIsValid()) {
                 this.history.pushState(this.state, '/dashboard');
             } else if (!!Meteor.userId()) {
@@ -77,14 +81,21 @@ const Layout = React.createClass({
             } else {
                 this.history.pushState(this.state, '/');
             }
-        }.bind(this));
+            // This assumes that the above paths are always the first tab.
+            this.setState({tabIndex: '0'});
+        }.bind(this)));
+    },
+
+    componentWillUnmount() {
+        _.each(this.handles, function(handle) {
+            handle.stop();
+        });
     },
 
     _windowResizeHandler() {
         let shouldShowLeftNav = $(window).width() <= 768;
         if (shouldShowLeftNav != this.state.showLeftNav)
             this.setState({showLeftNav: shouldShowLeftNav});
-
     },
 
     _onLeftIconButtonTouchTap(event) {
