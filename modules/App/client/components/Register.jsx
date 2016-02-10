@@ -2,6 +2,7 @@
 
 import Theme from '../theme';
 import { History } from 'react-router';
+import { userIsValid } from 'App/helpers';
 
 const { Card } = mui;
 
@@ -19,6 +20,11 @@ const Register = React.createClass({
         document.body.classList.remove('dark-background');
     },
 
+    getInitialState() {
+        return {
+            confirmEmail: Meteor.user() && !userIsValid()
+        }
+    },
 
     _getStyles() {
         return {
@@ -50,14 +56,19 @@ const Register = React.createClass({
     },
 
     _handleRedirect() {
-        this.history.pushState(this.state, '/dashboard');
+        this.setState({confirmEmail: true});
     },
 
     render() {
 
         let styles = this._getStyles();
 
-        return (
+        return this.state.confirmEmail ? (
+            <Card style={styles.card}>
+                <h1 style={styles.h1}>Confirm Email</h1>
+               <h2>An email was sent to {Meteor.user().emails[0].address}</h2>
+            </Card>
+        ) : (
             <Card style={styles.card}>
                 <h1 style={styles.h1}>Register</h1>
                 <div style={styles.formset}>

@@ -8,5 +8,8 @@ export default {
         { title: "Home", path: "/" },
         { title: "Login", path: "/login" },
         { title: "Register", path: "/register" }
+    ],
+    notValid: [
+        { title: "Register", path: "/register" }
     ]
 };

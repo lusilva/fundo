@@ -1,7 +1,10 @@
 import Helmet from 'react-helmet';
 import { History, Link } from 'react-router';
 import Theme from './theme';
-import Paths from './paths';
+
+import { userIsValid, getPathsForUser } from 'App/helpers';
+
+
 const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem} = mui;
 const { ThemeManager, Spacing, Typography } = Styles;
 
@@ -63,10 +66,15 @@ const Layout = React.createClass({
         }
 
         Tracker.autorun(function () {
-            let loggedIn = !!Meteor.userId();
-            if (loggedIn && _.indexOf(Paths.loggedOut, window.location.pathname) > -1) {
+            let currentPathValid = _.indexOf(getPathsForUser(), window.location.pathname) > -1;
+            if (!currentPathValid)
+                return;
+
+            if (userIsValid()) {
                 this.history.pushState(this.state, '/dashboard');
-            } else if (!loggedIn && _.indexOf(Paths.loggedIn, window.location.pathname) > -1) {
+            } else if (!!Meteor.userId()) {
+                this.history.pushState(this.state, '/register');
+            } else {
                 this.history.pushState(this.state, '/');
             }
         }.bind(this));
@@ -96,7 +104,7 @@ const Layout = React.createClass({
     },
 
     _getIcon(styles) {
-        if (!Meteor.userId() && this.state.tabIndex == '0')
+        if (!userIsValid() && this.state.tabIndex == '0')
             return null;
         return (
             <Link to='/' onClick={this._onIconSelect}>
@@ -140,7 +148,7 @@ const Layout = React.createClass({
             }
         };
 
-        let tabs = Meteor.userId() ? Paths.loggedIn : Paths.loggedOut;
+        let tabs = getPathsForUser();
 
         return (
             <div>
@@ -178,7 +186,7 @@ const Layout = React.createClass({
     },
 
     _getAppBar() {
-        let paths = Meteor.userId() ? Paths.loggedIn : Paths.loggedOut;
+        let paths = getPathsForUser();
         return (
             <div>
                 <AppBar title={this.state.appBarTitle}

@@ -1,5 +1,5 @@
 import { Route, IndexRoute } from 'react-router';
-import Paths from './paths';
+import { userIsValid, getPathsForUser } from '../helpers';
 
 import Layout from './Layout';
 import Home from './components/Home';
@@ -9,42 +9,55 @@ import Dashboard from './components/Dashboard';
 
 export default (
     <Route path="/" component={Layout}>
-        <IndexRoute component={Home} onEnter={validate}/>
-        <Route path="/login" component={Login} onEnter={validate}/>
-        <Route path="/register" component={Register} onEnter={validate}/>
-        <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
+        <IndexRoute component={Home} onEnter={ensureUserNotLoggedIn}/>
+        <Route path="/login" component={Login} onEnter={ensureUserNotLoggedIn}/>
+        <Route path="/register" component={Register} onEnter={ensureUserNotValid}/>
+        <Route path="/dashboard" component={Dashboard} onEnter={ensureUserValid}/>
     </Route>
 );
 
 
-function validate(nextState, transition) {
-    let isLoggedIn = !!Meteor.userId();
-    if (isLoggedIn) {
-        transition(null, '/dashboard');
-        return;
-    }
+function ensureUserNotLoggedIn(nextState, transition) {
 
-    let paths =  Paths.loggedOut;
+    let redirectURL = userIsValid() ? '/dashboard' : '/register';
 
-    if (Meteor.isClient && Session)
-        _.forEach(paths, function (value, index) {
-            if (value.path == nextState.location.pathname) {
-                Session.set('activePath', index)
-            }
-        });
+    validationHelper(
+        nextState,
+        transition,
+        redirectURL,
+        !!Meteor.userId());
 }
 
-function validateUser(nextState, transition) {
-    let isLoggedIn = !!Meteor.userId();
-    if (!isLoggedIn) {
-        transition(null, '/');
+function ensureUserNotValid(nextState, transition) {
+
+    let userValid = userIsValid();
+    validationHelper(
+        nextState,
+        transition,
+        '/dashboard',
+        userValid);
+}
+
+
+function ensureUserValid(nextState, transition) {
+
+    let userNotValid = !userIsValid();
+
+    validationHelper(
+        nextState,
+        transition,
+        '/',
+        userNotValid);
+}
+
+
+function validationHelper(nextState, transitionFunc, transitionURL, criteria) {
+    if (criteria) {
+        transitionFunc(null, transitionURL);
         return;
     }
-
-    let paths =  Paths.loggedIn;
-
     if (Meteor.isClient && Session)
-        _.forEach(paths, function (value, index) {
+        _.forEach(getPathsForUser(), function (value, index) {
             if (value.path == nextState.location.pathname) {
                 Session.set('activePath', index)
             }
