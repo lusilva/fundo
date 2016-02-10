@@ -1,9 +1,13 @@
 import 'App/methods';
+import 'App/logger';
 import 'App/server/publications';
 
 Accounts.config({
     sendVerificationEmail: true
 });
+
+if (Meteor.settings.debugEnabled)
+    Winston.level = 'debug';
 
 // Do server-rendering only in proudction mode
 if (process.env.NODE_ENV === 'production') {

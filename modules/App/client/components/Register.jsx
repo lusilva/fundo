@@ -3,6 +3,7 @@
 import Theme from '../theme';
 import { History } from 'react-router';
 import { userIsValid } from 'App/helpers';
+import { ProgressButton } from './ProgressButton';
 
 const { Card } = mui;
 
@@ -22,7 +23,9 @@ const Register = React.createClass({
 
     getInitialState() {
         return {
-            confirmEmail: Meteor.user() && !userIsValid()
+            confirmEmail: Meteor.user() && !userIsValid(),
+            resendButtonState: '',
+            resendButtonLabel: 'Send Again'
         }
     },
 
@@ -59,14 +62,29 @@ const Register = React.createClass({
         this.setState({confirmEmail: true});
     },
 
+    _handleResendClick() {
+        this.setState({resendButtonState: 'loading'});
+
+        Meteor.call('resendEmailVerification', function(error) {
+            this.setState({resendButtonState: 'disabled', resendButtonLabel: 'Email Sent!'});
+        }.bind(this));
+    },
+
     render() {
 
         let styles = this._getStyles();
 
         return this.state.confirmEmail ? (
             <Card style={styles.card}>
-                <h1 style={styles.h1}>Confirm Email</h1>
-               <h2>An email was sent to {Meteor.user().emails[0].address}</h2>
+                <h1 style={styles.h1}>Confirm Email</h1> <br/>
+                <div style={{padding: '50px 20px'}}>
+                    <h2>An email was sent to {Meteor.user().emails[0].address}</h2>
+                    <h2>please confirm your account</h2> <br/>
+                    <ProgressButton
+                        label={this.state.resendButtonLabel}
+                        onClick={this._handleResendClick}
+                        state={this.state.resendButtonState} />
+                </div>
             </Card>
         ) : (
             <Card style={styles.card}>

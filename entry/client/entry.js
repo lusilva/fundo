@@ -1,6 +1,5 @@
 // Methods for optimistic updates
 import 'App/methods';
-
 import './routes';
 
 // To activate the unit tests:

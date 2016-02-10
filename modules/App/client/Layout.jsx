@@ -3,6 +3,7 @@ import { History, Link } from 'react-router';
 import Theme from './theme';
 
 import { userIsValid, getPathsForUser } from 'App/helpers';
+import Logger from 'App/logger';
 
 
 const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem} = mui;
@@ -73,7 +74,6 @@ const Layout = React.createClass({
         }
 
         this.handles.push(Tracker.autorun(function () {
-            console.log('autorun!');
             if (userIsValid()) {
                 this.history.pushState(this.state, '/dashboard');
             } else if (!!Meteor.userId()) {
@@ -84,12 +84,16 @@ const Layout = React.createClass({
             // This assumes that the above paths are always the first tab.
             this.setState({tabIndex: '0'});
         }.bind(this)));
+
+        Logger.debug('Layout component mounted!');
     },
 
     componentWillUnmount() {
         _.each(this.handles, function(handle) {
             handle.stop();
         });
+
+        Logger.debug('Layout component unmounted!');
     },
 
     _windowResizeHandler() {
