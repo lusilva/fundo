@@ -21,6 +21,7 @@ export default {
         canvasColor: Colors.yellow50,
         borderColor: Colors.deepPurple300,
         disabledColor: Utils.ColorManipulator.fade(Colors.deepPurple700, 0.6),
-        pickerHeaderColor: Colors.cyan500
+        pickerHeaderColor: Colors.cyan500,
+        footerColor: Colors.grey700
     }
 };

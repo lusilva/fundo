@@ -1,7 +1,7 @@
 import Helmet from 'react-helmet';
 import { History, Link } from 'react-router';
 import Theme from './theme';
-
+import FullWidthSection from './components/FullWidthSection';
 import { userIsValid, getPathsForUser } from 'App/helpers';
 import Logger from 'App/logger';
 
@@ -227,6 +227,40 @@ const Layout = React.createClass({
         );
     },
 
+    _getFooter() {
+
+        if (this.history.isActive('/login') || this.history.isActive('/register'))
+            return;
+
+        const styles = {
+            footer: {
+                backgroundColor: Theme.palette.footerColor,
+                textAlign: 'center'
+            },
+            a: {
+                color: Theme.palette.accent1Color
+            },
+            p: {
+                margin: '0 auto',
+                padding: 0,
+                color: Theme.palette.alternateTextColor,
+                maxWidth: 335
+            }
+        };
+
+        return (
+            <FullWidthSection style={styles.footer}>
+                <p style={this.prepareStyles(styles.p)}>
+                    {'Made with love by students in '}
+                    <a style={styles.a} href="http://rcos.io">
+                        RCOS.
+                    </a>
+                </p>
+            </FullWidthSection>
+        );
+
+    },
+
     render() {
         const style = {
             paddingTop: this.state.showLeftNav ? '0' : Spacing.desktopKeylineIncrement
@@ -234,7 +268,7 @@ const Layout = React.createClass({
 
         let tabs = getPathsForUser();
         let activeTab = 0;
-        _.forEach(tabs, function(o, index) {
+        _.forEach(tabs, function (o, index) {
             if (this.history.isActive(o.path))
                 activeTab = index;
         }.bind(this));
@@ -258,6 +292,7 @@ const Layout = React.createClass({
                 <div style={style}>
                     {this.props.children}
                 </div>
+                {this._getFooter()}
             </AppCanvas>
         );
     }
