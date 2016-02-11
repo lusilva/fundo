@@ -1,21 +1,28 @@
 import 'App/methods';
 import 'App/logger';
 import 'App/server/publications';
-
-Accounts.config({
-    sendVerificationEmail: true
-});
+import 'App/server/fixtures';
 
 if (Meteor.settings.debugEnabled)
     Winston.level = 'debug';
 
-// Do server-rendering only in proudction mode
+// Do server-rendering only in production mode
 if (process.env.NODE_ENV === 'production') {
     // Load Webpack infos for SSR
     ReactRouterSSR.LoadWebpackStats(WebpackStats);
 
+    Accounts.config({
+        sendVerificationEmail: true,
+        forbidClientAccountCreation: true
+    });
+
     require('../client/routes');
 } else {
+
+    Accounts.config({
+        sendVerificationEmail: true
+    });
+
     // To activate the unit tests:
     // - meteor add sanjo:jasmine
     // - meteor add velocity:html-reporter

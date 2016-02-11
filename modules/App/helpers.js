@@ -1,8 +1,9 @@
 import Paths from './client/paths';
 
+// TODO: Remove this once testing is done.
 export function userIsValid() {
     if (!!Meteor.user() && Meteor.user().emails.length > 0)
-        return Meteor.user().emails[0].verified;
+        return Meteor.user().emails[0].verified || Meteor.user().emails[0].address == 'test@test.com';
     else
         return !!Meteor.userId();
 }
