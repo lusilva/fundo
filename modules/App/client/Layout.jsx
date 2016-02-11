@@ -43,21 +43,14 @@ const Layout = React.createClass({
     },
 
     getInitialState() {
-        let tabIndex = null;
-        if (Meteor.isClient && Session)
-            tabIndex = Session.get('activePath');
-
-
         return {
             showLeftNav: true,
-            tabIndex: tabIndex,
             appBarTitle: null,
             open: false
         }
     },
 
     componentDidMount() {
-
         _.each(this.handles, function (handle) {
             handle.stop();
         });
@@ -65,14 +58,6 @@ const Layout = React.createClass({
         this._windowResizeHandler();
         $(window).resize(this._windowResizeHandler);
 
-        // Add this here as a guard against SSR since Session doesn't exist in the server.
-        if (Meteor.isClient && Session) {
-            this.handles.push(Tracker.autorun(function () {
-                let tabIndex = Session.get('activePath');
-                if (typeof tabIndex == 'number' && tabIndex.toString() !== this.state.tabIndex)
-                    this.setState({tabIndex: tabIndex.toString()});
-            }.bind(this)));
-        }
 
         this.handles.push(Tracker.autorun(function () {
             if (userIsValid()) {
@@ -82,8 +67,6 @@ const Layout = React.createClass({
             } else {
                 this.history.pushState(this.state, '/');
             }
-            // This assumes that the above paths are always the first tab.
-            this.setState({tabIndex: '0'});
         }.bind(this)));
 
         Logger.debug('Layout component mounted!');
@@ -112,18 +95,13 @@ const Layout = React.createClass({
 
     _onTabChange(value, e, tab) {
         this.history.pushState(this.state, tab.props.path);
-        this.setState({tabIndex: value});
-    },
-
-    _onIconSelect() {
-        this.setState({tabIndex: '0'});
     },
 
     _getIcon(styles) {
-        if (!userIsValid() && this.state.tabIndex == '0')
+        if (!userIsValid() || this.history.isActive('/'))
             return null;
         return (
-            <Link to='/' onClick={this._onIconSelect}>
+            <Link to='/'>
                 <span style={this.prepareStyles(styles.span)}>
                     <img src={require('./img/fundo-xsmall.png')}/>
                 </span>
@@ -146,7 +124,7 @@ const Layout = React.createClass({
             </IconMenu>)
     },
 
-    _getTabs() {
+    _getTabs(tabs, activeTab) {
         let styles = {
             root: {
                 position: 'fixed',
@@ -179,8 +157,6 @@ const Layout = React.createClass({
             }
         };
 
-        let tabs = getPathsForUser();
-
         return (
             <div>
                 <Paper
@@ -193,7 +169,7 @@ const Layout = React.createClass({
                     <div style={this.prepareStyles(styles.container)}>
                         <Tabs
                             style={styles.tabs}
-                            value={this.state.tabIndex}
+                            value={activeTab.toString()}
                             onChange={this._onTabChange}>
                             {_.map(tabs, function (item, index) {
                                 return (
@@ -214,11 +190,10 @@ const Layout = React.createClass({
 
     _onMenuItemClick(value, index) {
         this.history.pushState(this.state, value.path);
-        this.setState({tabIndex: index.toString(), open: false});
+        this.setState({open: false});
     },
 
-    _getAppBar() {
-        let paths = getPathsForUser();
+    _getAppBar(paths, activePath) {
         return (
             <div>
                 <AppBar title={this.state.appBarTitle}
@@ -236,7 +211,7 @@ const Layout = React.createClass({
                         <img src={require('./img/fundo-xsmall.png')} style={{padding: '5px'}}/>
                     </Paper>
                     {_.map(paths, function (value, index) {
-                        let color = this.state.tabIndex == index ?
+                        let color = activePath == index ?
                             Theme.palette.alternateTextColor :
                             Theme.palette.canvasColor;
                         return (
@@ -257,6 +232,13 @@ const Layout = React.createClass({
             paddingTop: this.state.showLeftNav ? '0' : Spacing.desktopKeylineIncrement
         };
 
+        let tabs = getPathsForUser();
+        let activeTab = 0;
+        _.forEach(tabs, function(o, index) {
+            if (this.history.isActive(o.path))
+                activeTab = index;
+        }.bind(this));
+
         return (
             <AppCanvas>
                 <Helmet
@@ -271,7 +253,7 @@ const Layout = React.createClass({
                         {"rel": "stylesheet", "href": "https://fonts.googleapis.com/css?family=Roboto:400,300,500"}
                     ]}
                 />
-                {this.state.showLeftNav ? this._getAppBar() : this._getTabs()}
+                {this.state.showLeftNav ? this._getAppBar(tabs, activeTab) : this._getTabs(tabs, activeTab)}
                 <Accounts.ui.Dialogs />
                 <div style={style}>
                     {this.props.children}

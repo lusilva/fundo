@@ -59,12 +59,5 @@ function validationHelper(nextState, transitionFunc, transitionURL, criteria) {
     if (criteria && transitionURL !== nextState.location.pathname) {
         Logger.debug('Redirecting to %s', transitionURL);
         transitionFunc(null, transitionURL);
-        return;
     }
-    if (Meteor.isClient && Session)
-        _.forEach(getPathsForUser(), function (value, index) {
-            if (value.path == nextState.location.pathname) {
-                Session.set('activePath', index)
-            }
-        });
 }

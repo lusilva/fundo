@@ -12,11 +12,11 @@ export default {
         // #5c6bc0
         primary1Color: Colors.indigo400,
         primary2Color: Colors.deepPurple400,
-        primary3Color: Colors.indigo900,
+        primary3Color: Colors.yellow50,
         accent1Color: Colors.yellow500,
         accent2Color: Colors.indigo600,
         accent3Color: Colors.grey500,
-        textColor: Colors.indigo900,
+        textColor: Colors.indigo600,
         alternateTextColor: Colors.yellow500,
         canvasColor: Colors.yellow50,
         borderColor: Colors.deepPurple300,

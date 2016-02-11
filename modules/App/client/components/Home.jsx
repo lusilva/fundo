@@ -2,10 +2,10 @@
 
 import FullWidthSection from './FullWidthSection';
 import Theme from '../theme';
-import { History } from 'react-router';
+import { History, Link } from 'react-router';
 
 // Import components from Material-UI
-const { Mixins, Styles } = mui;
+const { Mixins, Styles, RaisedButton } = mui;
 const { StylePropable, StyleResizable } = Mixins;
 const { Typography } = Styles;
 
@@ -108,6 +108,9 @@ const Home = React.createClass({
             },
             h1WhenLarge: {
                 fontSize: 56
+            },
+            registerStyle: {
+                margin: '16px 32px 0px 32px'
             }
         };
 
@@ -131,7 +134,44 @@ const Home = React.createClass({
                             {' made easy'}
                         </h1>
                     </span>
+                    <Link to="/register">
+                        <RaisedButton label="Get Started"
+                                      linkButton={true}
+                                      style={styles.registerStyle}/>
+                    </Link>
                 </div>
+            </FullWidthSection>
+
+        );
+    },
+
+    _getHomePagePurpose() {
+        const styles = {
+            root: {
+                backgroundColor: Theme.palette.primary3Color
+            },
+            content: {
+                maxWidth: 700,
+                padding: 0,
+                margin: '0 auto',
+                fontWeight: Typography.fontWeightLight,
+                fontSize: 20,
+                lineHeight: '28px',
+                paddingTop: 19,
+                marginBottom: 13,
+                letterSpacing: 0,
+                color: Theme.palette.textColor
+            }
+        };
+
+        return (
+            <FullWidthSection
+                style={styles.root}
+                useContent={true}
+                contentStyle={styles.content}
+                contentType="p">
+                Welcome to the ultimate event discovery tool. Our smart recommendation algorithms
+                work hard to find events near you that you'll love. We do the thinking so you can focus on the doing.
             </FullWidthSection>
         );
     },
@@ -141,6 +181,7 @@ const Home = React.createClass({
         return (
             <div>
                 {this._getHomePageHero()}
+                {this._getHomePagePurpose()}
             </div>
         );
     }
