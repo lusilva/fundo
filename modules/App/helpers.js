@@ -1,11 +1,14 @@
 import Paths from './client/paths';
 
 export function userIsValid() {
-    return !!Meteor.userId() && Meteor.user().emails[0].verified
+    if (!!Meteor.user() && Meteor.user().emails.length > 0)
+        return Meteor.user().emails[0].verified;
+    else
+        return !!Meteor.userId();
 }
 
 export function getPathsForUser() {
-    if (userIsValid()) {
+    if (!!Meteor.user() && Meteor.user().emails.length > 0 && Meteor.user().emails[0].verified) {
         return Paths.loggedIn;
     } else if (!!Meteor.userId()) {
         return Paths.notValid;

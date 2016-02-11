@@ -6,7 +6,8 @@ import { userIsValid, getPathsForUser } from 'App/helpers';
 import Logger from 'App/logger';
 
 
-const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem} = mui;
+const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem, IconMenu, IconButton, SvgIcons } = mui;
+const { NavigationMoreVert } = SvgIcons;
 const { ThemeManager, Spacing, Typography } = Styles;
 
 /**
@@ -57,7 +58,7 @@ const Layout = React.createClass({
 
     componentDidMount() {
 
-        _.each(this.handles, function(handle) {
+        _.each(this.handles, function (handle) {
             handle.stop();
         });
 
@@ -68,7 +69,7 @@ const Layout = React.createClass({
         if (Meteor.isClient && Session) {
             this.handles.push(Tracker.autorun(function () {
                 let tabIndex = Session.get('activePath');
-                if (typeof null != tabIndex && tabIndex.toString() !== this.state.tabIndex)
+                if (typeof tabIndex == 'number' && tabIndex.toString() !== this.state.tabIndex)
                     this.setState({tabIndex: tabIndex.toString()});
             }.bind(this)));
         }
@@ -89,7 +90,7 @@ const Layout = React.createClass({
     },
 
     componentWillUnmount() {
-        _.each(this.handles, function(handle) {
+        _.each(this.handles, function (handle) {
             handle.stop();
         });
 
@@ -128,6 +129,21 @@ const Layout = React.createClass({
                 </span>
             </Link>
         );
+    },
+
+    _getIconMenu() {
+        if (!userIsValid())
+            return null;
+        return (
+            <IconMenu
+                iconButtonElement={<IconButton><NavigationMoreVert/></IconButton>}
+                iconStyle={{width: 'auto', height: "34px", fill: Theme.palette.accent1Color}}
+                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                style={{float: 'right', top: '5px', right: '10px', position: 'absolute'}}
+            >
+                <MenuItem onTouchTap={Meteor.logout} primaryText="Sign out"/>
+            </IconMenu>)
     },
 
     _getTabs() {
@@ -190,6 +206,7 @@ const Layout = React.createClass({
                             })}
                         </Tabs>
                     </div>
+                    {this._getIconMenu()}
                 </Paper>
             </div>
         );
@@ -205,7 +222,9 @@ const Layout = React.createClass({
         return (
             <div>
                 <AppBar title={this.state.appBarTitle}
-                        onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}/>
+                        onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}
+                        iconElementRight={this._getIconMenu()}
+                />
                 <LeftNav docked={false} width={250} open={this.state.open}
                          style={{backgroundColor: Theme.palette.primary1Color,
                                 color: Theme.palette.alternateTextColor}}
@@ -214,7 +233,7 @@ const Layout = React.createClass({
                            style={{backgroundColor: Theme.palette.primary3Color,
                                 color: Theme.palette.alternateTextColor,
                                 height: '64px', textAlign: 'center'}}>
-                            <img src={require('./img/fundo-xsmall.png')} style={{padding: '5px'}}/>
+                        <img src={require('./img/fundo-xsmall.png')} style={{padding: '5px'}}/>
                     </Paper>
                     {_.map(paths, function (value, index) {
                         let color = this.state.tabIndex == index ?
