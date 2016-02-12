@@ -74,6 +74,15 @@ const Register = React.createClass({
         this.setState({confirmEmail: true});
     },
 
+    _handleCancelRegistration() {
+        Meteor.logout(function(err) {
+            if (err)
+                console.log(err);
+            else
+                this.history.pushState(this.state, '/login');
+        }.bind(this));
+    },
+
     _handleResendClick() {
         this.setState({resendButtonState: 'loading'});
 
@@ -98,6 +107,7 @@ const Register = React.createClass({
                         state={this.state.resendButtonState} /> <br/>
                     <FlatButton
                         label="Cancel Registration"
+                        onTouchTap={this._handleCancelRegistration}
                         secondary={true}
                     />
                 </div>
