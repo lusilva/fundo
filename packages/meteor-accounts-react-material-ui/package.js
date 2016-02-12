@@ -11,9 +11,7 @@ Npm.depends({
   'material-ui': '0.13.4'
 });
 
-DEFAULT_LANGUAGES = ['ar', 'zh_cn', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es',
-  'es_ES', 'fa', 'fr', 'he', 'hr', 'hu', 'id', 'it', 'ja', 'kh', 'ko', 'pl', 'pt', 'pt_PT', 'ro',
-  'ru', 'sk', 'sl', 'sv', 'tr', 'uk', 'vi', 'no_NB', 'nl', 'zh_tw', 'zh_hk'];
+DEFAULT_LANGUAGES = ['en'];
 
 LANGUAGES = DEFAULT_LANGUAGES;
 if(process.env.T9N_LANGUAGES) {

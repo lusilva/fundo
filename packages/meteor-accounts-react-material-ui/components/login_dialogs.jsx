@@ -84,10 +84,12 @@ Accounts.ui.Dialogs = React.createClass({
 
     const actions = [
       <MUI.FlatButton
+        key={'dialogCancel'}
         label={t9n('cancel')}
         onTouchTap={this.cancel}
       />,
       <MUI.FlatButton
+        key={'dialogChangePassword'}
         label={t9n('changePassword')}
         secondary={true}
         onTouchTap={this.resetPassword}

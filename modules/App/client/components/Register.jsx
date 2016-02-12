@@ -5,7 +5,7 @@ import { History } from 'react-router';
 import { userIsValid } from 'App/helpers';
 import { ProgressButton } from './ProgressButton';
 
-const { Card } = mui;
+const { Card, FlatButton } = mui;
 
 const Register = React.createClass({
 
@@ -13,17 +13,29 @@ const Register = React.createClass({
         History
     ],
 
+    handlers: [],
+
     componentDidMount() {
         document.body.classList.add('dark-background');
+
+        this.handlers.push(Tracker.autorun(function() {
+            if (Meteor.userId() && !userIsValid())
+                this.setState({confirmEmail: true});
+        }.bind(this)));
+
     },
 
     componentWillUnmount() {
+        this.handlers.forEach(function(handler) {
+            handler.stop();
+        });
+
         document.body.classList.remove('dark-background');
     },
 
     getInitialState() {
         return {
-            confirmEmail: Meteor.user() && !userIsValid(),
+            confirmEmail: false,
             resendButtonState: '',
             resendButtonLabel: 'Send Again'
         }
@@ -82,8 +94,12 @@ const Register = React.createClass({
                     <h2>please confirm your account</h2> <br/>
                     <ProgressButton
                         label={this.state.resendButtonLabel}
-                        onClick={this._handleResendClick}
-                        state={this.state.resendButtonState} />
+                        onTouchTap={this._handleResendClick}
+                        state={this.state.resendButtonState} /> <br/>
+                    <FlatButton
+                        label="Cancel Registration"
+                        secondary={true}
+                    />
                 </div>
             </Card>
         ) : (

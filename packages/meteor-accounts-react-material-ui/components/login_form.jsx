@@ -341,17 +341,17 @@ Accounts.ui._loginForm = React.createClass({
       options.password = password;
     }
 
-    this.setState({waiting: true});
+    //this.setState({waiting: true});
 
     Accounts.createUser(options, (error)=> {
       if (error) {
         this.showMessage(t9n(`error.accounts.${error.reason}`) || t9n("Unknown error"));
       } else {
-        this.setState({formVariant: LOGIN_FORM_STATES.PASSWORD_CHANGE});
+        //this.setState({formVariant: LOGIN_FORM_STATES.PASSWORD_CHANGE});
         loginResultCallback(this.props.redirect);
       }
 
-      this.setState({waiting: false});
+      //this.setState({waiting: false});
     });
   },
 
@@ -553,28 +553,30 @@ Accounts.ui._loginForm = React.createClass({
             status={this.state.waiting ? 'loading' : 'hide'}/>
         </div>
       );
+    } else {
+      return null;
     }
 
 
-    return (
-      <div className="accounts-ui__form">
-        {this.fields()}
-        <div className="accounts-ui__form-buttons">
-          {signOutButton}
-          {signUpSwitch}
-          {signInSwitch}
-          {passwordResetSwitch}
-          {signUpButton}
-          {signInButton}
-          {passwordResetButton}
-          {passwordChangeButton}
-        </div>
-
-        <MUI.RefreshIndicator
-          size={40}
-          left={this.loaderPosition()}
-          top={120}
-          status={this.state.waiting ? 'loading' : 'hide'}/>
-      </div>);
+    //return (
+    //  <div className="accounts-ui__form">
+    //    {this.fields()}
+    //    <div className="accounts-ui__form-buttons">
+    //      {signOutButton}
+    //      {signUpSwitch}
+    //      {signInSwitch}
+    //      {passwordResetSwitch}
+    //      {signUpButton}
+    //      {signInButton}
+    //      {passwordResetButton}
+    //      {passwordChangeButton}
+    //    </div>
+    //
+    //    <MUI.RefreshIndicator
+    //      size={40}
+    //      left={this.loaderPosition()}
+    //      top={120}
+    //      status={this.state.waiting ? 'loading' : 'hide'}/>
+    //  </div>);
   }
 });

@@ -2,13 +2,14 @@ import Helmet from 'react-helmet';
 import { History, Link } from 'react-router';
 import Theme from './theme';
 import FullWidthSection from './components/FullWidthSection';
-import { userIsValid, getPathsForUser } from 'App/helpers';
+import { userIsValid, getPathsForUser, pathIsValidForUser } from 'App/helpers';
 import Logger from 'App/logger';
 
 
 const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem, IconMenu, IconButton, SvgIcons } = mui;
 const { NavigationMoreVert } = SvgIcons;
 const { ThemeManager, Spacing, Typography } = Styles;
+
 
 /**
  * The main Layout for the entire app.
@@ -46,7 +47,8 @@ const Layout = React.createClass({
         return {
             showLeftNav: true,
             appBarTitle: null,
-            open: false
+            open: false,
+            userIsValid: false
         }
     },
 
@@ -58,15 +60,16 @@ const Layout = React.createClass({
         this._windowResizeHandler();
         $(window).resize(this._windowResizeHandler);
 
-
         this.handles.push(Tracker.autorun(function () {
-            if (userIsValid()) {
-                this.history.pushState(this.state, '/dashboard');
-            } else if (!!Meteor.userId()) {
-                this.history.pushState(this.state, '/register');
-            } else {
-                this.history.pushState(this.state, '/');
+            let validPaths = getPathsForUser();
+            for (var i = 0; i < validPaths.length; ++i) {
+                if (this.history.isActive(validPaths[i].path)) {
+                    return;
+                }
             }
+            if (this.state.userIsValid != userIsValid())
+                this.setState({userIsValid: userIsValid()});
+            this.history.pushState(this.state, validPaths[0].path);
         }.bind(this)));
 
         Logger.debug('Layout component mounted!');
@@ -98,7 +101,7 @@ const Layout = React.createClass({
     },
 
     _getIcon(styles) {
-        if (!userIsValid() || this.history.isActive('/'))
+        if (!this.state.userIsValid || this.history.isActive('/'))
             return null;
         return (
             <Link to='/'>
@@ -109,8 +112,19 @@ const Layout = React.createClass({
         );
     },
 
+    _signoutHandler() {
+        Meteor.logout(function(err) {
+            if (err) {
+                Logger.error("error while logging out", err);
+                console.log(err);
+            } else {
+                this.history.pushState(this.state, '/login');
+            }
+        }.bind(this));
+    },
+
     _getIconMenu() {
-        if (!userIsValid())
+        if (!this.state.userIsValid)
             return null;
         return (
             <IconMenu
@@ -120,7 +134,7 @@ const Layout = React.createClass({
                 targetOrigin={{horizontal: 'right', vertical: 'top'}}
                 style={{float: 'right', top: '5px', right: '10px', position: 'absolute'}}
             >
-                <MenuItem onTouchTap={Meteor.logout} primaryText="Sign out"/>
+                <MenuItem onTouchTap={this._signoutHandler} primaryText="Sign out"/>
             </IconMenu>)
     },
 
