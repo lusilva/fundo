@@ -1,24 +1,16 @@
 /* global React, mui */
 
-import FullWidthSection from './FullWidthSection';
-import Theme from '../theme';
 import { History, Link } from 'react-router';
 
-// Import components from Material-UI
-const { Mixins, Styles, RaisedButton } = mui;
-const { StylePropable, StyleResizable } = Mixins;
-const { Typography } = Styles;
 
 /**
  * The Home page React component, responsible for rendering the home page.
- * @class
+ * @className
  * @extends React.Component
  */
 const Home = React.createClass({
 
     mixins: [
-        StylePropable,
-        StyleResizable,
         History
     ],
 
@@ -74,114 +66,78 @@ const Home = React.createClass({
             Meteor.clearInterval(this.intervalId);
     },
 
-    /**
-     * Gets the properly styled hero component for the home page
-     * @returns {XML}
-     * @private
-     */
-    _getHomePageHero() {
-        let styles = {
-            root: {
-                backgroundColor: Theme.palette.primary1Color,
-                overflow: 'hidden',
-                fontFamily: Theme.fontFamily
-            },
-            svgLogo: {
-                margin: '0 auto',
-                display: 'block'
-            },
-            tagline: {
-                margin: '16px auto 0 auto',
-                textAlign: 'center',
-                maxWidth: 575
-            },
-            h1: {
-                color: Theme.palette.alternateTextColor,
-                fontWeight: Typography.fontWeightLight,
-                fontSize: 26
-            },
-            nowrap: {
-                whiteSpace: 'nowrap'
-            },
-            taglineWhenLarge: {
-                marginTop: 16
-            },
-            h1WhenLarge: {
-                fontSize: 56
-            },
-            registerStyle: {
-                margin: '16px 32px 0px 32px'
-            }
-        };
-
-        styles.h2 = this.mergeStyles(styles.h1, styles.h2);
-
-        if (this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-            styles.tagline = this.mergeStyles(styles.tagline, styles.taglineWhenLarge);
-            styles.h1 = this.mergeStyles(styles.h1, styles.h1WhenLarge);
-        }
-
-        return (
-            <FullWidthSection style={styles.root}>
-                <img style={styles.svgLogo} src={require('../img/fundo.png')}/>
-                <div style={styles.tagline}>
-                    <span style={styles.nowrap}>
-                        <h1 style={styles.h1}>
-                            {'is '}
-                            <span style={{color: 'white'}}>
-                                {this.heroTextSelection[this.state.heroTextIndex]}
-                            </span>
-                            {' made easy'}
-                        </h1>
-                    </span>
-                    <Link to="/register">
-                        <RaisedButton label="Get Started"
-                                      linkButton={true}
-                                      style={styles.registerStyle}/>
-                    </Link>
-                </div>
-            </FullWidthSection>
-
-        );
-    },
-
-    _getHomePagePurpose() {
-        const styles = {
-            root: {
-                backgroundColor: Theme.palette.primary3Color
-            },
-            content: {
-                maxWidth: 700,
-                padding: 0,
-                margin: '0 auto',
-                fontWeight: Typography.fontWeightLight,
-                fontSize: 20,
-                lineHeight: '28px',
-                paddingTop: 19,
-                marginBottom: 13,
-                letterSpacing: 0,
-                color: Theme.palette.textColor
-            }
-        };
-
-        return (
-            <FullWidthSection
-                style={styles.root}
-                useContent={true}
-                contentStyle={styles.content}
-                contentType="p">
-                Welcome to the ultimate event discovery tool. Our smart recommendation algorithms
-                work hard to find events near you that you'll love. We do the thinking so you can focus on the doing.
-            </FullWidthSection>
-        );
-    },
-
     /** @inheritdoc */
     render() {
         return (
             <div>
-                {this._getHomePageHero()}
-                {this._getHomePagePurpose()}
+                <div className="ui inverted vertical center aligned segment masthead">
+                    <div className="ui text container middle aligned">
+                        <img src={require("App/client/img/fundo.png")} />
+                        <h2>is {this.heroTextSelection[this.state.heroTextIndex]} made easy</h2>
+                    </div>
+                </div>
+
+                <div className="ui vertical stripe segment">
+                    <div className="ui middle aligned stackable grid container">
+                        <div className="row">
+                            <div className="eight wide column">
+                                <h3 className="ui header">We Help Companies and Companions</h3>
+                                <p>We can give your company superpowers to do things that they never thought
+                                    possible. Let us delight your customers and empower your needs...through pure
+                                    data analytics.</p>
+                                <h3 className="ui header">We Make Bananas That Can Dance</h3>
+                                <p>Yes that's right, you thought it was the stuff of dreams, but even bananas can be
+                                    bioengineered.</p>
+                            </div>
+                            <div className="six wide right floated column">
+                                <img src="assets/images/wireframe/white-image.png"
+                                     className="ui large bordered rounded image"/>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="center aligned column">
+                                <a className="ui huge button">Check Them Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div className="ui vertical stripe quote segment">
+                    <div className="ui equal width stackable internally celled grid">
+                        <div className="center aligned row">
+                            <div className="column">
+                                <h3>"What a Company"</h3>
+                                <p>That is what they all say about us</p>
+                            </div>
+                            <div className="column">
+                                <h3>"I shouldn't have gone with their competitor."</h3>
+                                <p>
+                                    <img src="assets/images/avatar/nan.jpg" className="ui avatar image"/> <b>Nan</b>
+                                    Chief Fun Officer Acme Toys
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="ui vertical stripe segment">
+                    <div className="ui text container">
+                        <h3 className="ui header">Breaking The Grid, Grabs Your Attention</h3>
+                        <p>Instead of focusing on content creation and hard work, we have learned how to master the
+                            art of doing nothing by providing massive amounts of whitespace and generic content that
+                            can seem massive, monolithic and worth your attention.</p>
+                        <a className="ui large button">Read More</a>
+                        <h4 className="ui horizontal header divider">
+                            <a href="#">Case Studies</a>
+                        </h4>
+                        <h3 className="ui header">Did We Tell You About Our Bananas?</h3>
+                        <p>Yes I know you probably disregarded the earlier boasts as non-sequitor filler content,
+                            but its really true. It took years of gene splicing and combinatory DNA research, but
+                            our bananas can really dance.</p>
+                        <a className="ui large button">I'm Still Quite Interested</a>
+                    </div>
+                </div>
             </div>
         );
     }
