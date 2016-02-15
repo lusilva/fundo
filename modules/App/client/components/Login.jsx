@@ -3,6 +3,9 @@
 import { History } from 'react-router';
 
 
+const LoginForm = BlazeToReact('atForm');
+
+
 /**
  * The login view with the login form.
  *
@@ -27,7 +30,7 @@ const Login = React.createClass({
     },
 
     render() {
-        return (<div>Login</div>);
+        return (<div><LoginForm/></div>);
     }
 });
 

@@ -70,8 +70,7 @@ export default class Layout extends React.Component {
     };
 
     _getSidebar() {
-        console.log(this._getLinks('sidebar', 'active', 'item', this._toggleSideMenu.bind(this)));
-        return this._getLinks('sidebar', 'active', 'item', this._toggleSideMenu.bind(this));
+        return this._getLinks('sidebar', 'active', 'item primary-color', this._toggleSideMenu.bind(this));
     };
 
     _getLinks(keyPrefix, activeClassName, className, onClickCallback) {
@@ -98,9 +97,9 @@ export default class Layout extends React.Component {
         }
 
         return (
-            <div className="ui inverted vertical center aligned segment">
-                <div className="ui container">
-                    <div className="ui large secondary inverted pointing menu">
+            <div className="ui inverted vertical center aligned segment primary-color">
+                <div className="ui container primary-color">
+                    <div className="ui large secondary inverted pointing menu primary-color">
                         <div className="toc item" onClick={this._toggleSideMenu.bind(this)}>
                             <i className="sidebar icon"/>
                         </div>
@@ -127,7 +126,7 @@ export default class Layout extends React.Component {
                     }
                 />
 
-                <div className="ui vertical inverted sidebar menu">
+                <div className="ui vertical inverted sidebar menu primary-color">
                     {this._getSidebar()}
                 </div>
 
@@ -135,17 +134,11 @@ export default class Layout extends React.Component {
                     {this._getNavBar()}
                     {this.props.children}
 
-                    <div className="ui inverted vertical footer segment">
+                    <div className="ui inverted vertical footer segment primary primary-color">
                         <div className="ui container">
                             <div className="ui stackable inverted divided equal height stackable grid">
                                 <div className="three wide column">
-                                    <h4 className="ui inverted header">About</h4>
-                                    <div className="ui inverted link list">
-                                        <a href="#" className="item">Sitemap</a>
-                                        <a href="#" className="item">Contact Us</a>
-                                        <a href="#" className="item">Religious Ceremonies</a>
-                                        <a href="#" className="item">Gazebo Plans</a>
-                                    </div>
+                                    <h4 className="ui inverted header">Github Link</h4>
                                 </div>
                                 <div className="three wide column">
                                     <h4 className="ui inverted header">Services</h4>
