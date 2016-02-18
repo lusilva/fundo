@@ -3,7 +3,7 @@
 import { History } from 'react-router';
 
 
-const LoginForm = BlazeToReact('atForm');
+const LoginForm = BlazeToReact('fullPageAtForm');
 
 
 /**
@@ -22,15 +22,21 @@ const Login = React.createClass({
     // Add the dark purple background to the body, and remove it when
     // going to another page.
     componentDidMount() {
-        document.body.classList.add('dark-background');
+        document.body.classList.add('primary-color');
     },
 
     componentWillUnmount() {
-        document.body.classList.remove('dark-background');
+        document.body.classList.remove('primary-color');
     },
 
     render() {
-        return (<div><LoginForm/></div>);
+        return (
+            <div className="ui container">
+                <div className="login-form">
+                    <LoginForm/>
+                </div>
+            </div>
+        );
     }
 });
 

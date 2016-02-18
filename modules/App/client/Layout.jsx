@@ -42,6 +42,7 @@ export default class Layout extends React.Component {
                     return;
                 }
             }
+            console.log('RUN!');
             if (this.state.userIsValid != userIsValid())
                 this.setState({userIsValid: userIsValid()});
             this.history.pushState(this.state, validPaths[0].path);
@@ -51,9 +52,11 @@ export default class Layout extends React.Component {
         var rootNode = ReactDOM.findDOMNode(this);
 
         // Initialize the sidebar
-        $(rootNode).find('.ui.sidebar').sidebar({
-            context: $(rootNode)
-        });
+        $(rootNode).find('.ui.sidebar')
+            .sidebar({
+                context: $(rootNode)
+            })
+            .sidebar('setting', 'transition', 'overlay');
     };
 
     _toggleSideMenu() {

@@ -31,3 +31,4 @@ flemay:less-autoprefixer
 jquery
 semantic:ui
 useraccounts:semantic-ui
+useraccounts:core
