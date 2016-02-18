@@ -72,10 +72,13 @@ const Home = React.createClass({
             <div>
                 <div className="ui inverted vertical center aligned segment masthead primary-color">
                     <div className="ui text container middle aligned">
-                        <img src={require("App/client/img/fundo.png")} />
+                        <div className="ui middle aligned large image">
+                            <img src={require("App/client/img/fundo.png")}/>
+                        </div>
                         <h2>is {this.heroTextSelection[this.state.heroTextIndex]} made easy</h2>
                     </div>
                 </div>
+            </div>
         );
     }
 });
