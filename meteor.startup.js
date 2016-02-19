@@ -55,3 +55,16 @@ AccountsTemplates.configure({
         }
     }
 });
+
+if (Meteor.isClient) {
+    Accounts.onEmailVerificationLink(function (token, done) {
+        console.log('HEY!');
+        Accounts.verifyEmail(token, function (error) {
+            if (!error) {
+                Accounts.loginWithToken(token);
+            }
+            done();
+            // XXX show something if there was an error.
+        });
+    });
+}

@@ -16,6 +16,7 @@ if (Meteor.isClient)
  * @extends React.Component
  */
 @ReactMixin.decorate(History)
+@ReactMixin.decorate(ReactMeteorData)
 export default class Layout extends React.Component {
     static propTypes = {
         children: React.PropTypes.any.isRequired
@@ -23,30 +24,23 @@ export default class Layout extends React.Component {
 
     intervalId = null;
 
-    handles = [];
+    /**
+     * Get the current user of the application, or null if no user is logged in.
+     * This method is reactive and runs every time the user changes.
+     * @returns {{currentUser: any}}
+     */
+    getMeteorData() {
+        if (!!Meteor.user() != !!this.data.currentUser) {
+            let paths = getPathsForUser();
+            this.history.pushState(this.state, paths[0].path);
+        }
 
-    state = {
-        appBarTitle: null,
-        userIsValid: false
+        return {
+            currentUser: Meteor.user()
+        }
     };
 
     componentDidMount() {
-        _.each(this.handles, function (handle) {
-            handle.stop();
-        });
-
-        this.handles.push(Tracker.autorun(function () {
-            let validPaths = getPathsForUser();
-            for (var i = 0; i < validPaths.length; ++i) {
-                if (this.history.isActive(validPaths[i].path)) {
-                    return;
-                }
-            }
-            if (this.state.userIsValid != userIsValid())
-                this.setState({userIsValid: userIsValid()});
-            this.history.pushState(this.state, validPaths[0].path);
-        }.bind(this)));
-
         // Localize the selector instead of having jQuery search globally
         var rootNode = ReactDOM.findDOMNode(this);
 
@@ -62,13 +56,6 @@ export default class Layout extends React.Component {
         // Same thing as before, might want to store this as a variable
         var rootNode = ReactDOM.findDOMNode(this);
         $(rootNode).find('.ui.sidebar').sidebar('toggle');
-    };
-
-
-    componentWillUnmount() {
-        _.each(this.handles, function (handle) {
-            handle.stop();
-        });
     };
 
     _getSidebar() {
@@ -134,27 +121,29 @@ export default class Layout extends React.Component {
 
                 <div className="pusher">
                     {this._getNavBar()}
-                    {this.props.children}
+                    {React.Children.map(this.props.children, (child) => {
+                        return React.cloneElement(child, {currentUser: this.data.currentUser});
+                    })}
 
-                    <div className="ui inverted vertical footer segment primary primary-color">
+                    <div className="ui inverted vertical footer segment primary">
                         <div className="ui container">
                             <div className="ui stackable inverted divided equal height stackable grid">
                                 <div className="three wide column">
-                                    <h4 className="ui inverted header">Github Link</h4>
-                                </div>
-                                <div className="three wide column">
-                                    <h4 className="ui inverted header">Services</h4>
+                                    <h4 className="ui inverted header">Created @ RCOS</h4>
                                     <div className="ui inverted link list">
-                                        <a href="#" className="item">Banana Pre-Order</a>
-                                        <a href="#" className="item">DNA FAQ</a>
-                                        <a href="#" className="item">How To Access</a>
-                                        <a href="#" className="item">Favorite X-Men</a>
+                                        <a href="https://rcos.io" className="item">RCOS Website</a>
+                                        <a href="https://github.com/lusilva/fundo" className="item">Source</a>
                                     </div>
+
                                 </div>
                                 <div className="seven wide column">
-                                    <h4 className="ui inverted header">Footer Header</h4>
-                                    <p>Extra space for a call to action inside the footer that could help re-engage
-                                        users.</p>
+                                    <h4 className="ui inverted header">Who We Are</h4>
+                                    <p>fundo was developed with love by students at Rensselaer Polytechnic Institute.
+                                        Interface graphic by <a href="http://www.freepik.com/">Freepik</a> from <a
+                                            href="http://www.flaticon.com/">Flaticon</a> is licensed under <a
+                                            href="http://creativecommons.org/licenses/by/3.0/"
+                                            title="Creative Commons BY 3.0">CC BY 3.0</a>. Made with <a
+                                            href="http://logomakr.com" title="Logo Maker">Logo Maker</a>.</p>
                                 </div>
                             </div>
                         </div>

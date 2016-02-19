@@ -1,6 +1,6 @@
 /* global React */
 
-import { userIsValid } from 'App/helpers';
+import { isUserVerified } from 'App/helpers';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -9,15 +9,8 @@ import { userIsValid } from 'App/helpers';
  * @extends React.Component
  */
 const Dashboard = React.createClass({
-
-    getInitialState() {
-        return {
-            userIsValid: userIsValid()
-        }
-    },
-
     render() {
-        if (this.state.userIsValid) {
+        if (isUserVerified(this.props.currentUser)) {
             return (
                 <div>
                     dashboard
@@ -25,7 +18,9 @@ const Dashboard = React.createClass({
             );
         } else {
             return (
-                <div>Please verify your email</div>
+                <div>
+                    Please verify your email
+                </div>
             )
         }
     }
