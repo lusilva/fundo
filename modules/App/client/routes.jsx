@@ -12,6 +12,7 @@ export default (
         <Route path="/" component={Home} onEnter={validateUser}/>
         <Route path="/login" component={Login} onEnter={validateUser}/>
         <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
+        <Route path="/logout" onEnter={logoutUser}/>
     </Route>
 );
 
@@ -21,4 +22,12 @@ function validateUser(nextState, transitionFunc) {
         Logger.debug('Redirecting to %s', transitionURL, nextState);
         transitionFunc(null, transitionURL);
     }
+}
+
+function logoutUser(nextState, transitionFunc) {
+    Meteor.logout(function(err) {
+        if (!err) {
+            transitionFunc(null, '/login');
+        }
+    });
 }

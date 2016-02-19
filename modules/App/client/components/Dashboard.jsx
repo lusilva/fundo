@@ -8,22 +8,36 @@ import { isUserVerified } from 'App/helpers';
  * @class
  * @extends React.Component
  */
-const Dashboard = React.createClass({
-    render() {
-        if (isUserVerified(this.props.currentUser)) {
-            return (
-                <div>
-                    dashboard
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    Please verify your email
-                </div>
-            )
-        }
-    }
-});
+export default class Dashboard extends React.Component {
 
-export default Dashboard;
+    _toggleFilterMenu() {
+        console.log('hey!');
+    };
+
+
+    /** @inheritDoc */
+    render() {
+
+        let mastheadContent = isUserVerified(this.props.currentUser) ?
+            (<div>CONTENT PLACEHOLDER</div>) :
+            (<div>VERIFY EMAIL PLACEHOLDER</div>);
+
+        return (
+            <div>
+                <div className="ui inverted vertical center aligned segment dashboard-masthead primary-color">
+                    <div className="ui text container middle aligned">
+                        {mastheadContent}
+                    </div>
+                </div>
+                <div className="main-content">
+                    <div className="ui labeled icon menu">
+                        <a className="item" onClick={this._toggleFilterMenu.bind(this)}>
+                            <i className="options icon" />
+                            Filter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}

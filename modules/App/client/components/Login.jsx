@@ -1,5 +1,6 @@
 /* global mui, React */
 
+import ReactMixin from 'react-mixin';
 import { History } from 'react-router';
 
 
@@ -12,22 +13,18 @@ const LoginForm = BlazeToReact('fullPageAtForm');
  * @class
  * @extends React.Component
  */
-const Login = React.createClass({
-
-    // Allows for navigating to the dashboard upon form submission.
-    mixins: [
-        History
-    ],
+@ReactMixin.decorate(History)
+export default class Login extends React.Component {
 
     // Add the dark purple background to the body, and remove it when
     // going to another page.
     componentDidMount() {
         document.body.classList.add('primary-color');
-    },
+    };
 
     componentWillUnmount() {
         document.body.classList.remove('primary-color');
-    },
+    };
 
     render() {
         return (
@@ -38,6 +35,4 @@ const Login = React.createClass({
             </div>
         );
     }
-});
-
-export default Login;
+}

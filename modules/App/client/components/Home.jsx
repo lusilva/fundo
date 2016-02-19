@@ -1,5 +1,6 @@
 /* global React, mui */
 
+import ReactMixin from 'react-mixin';
 import { History, Link } from 'react-router';
 
 
@@ -8,14 +9,11 @@ import { History, Link } from 'react-router';
  * @className
  * @extends React.Component
  */
-const Home = React.createClass({
-
-    mixins: [
-        History
-    ],
+@ReactMixin.decorate(History)
+export default class Home extends React.Component {
 
     // The list of words that the hero text will cycle through
-    heroTextSelection: [
+    heroTextSelection = [
         'festivals',
         'concerts',
         'comedy',
@@ -29,26 +27,26 @@ const Home = React.createClass({
         'music',
         'dating',
         'restaurants'
-    ],
+    ];
     // Needed to clear the interval after the component unmounts
-    intervalId: null,
+    intervalId = null;
 
     // The time between word changes
-    intervalTimeMS: 2000,
+    intervalTimeMS = 2000;
 
     /**
      * Returns the initial state of this component.
      * @returns {{heroTextIndex: number}}
      */
-    getInitialState() {
+    state = {
+        heroTextIndex: 0
+    };
+
+    componentWillMount() {
         this.heroTextSelection.sort(function (a, b) {
             return b.length - a.length; // ASC -> a - b; DESC -> b - a
         });
-
-        return {
-            heroTextIndex: 0
-        }
-    },
+    };
 
     /** @inheritdoc */
     componentDidMount() {
@@ -58,13 +56,13 @@ const Home = React.createClass({
                 heroTextIndex: (nextIndex >= this.heroTextSelection.length ? 0 : nextIndex)
             });
         }.bind(this), this.intervalTimeMS);
-    },
+    };
 
     /** @inheritdoc */
     componentWillUnmount() {
         if (this.intervalId)
             Meteor.clearInterval(this.intervalId);
-    },
+    };
 
     /** @inheritdoc */
     render() {
@@ -80,7 +78,5 @@ const Home = React.createClass({
                 </div>
             </div>
         );
-    }
-});
-
-export default Home;
+    };
+}
