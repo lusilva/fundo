@@ -1,198 +1,110 @@
 import Helmet from 'react-helmet';
 import { History, Link } from 'react-router';
-import Theme from './theme';
-import Paths from './paths';
-const { AppBar, Tabs, Tab, AppCanvas, Paper, Styles, Mixins, LeftNav, MenuItem} = mui;
-const { ThemeManager, Spacing, Typography } = Styles;
+import ReactMixin from 'react-mixin';
+
+import { userIsValid, getPathsForUser, pathIsValidForUser } from 'App/helpers';
+import Logger from 'App/logger';
+
+if (Meteor.isClient)
+    require('App/lib/semantic-ui/definitions/modules/sidebar');
 
 
-const Layout = React.createClass({
-    propTypes: {
+/**
+ * The main Layout for the entire app.
+ *
+ * @className
+ * @extends React.Component
+ */
+@ReactMixin.decorate(History)
+@ReactMixin.decorate(ReactMeteorData)
+export default class Layout extends React.Component {
+    static propTypes = {
         children: React.PropTypes.any.isRequired
-    },
+    };
 
-    childContextTypes: {
-        muiTheme: React.PropTypes.object
-    },
+    intervalId = null;
 
-    intervalId: null,
-
-    mixins: [
-        Mixins.StylePropable,
-        History
-    ],
-
-
-    getChildContext() {
-        // Need to set the userAgent here for SSR in production.
-        return {
-            muiTheme: ThemeManager.getMuiTheme(Theme, {userAgent: 'all'})
-        };
-    },
-
-    getInitialState() {
-        let tabIndex = null;
-        if (Meteor.isClient && Session)
-            tabIndex = Session.get('activePath');
-
-
-        return {
-            showLeftNav: true,
-            tabIndex: tabIndex,
-            appBarTitle: null,
-            open: false
+    /**
+     * Get the current user of the application, or null if no user is logged in.
+     * This method is reactive and runs every time the user changes.
+     * @returns {{currentUser: any}}
+     */
+    getMeteorData() {
+        if (!!Meteor.user() != !!this.data.currentUser) {
+            let paths = getPathsForUser();
+            this.history.pushState(this.state, paths[0].path);
         }
-    },
+
+        return {
+            currentUser: Meteor.user()
+        }
+    };
 
     componentDidMount() {
-        this._windowResizeHandler();
-        $(window).resize(this._windowResizeHandler);
+        // Localize the selector instead of having jQuery search globally
+        var rootNode = ReactDOM.findDOMNode(this);
 
-        // Add this here as a guard against SSR since Session doesn't exist in the server.
-        if (Meteor.isClient && Session) {
-            Tracker.autorun(function () {
-                let tabIndex = Session.get('activePath');
-                if (typeof null != tabIndex && tabIndex.toString() !== this.state.tabIndex)
-                    this.setState({tabIndex: tabIndex.toString()});
-            }.bind(this));
+        // Initialize the sidebar
+        $(rootNode).find('.ui.sidebar')
+            .sidebar({
+                context: $(rootNode)
+            })
+            .sidebar('setting', 'transition', 'overlay');
+    };
+
+    _toggleSideMenu() {
+        // Same thing as before, might want to store this as a variable
+        var rootNode = ReactDOM.findDOMNode(this);
+        $(rootNode).find('.ui.sidebar').sidebar('toggle');
+    };
+
+    _getSidebar() {
+        return this._getLinks('sidebar', 'active', 'ui inverted item large', this._toggleSideMenu.bind(this));
+    };
+
+    _getLinks(keyPrefix, activeClassName, className, onClickCallback) {
+        return _.map(getPathsForUser(), function (path, index) {
+            return (
+                <Link to={path.path}
+                      key={keyPrefix+index}
+                      activeClassName={activeClassName}
+                      className={className}
+                      onClick={onClickCallback || function(){}}>{path.title}</Link>
+            );
+        }.bind(this))
+    };
+
+    _getNavBar() {
+        let logo = null;
+
+        if (!this.history.isActive('/')) {
+            logo = (
+                <Link to="/">
+                    <img className="ui inverted item" src={require('./img/fundo-xsmall.png')}/>
+                </Link>
+            )
         }
-    },
-
-    _windowResizeHandler() {
-        let shouldShowLeftNav = $(window).width() <= 768;
-        if (shouldShowLeftNav != this.state.showLeftNav)
-            this.setState({showLeftNav: shouldShowLeftNav});
-
-    },
-
-    _onLeftIconButtonTouchTap(event) {
-        if (this.state.showLeftNav) {
-            this.setState({open: true});
-            event.preventDefault();
-        }
-    },
-
-    _onTabChange(value, e, tab) {
-        this.history.pushState(this.state, tab.props.path);
-        this.setState({tabIndex: value});
-    },
-
-    _onIconSelect() {
-        this.setState({tabIndex: '0'});
-    },
-
-    _getIcon(styles) {
-        if (this.state.tabIndex == '0')
-            return null;
-        return (
-            <Link to='/' onClick={this._onIconSelect}>
-                <span style={this.prepareStyles(styles.span)}>
-                    <img src={require('./img/fundo-xsmall.png')}/>
-                </span>
-            </Link>
-        );
-    },
-
-    _getTabs() {
-        let styles = {
-            root: {
-                position: 'fixed',
-                height: 64,
-                top: 0,
-                right: 0,
-                zIndex: 4,
-                width: '100%',
-                backgroundColor: Theme.palette.primary1Color
-            },
-            container: {
-                position: 'absolute',
-                right: (Spacing.desktopGutter / 2) + 48,
-                bottom: 0,
-                backgroundColor: Theme.palette.primary1Color
-            },
-            span: {
-                fontWeight: Typography.fontWeightLight,
-                left: 25,
-                top: 5,
-                position: 'absolute',
-                fontSize: 26
-            },
-            tabs: {
-                width: 425,
-                bottom: 0
-            },
-            tab: {
-                height: 64
-            }
-        };
-
-        let tabs = Meteor.userId() ? Paths.loggedIn : Paths.loggedOut;
 
         return (
-            <div>
-                <Paper
-                    zDepth={0}
-                    rounded={false}
-                    style={styles.root}>
-
-                    {this._getIcon(styles)}
-
-                    <div style={this.prepareStyles(styles.container)}>
-                        <Tabs
-                            style={styles.tabs}
-                            value={this.state.tabIndex}
-                            onChange={this._onTabChange}>
-                            {_.map(tabs, function (item, index) {
-                                return (
-                                    <Tab key={index}
-                                         value={index.toString()}
-                                         label={item.title}
-                                         style={styles.tab}
-                                         path={item.path}/>
-                                );
-                            })}
-                        </Tabs>
+            <div className="ui inverted vertical center aligned segment primary-color">
+                <div className="ui container primary-color">
+                    <div className="ui large secondary inverted pointing menu primary-color">
+                        <div className="toc item" onClick={this._toggleSideMenu.bind(this)}>
+                            <i className="sidebar icon"/>
+                        </div>
+                        {logo}
+                        <div className="right item">
+                            {this._getLinks('navbar', 'active', 'ui inverted item', null)}
+                        </div>
                     </div>
-                </Paper>
+                </div>
             </div>
-        );
-    },
-
-    _onMenuItemClick(value, index) {
-        this.history.pushState(this.state, value.path);
-        this.setState({tabIndex: index.toString(), open: false});
-    },
-
-    _getAppBar() {
-        let paths = Meteor.userId() ? Paths.loggedIn : Paths.loggedOut;
-        return (
-            <div>
-                <AppBar title={this.state.appBarTitle}
-                        onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}/>
-                <LeftNav docked={false} width={250} open={this.state.open}
-                         onRequestChange={open => this.setState({open})}>
-                    {_.map(paths, function (value, index) {
-                        return (
-                            <MenuItem key={index}
-                                      onTouchTap={this._onMenuItemClick.bind(this, value, index)}
-                                      checked={this.state.tabIndex === index.toString()}
-                            >
-                                {value.title}
-                            </MenuItem>
-                        );
-                    }.bind(this))}
-                </LeftNav>
-            </div>
-        );
-    },
+        )
+    };
 
     render() {
-        const style = {
-            paddingTop: this.state.showLeftNav ? '0' : Spacing.desktopKeylineIncrement
-        };
-
         return (
-            <AppCanvas>
+            <div>
                 <Helmet
                     title="fundo"
                     meta={
@@ -201,19 +113,43 @@ const Layout = React.createClass({
                             { name: 'viewport', content: 'width=device-width, initial-scale=1' }
                         ]
                     }
-                    link={[
-                        {"rel": "stylesheet", "href": "https://fonts.googleapis.com/css?family=Roboto:400,300,500"}
-                    ]}
                 />
-                {this.state.showLeftNav ? this._getAppBar() : this._getTabs()}
-                <Accounts.ui.Dialogs />
-                <div style={style}>
-                    {this.props.children}
+
+                <div className="ui vertical inverted sidebar menu primary-color">
+                    {this._getSidebar()}
                 </div>
-            </AppCanvas>
+
+                <div className="pusher">
+                    {this._getNavBar()}
+                    {React.Children.map(this.props.children, (child) => {
+                        return React.cloneElement(child, {currentUser: this.data.currentUser});
+                    })}
+
+                    <div className="ui inverted vertical footer segment primary">
+                        <div className="ui container">
+                            <div className="ui stackable inverted divided equal height stackable grid">
+                                <div className="three wide column">
+                                    <h4 className="ui inverted header">Created @ RCOS</h4>
+                                    <div className="ui inverted link list">
+                                        <a href="https://rcos.io" className="item">RCOS Website</a>
+                                        <a href="https://github.com/lusilva/fundo" className="item">Source</a>
+                                    </div>
+
+                                </div>
+                                <div className="seven wide column">
+                                    <h4 className="ui inverted header">Who We Are</h4>
+                                    <p>fundo was developed with love by students at Rensselaer Polytechnic Institute.
+                                        Interface graphic by <a href="http://www.freepik.com/">Freepik</a> from <a
+                                            href="http://www.flaticon.com/">Flaticon</a> is licensed under <a
+                                            href="http://creativecommons.org/licenses/by/3.0/"
+                                            title="Creative Commons BY 3.0">CC BY 3.0</a>. Made with <a
+                                            href="http://logomakr.com" title="Logo Maker">Logo Maker</a>.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
-});
-
-
-export default Layout;
+}

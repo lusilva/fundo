@@ -1,5 +1,6 @@
 import { Route, IndexRoute } from 'react-router';
-import Paths from './paths';
+import { userIsValid, getPathsForUser, pathIsValidForUser } from '../helpers';
+import Logger from 'App/logger';
 
 import Layout from './Layout';
 import Home from './components/Home';
@@ -7,46 +8,26 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
 export default (
-    <Route path="/" component={Layout}>
-        <IndexRoute component={Home} onEnter={validate}/>
-        <Route path="/login" component={Login} onEnter={validate}/>
+    <Route component={Layout}>
+        <Route path="/" component={Home} onEnter={validateUser}/>
+        <Route path="/login" component={Login} onEnter={validateUser}/>
         <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
+        <Route path="/logout" onEnter={logoutUser}/>
     </Route>
 );
 
-
-function validate(nextState, transition) {
-    let isLoggedIn = !!Meteor.userId();
-    if (isLoggedIn) {
-        transition(null, '/dashboard');
-        return;
+function validateUser(nextState, transitionFunc) {
+    if (!pathIsValidForUser(nextState.location.pathname)) {
+        let transitionURL = getPathsForUser()[0].path;
+        Logger.debug('Redirecting to %s', transitionURL, nextState);
+        transitionFunc(null, transitionURL);
     }
-
-    let paths =  Paths.loggedOut;
-
-    if (Meteor.isClient && Session)
-        _.forEach(paths, function (value, index) {
-            if (value.path == nextState.location.pathname) {
-                Session.set('activePath', index)
-            }
-        });
 }
 
-function validateUser(nextState, transition) {
-    let isLoggedIn = !!Meteor.userId();
-    if (!isLoggedIn) {
-        transition(null, '/');
-        return;
-    }
-
-    let paths =  Paths.loggedIn;
-
-    if (Meteor.isClient && Session)
-        _.forEach(paths, function (value, index) {
-            if (value.path == nextState.location.pathname) {
-                Session.set('activePath', index)
-            }
-        });
+function logoutUser(nextState, transitionFunc) {
+    Meteor.logout(function(err) {
+        if (!err) {
+            transitionFunc(null, '/login');
+        }
+    });
 }
-
-

@@ -7,8 +7,6 @@
 meteor-base             # Packages every Meteor app needs to have
 mobile-experience       # Packages for a great mobile UX
 mongo                   # The database Meteor supports right now
-session                 # Client-side reactive dictionary for your app
-jquery                  # Helpful client-side library
 tracker                 # Meteor's client-side reactive programming library
 
 standard-minifiers      # JS/CSS minifiers run for production mode
@@ -23,6 +21,14 @@ webpack:webpack
 accounts-password
 nfl:react-helmet
 react-runtime
-local:material-ui
 email
-local:accounts-react-material-ui
+infinitedg:winston
+appcache
+session
+meteorhacks:kadira
+kadira:debug
+flemay:less-autoprefixer
+jquery
+semantic:ui
+useraccounts:semantic-ui
+useraccounts:core

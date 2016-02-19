@@ -7,7 +7,7 @@ This is a project for RCOS (Rensselaer Center for Open Source), built with Meteo
 fundo is a web application which will allow users to discover nearby events. It's main focus is on being an event discovery tool, and the plan is for it to be tinder-like. Users will be able to upvote and like events, and the system will learn user preferences and recommend nearby events that the user is likely to attend. In time, the event suggestions should improve as users provide more data points for the recommendation algorithm. We will also recommend events to users based on what other users with similar preferences have also liked. The goal of this project is to create a one-stop shop to find something to do if you’re bored, and only provide events that users are interested in attending.
 
 ### Timeline
-- [ ] Week 1-2: Finalize app design. Look into recommendation algorithms and get complete feature list of what we want to implement. 
+- [x] Week 1-2: Finalize app design. Look into recommendation algorithms and get complete feature list of what we want to implement. 
 
 - [ ] Weeks 3-4: Rough app skeleton, integrate event APIs to draw event data from. Implement event cache and figure out how to manage the data.
 
@@ -35,7 +35,9 @@ fundo is a web application which will allow users to discover nearby events. It'
 ### Build Instructions
 
 1. Install [Meteor](https://www.meteor.com/install)
-2. Create settings.json file in the root directory, and add your eventful API key. More info [here.](http://docs.meteor.com/#/full/meteor_settings)
+2. Create settings.json file in the root directory. File should look something like:
+    `{ debugEnabled: <bool>, eventfulAPIKey: <string> }`
+   More info [here.](http://docs.meteor.com/#/full/meteor_settings)
 3. Run `meteor run`, which will install all dependencies and start up the meteor server.
 4. Go to `localhost:3000` in your web browser.
 

@@ -1,59 +1,52 @@
 /* global React, mui */
 
-import FullWidthSection from './FullWidthSection';
-import Theme from '../theme';
+import ReactMixin from 'react-mixin';
+import { History, Link } from 'react-router';
 
-// Import components from Material-UI
-const { Mixins, Styles } = mui;
-const { StylePropable, StyleResizable } = Mixins;
-const { Colors, Spacing, Typography, lightBaseTheme } = Styles;
 
 /**
  * The Home page React component, responsible for rendering the home page.
- * @class
+ * @className
  * @extends React.Component
  */
-const Home = React.createClass({
-
-    mixins: [
-        StylePropable,
-        StyleResizable
-    ],
+@ReactMixin.decorate(History)
+export default class Home extends React.Component {
 
     // The list of words that the hero text will cycle through
-    heroTextSelection: [
+    heroTextSelection = [
         'festivals',
         'concerts',
         'comedy',
         'sports',
-        'family',
         'nightlife',
-        'organizations',
         'conferences',
-        'food',
-        'sales',
+        'shopping',
         'museums',
         'movies',
-        'hiking'
-    ],
+        'hiking',
+        'music',
+        'dating',
+        'restaurants'
+    ];
     // Needed to clear the interval after the component unmounts
-    intervalId: null,
+    intervalId = null;
 
-    intervalTimeMS: 2000,
+    // The time between word changes
+    intervalTimeMS = 2000;
 
     /**
      * Returns the initial state of this component.
      * @returns {{heroTextIndex: number}}
      */
-    getInitialState() {
+    state = {
+        heroTextIndex: 0
+    };
+
+    componentWillMount() {
         this.heroTextSelection.sort(function (a, b) {
             return b.length - a.length; // ASC -> a - b; DESC -> b - a
         });
-
-        return {
-            heroTextIndex: 0
-        }
-    },
+    };
 
     /** @inheritdoc */
     componentDidMount() {
@@ -63,84 +56,27 @@ const Home = React.createClass({
                 heroTextIndex: (nextIndex >= this.heroTextSelection.length ? 0 : nextIndex)
             });
         }.bind(this), this.intervalTimeMS);
-    },
+    };
 
     /** @inheritdoc */
     componentWillUnmount() {
         if (this.intervalId)
             Meteor.clearInterval(this.intervalId);
-    },
-
-    /**
-     * Gets the properly styled hero component for the home page
-     * @returns {XML}
-     * @private
-     */
-    _getHomePageHero() {
-        let styles = {
-            root: {
-                backgroundColor: Theme.palette.primary1Color,
-                overflow: 'hidden',
-                fontFamily: Theme.fontFamily
-            },
-            svgLogo: {
-                margin: '0 auto',
-                display: 'block'
-            },
-            tagline: {
-                margin: '16px auto 0 auto',
-                textAlign: 'center',
-                maxWidth: 575
-            },
-            h1: {
-                color: Theme.palette.alternateTextColor,
-                fontWeight: Typography.fontWeightLight,
-                fontSize: 26
-            },
-            nowrap: {
-                whiteSpace: 'nowrap'
-            },
-            taglineWhenLarge: {
-                marginTop: 16
-            },
-            h1WhenLarge: {
-                fontSize: 56
-            }
-        };
-
-        styles.h2 = this.mergeStyles(styles.h1, styles.h2);
-
-        if (this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-            styles.tagline = this.mergeStyles(styles.tagline, styles.taglineWhenLarge);
-            styles.h1 = this.mergeStyles(styles.h1, styles.h1WhenLarge);
-        }
-
-        return (
-            <FullWidthSection style={styles.root}>
-                <img style={styles.svgLogo} src={require('../img/fundo.png')}/>
-                <div style={styles.tagline}>
-                    <span style={styles.nowrap}>
-                        <h1 style={styles.h1}>
-                            {'is '}
-                            <span style={{color: 'white'}}>
-                                {this.heroTextSelection[this.state.heroTextIndex]}
-                            </span>
-                            {' made easy'}
-                        </h1>
-                    </span>
-                </div>
-            </FullWidthSection>
-        );
-    },
+    };
 
     /** @inheritdoc */
     render() {
         return (
             <div>
-                {this._getHomePageHero()}
+                <div className="ui inverted vertical center aligned segment masthead primary-color">
+                    <div className="ui text container middle aligned">
+                        <div className="ui middle aligned large image">
+                            <img src={require("App/client/img/fundo.png")}/>
+                        </div>
+                        <h2>is {this.heroTextSelection[this.state.heroTextIndex]} made easy</h2>
+                    </div>
+                </div>
             </div>
         );
-    }
-});
-
-export default Home;
+    };
+}
