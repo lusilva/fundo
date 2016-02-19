@@ -45,7 +45,7 @@ export default class Layout extends React.Component {
         var rootNode = ReactDOM.findDOMNode(this);
 
         // Initialize the sidebar
-        $(rootNode).find('.ui.sidebar')
+        $(rootNode).find('#sidebar-menu')
             .sidebar({
                 context: $(rootNode)
             })
@@ -55,7 +55,7 @@ export default class Layout extends React.Component {
     _toggleSideMenu() {
         // Same thing as before, might want to store this as a variable
         var rootNode = ReactDOM.findDOMNode(this);
-        $(rootNode).find('.ui.sidebar').sidebar('toggle');
+        $(rootNode).find('#sidebar-menu').sidebar('toggle');
     };
 
     _getSidebar() {
@@ -115,7 +115,7 @@ export default class Layout extends React.Component {
                     }
                 />
 
-                <div className="ui vertical inverted sidebar menu primary-color">
+                <div className="ui vertical inverted sidebar menu primary-color" id="sidebar-menu">
                     {this._getSidebar()}
                 </div>
 
@@ -125,7 +125,7 @@ export default class Layout extends React.Component {
                         return React.cloneElement(child, {currentUser: this.data.currentUser});
                     })}
 
-                    <div className="ui inverted vertical footer segment primary">
+                    <div className="ui inverted vertical footer segment primary footer">
                         <div className="ui container">
                             <div className="ui stackable inverted divided equal height stackable grid">
                                 <div className="three wide column">
