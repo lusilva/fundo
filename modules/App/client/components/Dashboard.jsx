@@ -2,6 +2,7 @@
 
 import { isUserVerified } from 'App/helpers';
 import Shuffle from 'react-shuffle';
+import Alert from 'react-s-alert';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -14,13 +15,16 @@ export default class Dashboard extends React.Component {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
+    counter = 0;
+
     state = {
         filter: {
             iconClass: 'options',
             iconText: 'Open Filters',
             open: true
         },
-        children: this.alphabet
+        children: this.alphabet,
+        isSendingEmail: false
     };
 
     componentDidMount() {
@@ -33,6 +37,18 @@ export default class Dashboard extends React.Component {
                 context: $(rootNode).find('.ui.bottom'),
                 dimPage: false,
                 closable: false
+            });
+
+        $(rootNode).find('.dashboard.pusher')
+            .visibility({
+                once: false,
+                // update size when new content loads
+                observeChanges: true,
+                // load content on bottom edge visible
+                onBottomVisible: function () {
+                    // loads a max of 5 times
+                    this._loadMoreEvents();
+                }.bind(this)
             });
     };
 
@@ -58,13 +74,52 @@ export default class Dashboard extends React.Component {
 
     _renderEvents() {
         return this.state.children.map(function (letter) {
+            this.counter += 1;
             return (
-                <div className="tile" key={letter}>
+                <div className="tile" key={this.counter}>
                     <img
                         src={"http://placehold.it/100x100&text=" + letter}/>
                 </div>
             )
-        })
+        }.bind(this))
+    };
+
+    _loadMoreEvents() {
+        this.alphabet = this.alphabet.concat(this.alphabet);
+        this.setState({children: this.alphabet});
+    };
+
+    _sendEmailVerification() {
+        this.setState({isSendingEmail: true});
+        Meteor.call('resendEmailVerification', function (err, res) {
+            if (!err) {
+                this.setState({isSendingEmail: false});
+                Alert.success('Email Sent!')
+            } else {
+                Alert.error('Could not resend email. Please try again later.')
+            }
+        }.bind(this))
+    };
+
+    _getVerifyEmailHeader() {
+        if (!this.props.currentUser) {
+            return (
+                <div className="ui active dimmer primary-color">
+                    <div className="ui large loader"></div>
+                </div>
+            );
+        }
+
+        return (
+            <div>
+                <h2>An email was sent to {this.props.currentUser.emails[0].address}.</h2>
+                <h4>Please follow the instructions to verify your email.</h4>
+                <button className={"ui inverted button" + (this.state.isSendingEmail ? 'loading' : '')}
+                        onClick={this._sendEmailVerification.bind(this)}>
+                    Send Again
+                </button>
+            </div>
+        )
     };
 
     filterChildren() {
@@ -92,7 +147,7 @@ export default class Dashboard extends React.Component {
 
         let mastheadContent = isUserVerified(this.props.currentUser) ?
             (<div>CONTENT PLACEHOLDER</div>) :
-            (<div>VERIFY EMAIL PLACEHOLDER</div>);
+            this._getVerifyEmailHeader();
 
         let filters = (
             <div>
@@ -117,12 +172,12 @@ export default class Dashboard extends React.Component {
                     <div className="ui left vertical sidebar menu">
                         {filters}
                     </div>
-                    <div className="pusher">
+                    <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
                             <div className="ui container">
-                                <Shuffle duration={500} fade={false}>
+                                {/*<Shuffle duration={500} fade={false}>*/}
                                     {this._renderEvents()}
-                                </Shuffle>
+                                {/*</Shuffle>*/}
                             </div>
                         </div>
                     </div>

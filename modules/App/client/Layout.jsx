@@ -1,12 +1,15 @@
 import Helmet from 'react-helmet';
 import { History, Link } from 'react-router';
 import ReactMixin from 'react-mixin';
+import Alert from 'react-s-alert';
 
 import { userIsValid, getPathsForUser, pathIsValidForUser } from 'App/helpers';
 import Logger from 'App/logger';
 
-if (Meteor.isClient)
+if (Meteor.isClient) {
     require('App/lib/semantic-ui/definitions/modules/sidebar');
+    require('App/lib/semantic-ui/definitions/behaviors/visibility');
+}
 
 
 /**
@@ -132,13 +135,13 @@ export default class Layout extends React.Component {
                                     <h4 className="ui inverted header">Created @ RCOS</h4>
                                     <div className="ui inverted link list">
                                         <a href="https://rcos.io" className="item">RCOS Website</a>
-                                        <a href="https://github.com/lusilva/fundo" className="item">Source</a>
+                                        <a href="https://github.com/lusilva/fundo" className="item">GitHub</a>
                                     </div>
 
                                 </div>
                                 <div className="seven wide column">
                                     <h4 className="ui inverted header">Who We Are</h4>
-                                    <p>fundo was developed with love by students at Rensselaer Polytechnic Institute.
+                                    <p>fundo was developed with love by students at Rensselaer Polytechnic Institute.<br/>
                                         Interface graphic by <a href="http://www.freepik.com/">Freepik</a> from <a
                                             href="http://www.flaticon.com/">Flaticon</a> is licensed under <a
                                             href="http://creativecommons.org/licenses/by/3.0/"
@@ -149,6 +152,7 @@ export default class Layout extends React.Component {
                         </div>
                     </div>
                 </div>
+                <Alert stack={{limit: 3}} effect='slide' position='top-right' />
             </div>
         );
     }

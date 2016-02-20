@@ -1,4 +1,4 @@
-import 'App/methods';
+import 'App/server/methods';
 import 'App/logger';
 import 'App/server/publications';
 import 'App/server/fixtures';
