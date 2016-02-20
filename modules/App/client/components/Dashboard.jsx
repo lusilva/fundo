@@ -121,6 +121,36 @@ export default class Dashboard extends React.Component {
         )
     };
 
+    _showHeadContent() {
+        return (
+            <div>
+                <h1>FEATURED EVENTS</h1>
+                <div className="ui card">
+                    <a href="http://www.eventful.com">
+                        <div className="image">
+                                <img src={require("App/client/img/eventful.png")} width="200" height="200"/>
+                        </div>
+                    </a>
+                    <div className="content">
+                        <a className="header">Event Name</a>
+                        <div className="meta">
+                            <span className="date">Joined in 2013</span>
+                        </div>
+                        <div className="description">
+                            Description of event
+                        </div>
+                    </div>
+                    <div className="extra content">
+                        <div className="ui two buttons">
+                            <div className="ui basic blue button">I'm Interested!</div>
+                            <div className="ui basic red button">Not interested</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    };
+
     filterChildren() {
         if (this.state.filtered === false) {
             let newChildren = this.state.children.filter(function (child, index) {
@@ -145,7 +175,7 @@ export default class Dashboard extends React.Component {
     render() {
 
         let mastheadContent = isUserVerified(this.props.currentUser) ?
-            (<div>CONTENT PLACEHOLDER</div>) :
+            this._showHeadContent() :
             this._getVerifyEmailHeader();
 
         let filters = (
