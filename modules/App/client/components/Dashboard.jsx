@@ -13,13 +13,12 @@ export default class Dashboard extends React.Component {
 
     alphabet = [
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 
     state = {
         filter: {
-            iconClass: 'options',
-            iconText: 'Open Filters',
-            open: true
+            open: false
         },
         children: this.alphabet,
         isSendingEmail: false
@@ -33,23 +32,8 @@ export default class Dashboard extends React.Component {
         $(rootNode).find('.ui.sidebar')
             .sidebar({
                 context: $(rootNode).find('.ui.bottom'),
-                dimPage: false,
-                closable: false
+                dimPage: false
             });
-
-        // React shuffle can't handle too many nodes, need to come
-        // up with better way of adding events if we want to keep animation.
-        //$(rootNode).find('.dashboard.pusher')
-        //    .visibility({
-        //        once: false,
-        //        // update size when new content loads
-        //        observeChanges: true,
-        //        // load content on bottom edge visible
-        //        onBottomVisible: function () {
-        //            // loads a max of 5 times
-        //            this._loadMoreEvents();
-        //        }.bind(this)
-        //    });
     };
 
     _toggleFilterMenu() {
@@ -59,13 +43,9 @@ export default class Dashboard extends React.Component {
 
         let filter = !this.state.filter.open ?
         {
-            iconClass: 'options',
-            iconText: 'Open Filters',
             open: true
         } :
         {
-            iconClass: 'options',
-            iconText: 'Hide Filters',
             open: false
         };
 
@@ -161,11 +141,24 @@ export default class Dashboard extends React.Component {
                         {mastheadContent}
                     </div>
                 </div>
-                <div className="ui labeled icon menu attached">
-                    <a className="item" onClick={this._toggleFilterMenu.bind(this)}>
-                        <i className={this.state.filter.iconClass + " icon"}/>
-                        {this.state.filter.iconText}
+                <div className="ui menu attached secondary filter-menu">
+                    <a className={'item ' + (this.state.filter.open ? 'active' : '')}
+                       onClick={this._toggleFilterMenu.bind(this)}>
+                        <i className="options icon"/>
+                        Filters
                     </a>
+                    <div className="item">
+                        <div className="ui icon input">
+                            <input type="text" placeholder="Search..."/>
+                            <i className="search icon"/>
+                        </div>
+                    </div>
+                    <div className="right menu">
+                        <a className="item">
+                            <i className="frown icon"/>
+                            Get Me Better Events
+                        </a>
+                    </div>
                 </div>
                 <div className="ui bottom attached segment pushable">
                     <div className="ui left vertical sidebar menu">
