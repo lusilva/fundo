@@ -104,8 +104,7 @@ export default class Dashboard extends React.Component {
     _showHeadContent() {
         return (
             <div>
-                <h1>FEATURED EVENTS</h1>
-                <div className="ui card">
+                <div className="ui centered card">
                     <a href="http://www.eventful.com" target="_blank">
                         <div className="image">
                                 <img src={require("App/client/img/eventful.png")} width="200" height="200"/>
