@@ -16,16 +16,19 @@ const LoginForm = BlazeToReact('fullPageAtForm');
 @ReactMixin.decorate(History)
 export default class Login extends React.Component {
 
-    // Add the dark purple background to the body, and remove it when
-    // going to another page.
+    /** @inheritDoc */
     componentDidMount() {
+        // Add the dark purple background to the body, and remove it when
+        // going to another page.
         document.body.classList.add('primary-color');
     };
 
+    /** @inheritDoc */
     componentWillUnmount() {
         document.body.classList.remove('primary-color');
     };
 
+    /** @inheritDoc */
     render() {
         return (
             <div className="ui container">

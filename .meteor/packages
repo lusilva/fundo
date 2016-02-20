@@ -7,24 +7,18 @@
 meteor-base             # Packages every Meteor app needs to have
 mobile-experience       # Packages for a great mobile UX
 mongo                   # The database Meteor supports right now
-tracker                 # Meteor's client-side reactive programming library
 
 standard-minifiers      # JS/CSS minifiers run for production mode
 es5-shim                # ECMAScript 5 compatibility for older browsers.
 
 react-meteor-data
-reactrouter:react-router-ssr
-thereactivestack:blazetoreact
 
 
 webpack:webpack
 accounts-password
-nfl:react-helmet
-react-runtime
 email
 infinitedg:winston
 appcache
-session
 meteorhacks:kadira
 kadira:debug
 flemay:less-autoprefixer
@@ -32,3 +26,6 @@ jquery
 semantic:ui
 useraccounts:semantic-ui
 useraccounts:core
+reactrouter:react-router-ssr
+nfl:react-helmet
+thereactivestack:blazetoreact

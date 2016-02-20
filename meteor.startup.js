@@ -1,3 +1,8 @@
+/**
+ * This file runs at startup, and has a special name. It contains all of the
+ * accounts configurations for the built-in user package. This provides
+ * user authentication.x
+ */
 AccountsTemplates.configure({
     // Behavior
     confirmPassword: true,
@@ -57,14 +62,17 @@ AccountsTemplates.configure({
 });
 
 if (Meteor.isClient) {
+    /**
+     * Verify emails and log users in when they click on a verify
+     * email link.
+     */
     Accounts.onEmailVerificationLink(function (token, done) {
-        console.log('HEY!');
         Accounts.verifyEmail(token, function (error) {
             if (!error) {
                 Accounts.loginWithToken(token);
             }
             done();
-            // XXX show something if there was an error.
+            //TODO: show something if there was an error.
         });
     });
 }

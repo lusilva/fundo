@@ -3,6 +3,6 @@
     border: none !important;
 }
 
-.footer {
-    margin-top: 64px !important;
+.main-content {
+    min-height: 500px;
 }

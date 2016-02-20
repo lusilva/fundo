@@ -1,6 +1,7 @@
 /* global React */
 
 import { isUserVerified } from 'App/helpers';
+import Shuffle from 'react-shuffle';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -14,14 +15,14 @@ export default class Dashboard extends React.Component {
             iconClass: 'options',
             iconText: 'Open Filters',
             open: true
-        }
+        },
+        children: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     };
 
     componentDidMount() {
         // Localize the selector instead of having jQuery search globally
         var rootNode = ReactDOM.findDOMNode(this);
-
-        console.log(rootNode);
 
         // Initialize the sidebar
         $(rootNode).find('.ui.sidebar')
@@ -52,6 +53,25 @@ export default class Dashboard extends React.Component {
         this.setState({filter: filter});
     };
 
+    filterChildren() {
+        if (this.state.filtered === false) {
+            let newChildren = this.state.children.filter(function(child,index){
+                if (index % 2 ===0) {
+                    return child
+                }
+            });
+            this.setState({
+                children: newChildren,
+                filtered: true
+            });
+        } else {
+            this.setState({
+                children: alphabet,
+                filtered: false
+            });
+        }
+    };
+
 
     /** @inheritDoc */
     render() {
@@ -60,7 +80,7 @@ export default class Dashboard extends React.Component {
             (<div>CONTENT PLACEHOLDER</div>) :
             (<div>VERIFY EMAIL PLACEHOLDER</div>);
 
-        let filters = <div>FILTERS</div>;
+        let filters = <div>FILTERS GO HERE</div>;
 
         return (
             <div>
@@ -69,23 +89,30 @@ export default class Dashboard extends React.Component {
                         {mastheadContent}
                     </div>
                 </div>
+                <div className="ui labeled icon menu attached">
+                    <a className="item" onClick={this._toggleFilterMenu.bind(this)}>
+                        <i className={this.state.filter.iconClass + " icon"}/>
+                        {this.state.filter.iconText}
+                    </a>
+                </div>
                 <div className="ui bottom attached segment pushable">
                     <div className="ui left vertical sidebar menu">
                         {filters}
                     </div>
                     <div className="pusher">
-                        <div className="ui labeled icon menu">
-                            <a className="item" onClick={this._toggleFilterMenu.bind(this)}>
-                                <i className={this.state.filter.iconClass + " icon"}/>
-                                {this.state.filter.iconText}
-                            </a>
-                        </div>
-                        <div className="ui basic segment">
-                            <h3 className="ui header">Application Content</h3>
-                            <p></p>
-                            <p></p>
-                            <p></p>
-                            <p></p>
+                        <div className="ui basic segment main-content">
+                            <div className="ui container">
+                                <Shuffle duration={500} fade={false}>
+                                    {this.state.children.map(function (letter) {
+                                        return (
+                                            <div className="tile" key={letter}>
+                                                <img
+                                                    src={"http://placehold.it/100x100&text=" + letter}/>
+                                            </div>
+                                        )
+                                    })}
+                                </Shuffle>
+                            </div>
                         </div>
                     </div>
                 </div>
