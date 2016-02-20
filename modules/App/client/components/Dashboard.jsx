@@ -15,8 +15,6 @@ export default class Dashboard extends React.Component {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
-    counter = 0;
-
     state = {
         filter: {
             iconClass: 'options',
@@ -39,17 +37,19 @@ export default class Dashboard extends React.Component {
                 closable: false
             });
 
-        $(rootNode).find('.dashboard.pusher')
-            .visibility({
-                once: false,
-                // update size when new content loads
-                observeChanges: true,
-                // load content on bottom edge visible
-                onBottomVisible: function () {
-                    // loads a max of 5 times
-                    this._loadMoreEvents();
-                }.bind(this)
-            });
+        // React shuffle can't handle too many nodes, need to come
+        // up with better way of adding events if we want to keep animation.
+        //$(rootNode).find('.dashboard.pusher')
+        //    .visibility({
+        //        once: false,
+        //        // update size when new content loads
+        //        observeChanges: true,
+        //        // load content on bottom edge visible
+        //        onBottomVisible: function () {
+        //            // loads a max of 5 times
+        //            this._loadMoreEvents();
+        //        }.bind(this)
+        //    });
     };
 
     _toggleFilterMenu() {
@@ -74,9 +74,8 @@ export default class Dashboard extends React.Component {
 
     _renderEvents() {
         return this.state.children.map(function (letter) {
-            this.counter += 1;
             return (
-                <div className="tile" key={this.counter}>
+                <div className="tile" key={letter}>
                     <img
                         src={"http://placehold.it/100x100&text=" + letter}/>
                 </div>
@@ -175,9 +174,9 @@ export default class Dashboard extends React.Component {
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
                             <div className="ui container">
-                                {/*<Shuffle duration={500} fade={false}>*/}
+                                <Shuffle duration={500} fade={false}>
                                     {this._renderEvents()}
-                                {/*</Shuffle>*/}
+                                </Shuffle>
                             </div>
                         </div>
                     </div>
