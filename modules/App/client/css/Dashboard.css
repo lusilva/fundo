@@ -6,3 +6,11 @@
 .filter-menu {
     margin: 0;
 }
+
+.tile {
+    display: block;
+    float: left;
+    width: 100px;
+    height: 100px;
+    margin: 20px;
+}

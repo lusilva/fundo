@@ -10,14 +10,17 @@ import Shuffle from 'react-shuffle';
  */
 export default class Dashboard extends React.Component {
 
+    alphabet = [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
     state = {
         filter: {
             iconClass: 'options',
             iconText: 'Open Filters',
             open: true
         },
-        children: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        children: this.alphabet
     };
 
     componentDidMount() {
@@ -30,7 +33,7 @@ export default class Dashboard extends React.Component {
                 context: $(rootNode).find('.ui.bottom'),
                 dimPage: false,
                 closable: false
-            })
+            });
     };
 
     _toggleFilterMenu() {
@@ -53,10 +56,21 @@ export default class Dashboard extends React.Component {
         this.setState({filter: filter});
     };
 
+    _renderEvents() {
+        return this.state.children.map(function (letter) {
+            return (
+                <div className="tile" key={letter}>
+                    <img
+                        src={"http://placehold.it/100x100&text=" + letter}/>
+                </div>
+            )
+        })
+    };
+
     filterChildren() {
         if (this.state.filtered === false) {
-            let newChildren = this.state.children.filter(function(child,index){
-                if (index % 2 ===0) {
+            let newChildren = this.state.children.filter(function (child, index) {
+                if (index % 2 === 0) {
                     return child
                 }
             });
@@ -66,7 +80,7 @@ export default class Dashboard extends React.Component {
             });
         } else {
             this.setState({
-                children: alphabet,
+                children: this.alphabet,
                 filtered: false
             });
         }
@@ -80,7 +94,11 @@ export default class Dashboard extends React.Component {
             (<div>CONTENT PLACEHOLDER</div>) :
             (<div>VERIFY EMAIL PLACEHOLDER</div>);
 
-        let filters = <div>FILTERS GO HERE</div>;
+        let filters = (
+            <div>
+                <button type="button" onClick={this.filterChildren.bind(this)}>Filter Children</button>
+            </div>
+        );
 
         return (
             <div>
@@ -103,14 +121,7 @@ export default class Dashboard extends React.Component {
                         <div className="ui basic segment main-content">
                             <div className="ui container">
                                 <Shuffle duration={500} fade={false}>
-                                    {this.state.children.map(function (letter) {
-                                        return (
-                                            <div className="tile" key={letter}>
-                                                <img
-                                                    src={"http://placehold.it/100x100&text=" + letter}/>
-                                            </div>
-                                        )
-                                    })}
+                                    {this._renderEvents()}
                                 </Shuffle>
                             </div>
                         </div>
