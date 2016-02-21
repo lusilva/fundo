@@ -28,6 +28,7 @@ export default class Home extends React.Component {
         'dating',
         'restaurants'
     ];
+
     // Needed to clear the interval after the component unmounts
     intervalId = null;
 

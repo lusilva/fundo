@@ -19,5 +19,9 @@
 
   "react-transform-hmr": "^1.0.0",
   "react-transform-catch-errors": "^1.0.0",
-  "redbox-react": "^1.2.0"
+  "redbox-react": "^1.2.0",
+
+  "react-shuffle": "^1.0.0",
+  "react-s-alert": "^1.0.2",
+  "react-infinite-grid": "^0.4.0"
 }

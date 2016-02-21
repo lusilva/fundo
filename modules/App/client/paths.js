@@ -2,6 +2,7 @@ export default {
     // The paths the user can see while logged in.
     loggedIn: [
         { title: "Dashboard", path: "/dashboard" },
+        { title: "My Events", path: "/savedevents" },
         { title: "Logout", path: "/logout"}
     ],
     // The paths the user can see while not logged in.
