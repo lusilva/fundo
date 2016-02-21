@@ -3,6 +3,7 @@
 import { isUserVerified } from 'App/helpers';
 import Shuffle from 'react-shuffle';
 import Alert from 'react-s-alert';
+import FeaturedEvents from './FeaturedEvents';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -102,32 +103,7 @@ export default class Dashboard extends React.Component {
     };
 
     _showHeadContent() {
-        return (
-            <div>
-                <div className="ui centered card">
-                    <a href="http://www.eventful.com" target="_blank">
-                        <div className="image">
-                                <img src={require("App/client/img/eventful.png")} width="200" height="200"/>
-                        </div>
-                    </a>
-                    <div className="content">
-                        <a className="header">Event Name</a>
-                        <div className="meta">
-                            <span className="date">Joined in 2013</span>
-                        </div>
-                        <div className="description">
-                            Description of event
-                        </div>
-                    </div>
-                    <div className="extra content">
-                        <div className="ui two buttons">
-                            <div className="ui basic blue button">I'm Interested!</div>
-                            <div className="ui basic red button">Not interested</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
+        return <FeaturedEvents />
     };
 
     filterChildren() {
@@ -165,23 +141,15 @@ export default class Dashboard extends React.Component {
 
         return (
             <div>
-                <div className="ui inverted vertical center aligned segment dashboard-masthead primary-color">
-                    <div className="ui text container middle aligned">
-                        {mastheadContent}
-                    </div>
+                <div className="ui inverted vertical segment dashboard-masthead primary-color">
+                    {mastheadContent}
                 </div>
-                <div className="ui menu attached secondary filter-menu">
+                <div className="ui menu attached secondary labeled icon filter-menu">
                     <a className={'item ' + (this.state.filter.open ? 'active' : '')}
                        onClick={this._toggleFilterMenu.bind(this)}>
                         <i className="options icon"/>
                         Filters
                     </a>
-                    <div className="item">
-                        <div className="ui icon input">
-                            <input type="text" placeholder="Search..."/>
-                            <i className="search icon"/>
-                        </div>
-                    </div>
                     <div className="right menu">
                         <a className="item">
                             <i className="frown icon"/>
