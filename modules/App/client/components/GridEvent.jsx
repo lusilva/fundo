@@ -11,7 +11,12 @@ export default class Event extends React.Component {
 
     render() {
         return (
-            <div className="ui card">
+            <div className="ui card small">
+                <div className="content">
+                    <i className="right floated thumbs up large icon"/>
+                    <i className="right floated thumbs down large icon"/>
+                    <div className="header">Event Name</div>
+                </div>
                 <div className="blurring image dimmable dimmer-image">
                     <div className="ui dimmer">
                         <div className="content">

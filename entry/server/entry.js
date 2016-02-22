@@ -1,3 +1,4 @@
+import PreferenceSet from 'App/collections/PreferenceSet'
 import 'App/server/methods';
 import 'App/logger';
 import 'App/server/publications';
@@ -8,6 +9,12 @@ SyncedCron.start();
 
 if (Meteor.settings.debugEnabled)
     Winston.level = 'debug';
+
+Accounts.onCreateUser(function (options, user) {
+    let preferences = new PreferenceSet(null, user._id, null, null);
+    preferences.save();
+    return user;
+});
 
 // Do server-rendering only in production mode
 if (process.env.NODE_ENV === 'production') {

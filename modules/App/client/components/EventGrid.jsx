@@ -25,7 +25,7 @@ export default class EventGrid extends React.Component {
                     <AbsoluteGrid items={this.state.items}
                                   displayObject={<GridEvent />}
                                   responsive={true}
-                                  itemHeight={429}
+                                  itemHeight={463}
                                   itemWidth={290}
                     />
                 </div>
