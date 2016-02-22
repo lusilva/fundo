@@ -4,9 +4,9 @@ import { isUserVerified } from 'App/helpers';
 import Alert from 'react-s-alert';
 import FeaturedEvents from './FeaturedEvents';
 import EventGrid from './EventGrid';
-import GeoSuggest from 'react-geosuggest';
 import ReactMixin from 'react-mixin';
 import PreferenceSet from 'App/collections/PreferenceSet';
+import Filters from './Filters';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -18,7 +18,6 @@ export default class Dashboard extends React.Component {
     state = {
         filter: {
             open: false,
-            loading: false
         },
         isSendingEmail: false,
         location: null
@@ -100,58 +99,12 @@ export default class Dashboard extends React.Component {
         return <FeaturedEvents />
     };
 
-    _updateUserLocation(suggest) {
-        let preferences = this.data.preferences;
-        if (preferences && preferences.location == suggest.label)
-            return;
-        this.setState({filter: {loading: true}});
-        preferences.location = suggest.label;
-        preferences.save(function (err, res) {
-            this.setState({filter: {loading: false}});
-            if (!err) {
-                Alert.success('Location updated to ' + suggest.label);
-            } else {
-                Alert.error('Error occurred while updating location');
-            }
-        }.bind(this));
-    };
-
-    _skipSuggestFunc(suggest) {
-        return this.data.preferences && this.data.preferences.location == suggest.description;
-    };
-
     /** @inheritDoc */
     render() {
 
         let mastheadContent = isUserVerified(this.props.currentUser) ?
             this._showHeadContent() :
             this._getVerifyEmailHeader();
-
-        let initialLocation = (this.data.preferences && this.data.preferences.location) ?
-            this.data.preferences.location : null;
-
-        let filters =
-            (typeof window != 'undefined') && window.google && window.google.maps && !this.state.filter.loading ?
-                (
-                    <div className="ui container">
-                        <div className="ui header item center">Select Location</div>
-                        <div className="ui item center">
-                            <GeoSuggest country="us"
-                                        types={['(cities)']}
-                                        initialValue={initialLocation || ''}
-                                        autoActivateFirstSuggest={true}
-                                        onSuggestSelect={this._updateUserLocation.bind(this)}
-                                        skipSuggest={this._skipSuggestFunc.bind(this)}
-                            />
-                        </div>
-                        <div className="ui header item center">Select Price</div>
-                    </div>
-                ) :
-                (
-                    <div className="ui active dimmer">
-                        <div className="ui text loader">Loading</div>
-                    </div>
-                );
 
         return (
             <div>
@@ -178,7 +131,7 @@ export default class Dashboard extends React.Component {
                 </div>
                 <div className="ui bottom attached segment pushable">
                     <div className="ui left vertical sidebar menu">
-                        {filters}
+                        <Filters preferences={this.data.preferences}/>
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
