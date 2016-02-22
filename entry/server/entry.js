@@ -2,6 +2,9 @@ import 'App/server/methods';
 import 'App/logger';
 import 'App/server/publications';
 import 'App/server/fixtures';
+import 'App/server/scheduler';
+
+SyncedCron.start();
 
 if (Meteor.settings.debugEnabled)
     Winston.level = 'debug';

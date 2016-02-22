@@ -1,9 +1,10 @@
 /* global React */
 
 import { isUserVerified } from 'App/helpers';
-import Shuffle from 'react-shuffle';
 import Alert from 'react-s-alert';
 import FeaturedEvents from './FeaturedEvents';
+import EventGrid from './EventGrid';
+import GeoSuggest from 'react-geosuggest';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -11,17 +12,10 @@ import FeaturedEvents from './FeaturedEvents';
  * @extends React.Component
  */
 export default class Dashboard extends React.Component {
-
-    alphabet = [
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-
     state = {
         filter: {
             open: false
         },
-        children: this.alphabet,
         isSendingEmail: false
     };
 
@@ -33,7 +27,13 @@ export default class Dashboard extends React.Component {
         $(rootNode).find('.ui.sidebar')
             .sidebar({
                 context: $(rootNode).find('.ui.bottom'),
-                dimPage: false
+                dimPage: false,
+                onVisible: function () {
+                    this.setState({filter: {open: true}});
+                }.bind(this),
+                onHide: function () {
+                    this.setState({filter: {open: false}});
+                }.bind(this)
             });
     };
 
@@ -41,32 +41,6 @@ export default class Dashboard extends React.Component {
         // Same thing as before, might want to store this as a variable
         let rootNode = ReactDOM.findDOMNode(this);
         $(rootNode).find('.ui.sidebar').sidebar('toggle');
-
-        let filter = !this.state.filter.open ?
-        {
-            open: true
-        } :
-        {
-            open: false
-        };
-
-        this.setState({filter: filter});
-    };
-
-    _renderEvents() {
-        return this.state.children.map(function (letter) {
-            return (
-                <div className="tile" key={letter}>
-                    <img
-                        src={"http://placehold.it/100x100&text=" + letter}/>
-                </div>
-            )
-        }.bind(this))
-    };
-
-    _loadMoreEvents() {
-        this.alphabet = this.alphabet.concat(this.alphabet);
-        this.setState({children: this.alphabet});
     };
 
     _sendEmailVerification() {
@@ -84,14 +58,16 @@ export default class Dashboard extends React.Component {
     _getVerifyEmailHeader() {
         if (!this.props.currentUser) {
             return (
-                <div className="ui active dimmer primary-color">
-                    <div className="ui large loader"></div>
+                <div className="ui text container middle aligned">
+                    <div className="ui active dimmer primary-color">
+                        <div className="ui large loader"></div>
+                    </div>
                 </div>
             );
         }
 
         return (
-            <div>
+            <div className="ui text container middle aligned">
                 <h2>An email was sent to {this.props.currentUser.emails[0].address}.</h2>
                 <h4>Please follow the instructions to verify your email.</h4>
                 <button className={"ui inverted button" + (this.state.isSendingEmail ? 'loading' : '')}
@@ -106,25 +82,6 @@ export default class Dashboard extends React.Component {
         return <FeaturedEvents />
     };
 
-    filterChildren() {
-        if (this.state.filtered === false) {
-            let newChildren = this.state.children.filter(function (child, index) {
-                if (index % 2 === 0) {
-                    return child
-                }
-            });
-            this.setState({
-                children: newChildren,
-                filtered: true
-            });
-        } else {
-            this.setState({
-                children: this.alphabet,
-                filtered: false
-            });
-        }
-    };
-
 
     /** @inheritDoc */
     render() {
@@ -133,18 +90,20 @@ export default class Dashboard extends React.Component {
             this._showHeadContent() :
             this._getVerifyEmailHeader();
 
-        let filters = (
-            <div>
-                <button type="button" onClick={this.filterChildren.bind(this)}>Filter Children</button>
-            </div>
-        );
+        let filters =
+            window.google && window.google.maps ?
+                (<div className="ui container">
+                    <div className="ui item center">
+                        <GeoSuggest country="us" types={['(cities)']} initialValue="Troy, NY, United States"/>
+                    </div>
+                </div>) : null;
 
         return (
             <div>
                 <div className="ui inverted vertical segment dashboard-masthead primary-color">
                     {mastheadContent}
                 </div>
-                <div className="ui menu attached secondary labeled icon filter-menu">
+                <div className="ui menu attached secondary labeled icon filter-menu sticky">
                     <a className={'item ' + (this.state.filter.open ? 'active' : '')}
                        onClick={this._toggleFilterMenu.bind(this)}>
                         <i className="options icon"/>
@@ -152,9 +111,14 @@ export default class Dashboard extends React.Component {
                     </a>
                     <div className="right menu">
                         <a className="item">
-                            <i className="frown icon"/>
-                            Get Me Better Events
+                            <i className="map icon"/>
+                            Map View
                         </a>
+                        <a className="item">
+                            <i className="frown icon"/>
+                            Dislike All
+                        </a>
+
                     </div>
                 </div>
                 <div className="ui bottom attached segment pushable">
@@ -163,11 +127,7 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            <div className="ui container">
-                                <Shuffle duration={500} fade={false}>
-                                    {this._renderEvents()}
-                                </Shuffle>
-                            </div>
+                            <EventGrid />
                         </div>
                     </div>
                 </div>

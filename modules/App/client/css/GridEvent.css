@@ -1,0 +1,16 @@
+.eventful-badge {
+    margin: 0 auto;
+    padding: 0;
+    border: 0;
+    text-align: center;
+    color: #CCC;
+    font-family: Arial;
+    text-decoration: none;
+    display: block;
+}
+
+.eventful-small {
+    width: 150px;
+    font-size: 11px;
+    line-height: 11px;
+}
