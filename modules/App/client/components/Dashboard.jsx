@@ -17,7 +17,7 @@ import Filters from './Filters';
 export default class Dashboard extends React.Component {
     state = {
         filter: {
-            open: false,
+            open: false
         },
         isSendingEmail: false,
         location: null

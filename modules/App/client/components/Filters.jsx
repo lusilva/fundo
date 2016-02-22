@@ -10,6 +10,8 @@ export default class Filters extends React.Component {
         message: null
     };
 
+    timeoutHandle = null;
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.preferences != this.state.preferences)
             this.setState({preferences: nextProps.preferences, loading: false});
@@ -21,7 +23,7 @@ export default class Filters extends React.Component {
 
         return (
             <div className={"ui message " + this.state.message.className}>
-                <i className="close icon"/>
+                <i className="close icon" onClick={this._clearMessage.bind(this)}/>
                 <div className="header">
                     {this.state.message.text}
                 </div>
@@ -29,11 +31,18 @@ export default class Filters extends React.Component {
         );
     };
 
+    _clearMessage() {
+        if (this.timeoutHandle)
+            Meteor.clearInterval(this.timeoutHandle);
+        this.timeoutHandle = null;
+        this.setState({message: null});
+    }
+
     _showMessage(isError, message, duration) {
         let className = isError ? 'negative' : 'positive';
         this.setState({message: {text: message, className: className}});
         if (duration) {
-            Meteor.setTimeout(function() {
+            this.timeoutHandle = Meteor.setTimeout(function () {
                 this.setState({message: null});
             }.bind(this), duration);
         }
@@ -41,7 +50,8 @@ export default class Filters extends React.Component {
     };
 
     _updateUserLocation(suggest) {
-        this.setState({message: null});
+        this._clearMessage();
+
         if (!suggest.placeId && suggest.label != this.state.preferences.location) {
             this._showMessage(true, suggest.label + ' is not a valid location!');
             this.refs.geosuggest.update(this.state.preferences.location || '');
