@@ -109,6 +109,12 @@ export default class Layout extends React.Component {
     };
 
     render() {
+
+        let googleMapsScript = (typeof google != 'undefined') ? [] : [{
+            "src": "https://maps.googleapis.com/maps/api/js?libraries=places",
+            "type": "text/javascript"
+        }];
+
         return (
             <div>
                 <Helmet
@@ -119,11 +125,7 @@ export default class Layout extends React.Component {
                             { name: 'viewport', content: 'width=device-width, initial-scale=1' }
                         ]
                     }
-                    script={
-                        [
-                            {"src": "https://maps.googleapis.com/maps/api/js?libraries=places", "type": "text/javascript"}
-                        ]
-                    }
+                    script={googleMapsScript}
                 />
 
                 <div className="ui vertical inverted sidebar menu primary-color" id="sidebar-menu">
