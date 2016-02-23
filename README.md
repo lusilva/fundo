@@ -9,7 +9,7 @@ fundo is a web application which will allow users to discover nearby events. It'
 ### Timeline
 - [x] Week 1-2: Finalize app design. Look into recommendation algorithms and get complete feature list of what we want to implement. 
 
-- [ ] Weeks 3-4: Rough app skeleton, integrate event APIs to draw event data from. Implement event cache and figure out how to manage the data.
+- [x] Weeks 3-4: Rough app skeleton, integrate event APIs to draw event data from. Implement event cache and figure out how to manage the data.
 
 - [ ] Weeks 5-6: Play around with recommendation systems. Improve app infrastructure. Test recommendations using mock users with different preferences.
 
@@ -37,7 +37,7 @@ fundo is a web application which will allow users to discover nearby events. It'
 1. Install [Meteor](https://www.meteor.com/install)
 2. Create settings.json file in the root directory.
    More info [here.](http://docs.meteor.com/#/full/meteor_settings)
-3. Run `meteor run`, which will install all dependencies and start up the meteor server.
+3. Run `meteor run --settings settings.json`, which will install all dependencies and start up the meteor server.
 4. Go to `localhost:3000` in your web browser.
 
 
@@ -63,10 +63,14 @@ fundo is a web application which will allow users to discover nearby events. It'
         }
 
 #### Run in production mode (with SSR enabled)
-`meteor run --production`
+`meteor run --production --settings settings.json`
 
 #### Build for production
 `meteor build .`
+
+
+##### A little note about SSR
+This application uses SSR (Server Side Rendering) in production. Therefore, all code that relies on the global `window` object in any view must be wrapped in a conditional such as `if (typeof window != 'undefined') { code block } `, since `window` exists only on the browser and not on the server. This does not apply to code inside functions that are only run on the browser, such as `componentDidMount`.
 
 
 Thanks to [thereactivestack's kickstart project](https://github.com/thereactivestack/kickstart-simple), which this project is based upon.
