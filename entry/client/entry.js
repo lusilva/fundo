@@ -2,8 +2,6 @@ import './routes';
 import 'App/collections/Event';
 import 'App/collections/PreferenceSet';
 
-Meteor.subscribe("userpreferences");
-
 // To activate the unit tests:
 // - meteor add sanjo:jasmine
 // - meteor add velocity:html-reporter
