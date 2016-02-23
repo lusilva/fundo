@@ -1,9 +1,11 @@
-import PreferenceSet from 'App/collections/PreferenceSet'
+import PreferenceSet from 'App/collections/PreferenceSet';
+import 'App/collections/Event';
 import 'App/server/methods';
 import 'App/logger';
 import 'App/server/publications';
 import 'App/server/fixtures';
 import 'App/server/scheduler';
+import 'App/server/eventful/reader';
 
 SyncedCron.start();
 

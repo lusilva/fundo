@@ -1,5 +1,6 @@
 import './routes';
-import 'App/collections/PreferenceSet'
+import 'App/collections/Event';
+import 'App/collections/PreferenceSet';
 
 Meteor.subscribe("userpreferences");
 

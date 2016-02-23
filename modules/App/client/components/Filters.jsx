@@ -39,6 +39,7 @@ export default class Filters extends React.Component {
     }
 
     _showMessage(isError, message, duration) {
+        this._clearMessage();
         let className = isError ? 'negative' : 'positive';
         this.setState({message: {text: message, className: className}});
         if (duration) {
@@ -50,8 +51,6 @@ export default class Filters extends React.Component {
     };
 
     _updateUserLocation(suggest) {
-        this._clearMessage();
-
         if (!suggest.placeId && suggest.label != this.state.preferences.location) {
             this._showMessage(true, suggest.label + ' is not a valid location!');
             this.refs.geosuggest.update(this.state.preferences.location || '');

@@ -15,8 +15,6 @@ Meteor.methods({
     },
     "guessUserLocation": function () {
         let ip = this.connection.clientAddress;
-
-
         console.log(ip);
     }
 });
