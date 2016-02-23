@@ -35,11 +35,32 @@ fundo is a web application which will allow users to discover nearby events. It'
 ### Build Instructions
 
 1. Install [Meteor](https://www.meteor.com/install)
-2. Create settings.json file in the root directory. File should look something like:
-    `{ debugEnabled: <bool>, eventfulAPIKey: <string> }`
+2. Create settings.json file in the root directory.
    More info [here.](http://docs.meteor.com/#/full/meteor_settings)
 3. Run `meteor run`, which will install all dependencies and start up the meteor server.
 4. Go to `localhost:3000` in your web browser.
+
+
+### Example settings.json
+    
+        {
+            "kadira": {
+                "appId": <KADIRA_APP_KEY_GOES_HERE>,
+                "appSecret": <KADIRA_SECRET_KEY_GOES_HERE>,
+                "debug": {
+                "authKey": <KADIRA_AUTH_KEY_GOES_HERE>
+                }
+            },
+            "testUser": {
+                "email": <EXAMPLE EMAIL ADDRESS (eg "test@test.com")>,
+                "password": <EXAMPLE PASSWORD (eg "testpassword")>
+            },
+            "debugEnabled": <true OR false>,
+            "eventfulAPIKey": <EVENTFUL_API_KEY_GOES_HERE>,
+            "maxPagesPerCity": <NUMBER>,
+            "hoursEventsExpiresIn": <NUMBER>,
+            "refreshEventsEvery": <STRING (eg "every 2 hours")>
+        }
 
 #### Run in production mode (with SSR enabled)
 `meteor run --production`

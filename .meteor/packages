@@ -29,3 +29,5 @@ useraccounts:core
 reactrouter:react-router-ssr
 nfl:react-helmet
 thereactivestack:blazetoreact
+percolate:synced-cron
+matb33:collection-hooks

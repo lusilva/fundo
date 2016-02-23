@@ -9,7 +9,7 @@ import Dashboard from './components/Dashboard';
 
 export default (
     <Route component={Layout}>
-        <Route path="/" component={Home} onEnter={validateUser}/>
+        <Route path="/" component={Home}/>
         <Route path="/login" component={Login} onEnter={validateUser}/>
         <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
         <Route path="/logout" onEnter={logoutUser}/>
@@ -19,13 +19,13 @@ export default (
 function validateUser(nextState, transitionFunc) {
     if (!pathIsValidForUser(nextState.location.pathname)) {
         let transitionURL = getPathsForUser()[0].path;
-        Logger.debug('Redirecting to %s', transitionURL, nextState);
+        Logger.debug('Redirecting to %s', transitionURL);
         transitionFunc(null, transitionURL);
     }
 }
 
 function logoutUser(nextState, transitionFunc) {
-    Meteor.logout(function(err) {
+    Meteor.logout(function (err) {
         if (!err) {
             transitionFunc(null, '/login');
         }

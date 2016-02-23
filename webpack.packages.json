@@ -12,6 +12,7 @@
   "babel-loader": "^6.2.0",
   "null-loader": "^0.1.1",
   "url-loader": "^0.5.7",
+  "json-loader": "^0.5.4",
   "file-loader": "^0.8.5",
   "style-loader": "^0.13.0",
   "css-loader": "^0.23.0",
@@ -21,7 +22,9 @@
   "react-transform-catch-errors": "^1.0.0",
   "redbox-react": "^1.2.0",
 
-  "react-shuffle": "^1.0.0",
+  "react-absolute-grid": "^2.0.1",
   "react-s-alert": "^1.0.2",
-  "react-infinite-grid": "^0.4.0"
+  "google-map-react": "^0.10.5",
+  "immutable": "^3.7.6",
+  "react-geosuggest": "^1.18.1"
 }

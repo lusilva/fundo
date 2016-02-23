@@ -8,6 +8,9 @@ import Logger from 'App/logger';
 
 if (Meteor.isClient) {
     require('App/lib/semantic-ui/definitions/modules/sidebar');
+    require('App/lib/semantic-ui/definitions/modules/dimmer');
+    require('App/lib/semantic-ui/definitions/modules/transition');
+    require('App/lib/semantic-ui/definitions/modules/modal');
     require('App/lib/semantic-ui/definitions/behaviors/visibility');
 }
 
@@ -106,6 +109,12 @@ export default class Layout extends React.Component {
     };
 
     render() {
+
+        let googleMapsScript = (typeof google != 'undefined') ? [] : [{
+            "src": "https://maps.googleapis.com/maps/api/js?libraries=places",
+            "type": "text/javascript"
+        }];
+
         return (
             <div>
                 <Helmet
@@ -116,6 +125,7 @@ export default class Layout extends React.Component {
                             { name: 'viewport', content: 'width=device-width, initial-scale=1' }
                         ]
                     }
+                    script={googleMapsScript}
                 />
 
                 <div className="ui vertical inverted sidebar menu primary-color" id="sidebar-menu">
@@ -141,7 +151,8 @@ export default class Layout extends React.Component {
                                 </div>
                                 <div className="seven wide column">
                                     <h4 className="ui inverted header">Who We Are</h4>
-                                    <p>fundo was developed with love by students at Rensselaer Polytechnic Institute.<br/>
+                                    <p>fundo was developed with love by students at Rensselaer Polytechnic
+                                        Institute.<br/>
                                         Interface graphic by <a href="http://www.freepik.com/">Freepik</a> from <a
                                             href="http://www.flaticon.com/">Flaticon</a> is licensed under <a
                                             href="http://creativecommons.org/licenses/by/3.0/"
@@ -152,7 +163,7 @@ export default class Layout extends React.Component {
                         </div>
                     </div>
                 </div>
-                <Alert stack={{limit: 3}} effect='slide' position='top-right' />
+                <Alert stack={{limit: 3}} effect='slide' position='top-right'/>
             </div>
         );
     }
