@@ -61,7 +61,7 @@ export default class Filters extends React.Component {
             return;
         this.setState({loading: true});
         preferences.location = suggest.label;
-        preferences.save(function (err, res) {
+        Meteor.call("updatePreferences", preferences, function (err, res) {
             this.setState({loading: false});
             if (!err) {
                 this._showMessage(false, 'Location updated to ' + suggest.label, 5000);

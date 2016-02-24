@@ -26,7 +26,8 @@ export default class Dashboard extends React.Component {
     subs = [];
 
     getMeteorData() {
-        this.subs.push(Meteor.subscribe('userpreferences'));
+        // Get all necessary subscriptions
+        Meteor.subscribe('userpreferences');
 
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
@@ -54,13 +55,6 @@ export default class Dashboard extends React.Component {
             console.log(err);
             console.log(res);
         });
-    };
-
-    componentWillUnmount() {
-        _.each(this.subs, function(sub) {
-            sub.stop();
-        });
-        this.subs = [];
     };
 
     _toggleFilterMenu() {

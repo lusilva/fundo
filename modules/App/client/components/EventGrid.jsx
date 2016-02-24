@@ -27,6 +27,7 @@ export default class EventGrid extends React.Component {
                                   responsive={true}
                                   itemHeight={463}
                                   itemWidth={290}
+                                  zoom={1}
                     />
                 </div>
             </div>

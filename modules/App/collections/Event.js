@@ -116,8 +116,20 @@ export default class Event {
         return this._popularity_score;
     };
 
+    set relevant_cities(relevant_cities) {
+        this._relevant_cities = relevant_cities;
+    };
+
     static getCollection() {
         return Events;
+    };
+
+    static numEventsInCity(city) {
+        return Event.findEventsInCity(city).count() > 0;
+    };
+
+    static findEventsInCity(city) {
+        return Event.getCollection().find({relevant_cities: {$in: [city]}});
     };
 
     save(callback) {
@@ -157,14 +169,6 @@ export default class Event {
 
         // If this event already exists, then modify it.
         if (Events.find({_id: this.id}).count() > 0) {
-
-            // If this event already exists, then make the owners and the relevant cities the union of
-            // what already exists and the new information. THIS IS VERY IMPORTANT TO CATEGORIZE CITIES AND
-            // KEEP TRACK OF SAVED EVENTS.
-            let existingEvent = Events.findOne({_id: this.id});
-            doc.owners = _.union(doc.owners, existingEvent.owners);
-            doc.relevant_cities = _.union(doc.relevant_cities, existingEvent.relevant_cities);
-
             Events.update(this.id, {$set: doc},
                 callback
             );
@@ -183,7 +187,7 @@ export default class Event {
         }
     };
 
-    delete(callback) {
+    remove(callback) {
         if (Events.find({_id: this.id}).count() > 0)
             Events.remove(this.id, callback);
         else
