@@ -8,21 +8,48 @@ import AbsoluteGrid from 'react-absolute-grid';
 export default class EventGrid extends React.Component {
 
     state = {
-        items: [
-            {key: 1, name: 'Test', sort: 0, filtered: 0},
-            {key: 2, name: 'Test 1', sort: 1, filtered: 0},
-            {key: 3, name: 'Test', sort: 0, filtered: 0},
-            {key: 4, name: 'Test 1', sort: 1, filtered: 0},
-            {key: 5, name: 'Test', sort: 0, filtered: 0},
-            {key: 6, name: 'Test 1', sort: 1, filtered: 0}
-        ]
+        events: [],
+        preferences: this.props.preferences
     };
+
+    componentDidMount() {
+        if (this.state.preferences)
+            this._updateEvents(this.state.preferences);
+    };
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps);
+        if (nextProps.preferences != this.state.preferences)
+            this._updateEvents(nextProps.preferences);
+    };
+
+    _updateEvents(preferences){
+        console.log('GETTING EVENTS!');
+        Meteor.call("getEventsForUser", preferences, function(error, result) {
+            console.log(result);
+            // loop through each event in result
+            _.map(result, function(event, index){
+                var filtered = 0;
+                if (index > 20 ){
+                    filtered = 1;
+                }
+                console.log(event.id);
+                return {key: event._id, event: event, sort: 0, filtered: filtered}
+
+            });
+
+            //check for error first
+
+            // make each item
+            this.setState({events: result, preferences: preferences});
+        }.bind(this) );
+    }
 
     render() {
         return (
             <div className="ui container">
                 <div className="ui grid-events">
-                    <AbsoluteGrid items={this.state.items}
+                    <AbsoluteGrid items={this.state.events}
                                   displayObject={<GridEvent />}
                                   responsive={true}
                                   itemHeight={463}

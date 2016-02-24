@@ -1,3 +1,6 @@
+import PreferenceSet from "App/collections/PreferenceSet";
+import Event from "App/collections/Event";
+
 Meteor.methods({
     "log": function (level, logArguments) {
         logArguments.unshift(level);
@@ -16,5 +19,28 @@ Meteor.methods({
     "guessUserLocation": function () {
         let ip = this.connection.clientAddress;
         console.log(ip);
+    },
+
+    "getEventsForUser": function (userPref) {
+        
+        // var userID = this.userId;
+        // // else get and return events for user's city from db
+        // var userPref = PreferenceSet.getCollection().findOne({userId: userID});
+        
+
+        // null check
+
+        var userCity = userPref._location;
+
+        console.log(Event.getCollection().find({}).fetch()[0]);
+
+        console.log(userPref);
+
+
+        var events = [Event.getCollection().findOne({relevant_cities: { $in: [userCity] } } )];
+
+        console.log(events);
+
+        return events;
     }
 });

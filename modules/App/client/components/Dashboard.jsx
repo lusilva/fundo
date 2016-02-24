@@ -144,7 +144,7 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            <EventGrid />
+                            <EventGrid preferences={this.data.preferences}/>
                         </div>
                     </div>
                 </div>
