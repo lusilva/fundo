@@ -19,10 +19,10 @@ Meteor.methods({
         let ip = this.connection.clientAddress;
         console.log(ip);
     },
-    "updatePreferences": function(preferences, callback) {
+    "updatePreferences": function (preferences, callback) {
         let newPrefs = new PreferenceSet(
             preferences._id,
-            preferences._userId,
+            this.userId,
             preferences._indices,
             preferences._location
         );

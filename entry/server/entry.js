@@ -4,7 +4,7 @@ import 'App/server/methods';
 import 'App/logger';
 import 'App/server/publications';
 import 'App/server/fixtures';
-import 'App/server/cache/refresh';
+import 'App/server/cache/scheduler';
 
 SyncedCron.start();
 

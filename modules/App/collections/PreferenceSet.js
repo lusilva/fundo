@@ -105,7 +105,6 @@ export default class PreferenceSet {
                 // Check if the old city still has any users. If not, then remove the cron job for it, and remove
                 // it from the list of relevant cities.
                 if (existingSet.location && PreferenceSets.find({location: existingSet.location}).count() == 1) {
-
                     // Remove the cron job.
                     SyncedCron.remove('eventful-' + existingSet.location);
 

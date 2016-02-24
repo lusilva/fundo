@@ -8,10 +8,21 @@ import Event from './Event';
  */
 export default function createEvent(city, event) {
 
+    // If this event already exists, then make the owners and the relevant cities the union of
+    // what already exists and the new information. THIS IS VERY IMPORTANT TO CATEGORIZE CITIES AND
+    // KEEP TRACK OF SAVED EVENTS.
+    let existingEvent = Event.getCollection().findOne({_id: event.id});
+    let owners = [];
+    let relevant_cities = [city];
+    if (!!existingEvent) {
+        owners = existingEvent.owners;
+        relevant_cities = _.union(relevant_cities, existingEvent.relevant_cities);
+    }
+
     let dbEvent = new Event(
         event.id,
-        null,
-        [city],
+        owners,
+        relevant_cities,
         event.title,
         event.description,
         event.popularity_score,

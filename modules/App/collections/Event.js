@@ -169,14 +169,6 @@ export default class Event {
 
         // If this event already exists, then modify it.
         if (Events.find({_id: this.id}).count() > 0) {
-
-            // If this event already exists, then make the owners and the relevant cities the union of
-            // what already exists and the new information. THIS IS VERY IMPORTANT TO CATEGORIZE CITIES AND
-            // KEEP TRACK OF SAVED EVENTS.
-            let existingEvent = Events.findOne({_id: this.id});
-            doc.owners = _.union(doc.owners, existingEvent.owners);
-            doc.relevant_cities = _.union(doc.relevant_cities, existingEvent.relevant_cities);
-
             Events.update(this.id, {$set: doc},
                 callback
             );
