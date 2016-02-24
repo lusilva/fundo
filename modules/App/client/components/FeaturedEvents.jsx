@@ -1,6 +1,18 @@
+/* global React, Meteor */
+
+/**
+ * Represents the featured events shown at the top of the page.
+ *
+ * TODO: Needs to be cleaned up a lot.
+ * @class
+ * @extends React.Component
+ *
+ */
 export default class FeaturedEvents extends React.Component {
 
+    /** @inheritDoc */
     componentDidMount() {
+        // Setup code to make the animation of the events sliding in.
         var projectsContainer = $('.cd-projects-wrapper'),
             projectsSlider = projectsContainer.children('.cd-slider'),
             sliderNav = $('.cd-slider-navigation');

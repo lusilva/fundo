@@ -1,5 +1,7 @@
 import { refresh } from './refresh';
 
+// Add a cron job to run periodically and run the refresh function to refresh the cache.
+// This mainly just checks for expired events and removes them.
 SyncedCron.add({
     name: 'refresh',
     schedule: function (parser) {
@@ -8,3 +10,7 @@ SyncedCron.add({
     },
     job: refresh
 });
+
+
+// Start the scheduler.
+SyncedCron.start();

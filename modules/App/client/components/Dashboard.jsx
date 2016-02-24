@@ -1,4 +1,4 @@
-/* global React */
+/* global React, Meteor, ReactMeteorData */
 
 import { isUserVerified } from 'App/helpers';
 import Alert from 'react-s-alert';
@@ -11,10 +11,26 @@ import Filters from './Filters';
 /**
  * The dashboard view that the user sees upon logging in.
  *
+ * @class
  * @extends React.Component
  */
 @ReactMixin.decorate(ReactMeteorData)
 export default class Dashboard extends React.Component {
+
+    /**
+     * The props that this component expects.
+     *
+     * @type {{currentUser: *}}
+     */
+    static propTypes = {
+        currentUser: React.PropTypes.object
+    };
+
+    /**
+     * The state of the dashboard.
+     *
+     * @type {{filter: {open: boolean}, isSendingEmail: boolean, location: ?string}}
+     */
     state = {
         filter: {
             open: false
@@ -23,14 +39,21 @@ export default class Dashboard extends React.Component {
         location: null
     };
 
-    subs = [];
-
+    /**
+     * Function that runs automatically everytime the data that its subscribed to changes.
+     * In this case, it provides the user preferences data. This is accessible in the rest of the
+     * component through this.data.preferences.
+     *
+     * @returns {{preferences: ?PreferenceSet}}
+     */
     getMeteorData() {
         // Get all necessary subscriptions
         Meteor.subscribe('userpreferences');
 
+        // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
+        // Return the preference. This is available in this.data.preferences.
         return {preferences}
     };
 
@@ -43,6 +66,7 @@ export default class Dashboard extends React.Component {
             .sidebar({
                 context: $(rootNode).find('.ui.bottom'),
                 dimPage: false,
+                // Every time the sidebar state changes, update this.state.filter.open.
                 onVisible: function () {
                     this.setState({filter: {open: true}});
                 }.bind(this),
@@ -50,19 +74,30 @@ export default class Dashboard extends React.Component {
                     this.setState({filter: {open: false}});
                 }.bind(this)
             });
-        // TODO: implement this maybe?
-        Meteor.call('guessUserLocation', function (err, res) {
-            console.log(err);
-            console.log(res);
-        });
+
+        /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
+        //Meteor.call('guessUserLocation', function (err, res) {
+        //    console.log(err);
+        //    console.log(res);
+        //});
     };
 
+    /**
+     * Toggles the filter menu sidebar.
+     *
+     * @private
+     */
     _toggleFilterMenu() {
-        // Same thing as before, might want to store this as a variable
+        // Same thing as before, might want to store this as a variable.
         let rootNode = ReactDOM.findDOMNode(this);
         $(rootNode).find('.ui.sidebar').sidebar('toggle');
     };
 
+    /**
+     * Sends the verification email when the user clicks the 'Send Again' button.
+     *
+     * @private
+     */
     _sendEmailVerification() {
         this.setState({isSendingEmail: true});
         Meteor.call('resendEmailVerification', function (err, res) {
@@ -75,7 +110,14 @@ export default class Dashboard extends React.Component {
         }.bind(this))
     };
 
+    /**
+     * Gets the header for the page if the user is not verified.
+     *
+     * @returns {XML} - The header for the page.
+     * @private
+     */
     _getVerifyEmailHeader() {
+        // If the user object isn't available yet, display a loading message.
         if (!this.props.currentUser) {
             return (
                 <div className="ui text container middle aligned">
@@ -86,6 +128,7 @@ export default class Dashboard extends React.Component {
             );
         }
 
+        // Else, display the verify email message.
         return (
             <div className="ui text container center aligned verify-email">
                 <h2>An email was sent to {this.props.currentUser.emails[0].address}.</h2>
@@ -98,6 +141,12 @@ export default class Dashboard extends React.Component {
         )
     };
 
+    /**
+     * Shows the header content when the user is verified.
+     *
+     * @returns {XML} - The header content containing the featured events.
+     * @private
+     */
     _showHeadContent() {
         return <FeaturedEvents />
     };

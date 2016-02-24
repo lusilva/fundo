@@ -1,10 +1,14 @@
-/**
- * Created by lusilva on 2/21/16.
- */
+/* global React, Meteor */
 
 import GridEvent from './GridEvent';
 import AbsoluteGrid from 'react-absolute-grid';
 
+/**
+ * The grid view of all the events at the bottom of the dashboard.
+ *
+ * @class
+ * @extends React.Component
+ */
 export default class EventGrid extends React.Component {
 
     state = {
@@ -18,6 +22,7 @@ export default class EventGrid extends React.Component {
         ]
     };
 
+    /** @inheritDoc */
     render() {
         return (
             <div className="ui container">
