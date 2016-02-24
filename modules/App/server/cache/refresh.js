@@ -1,13 +1,16 @@
 import getAllEventsForCity from 'App/server/eventful/reader';
 import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from 'App/collections/Event';
+import createEventfulEvent from 'App/collections/EventfulEventCreator';
 import Logger from 'App/logger';
 
 Meteor.methods({
-    "refresh": function() {refresh()}
+    "refresh": function () {
+        refresh()
+    }
 });
 
-export default function refresh() {
+export function refresh() {
     // Remove all events that have already happened. THIS CAN'T REALLY BE DONE YET BECAUSE OF TIMEZONE ISSUES.
     // Event.getCollection().remove({stop_time: {$gte: new Date()}});
 
@@ -22,42 +25,10 @@ export default function refresh() {
     _.each(cities, function (city) {
         updateAllEventsForCity(city);
     });
-};
-
-
-function updateAllEventsForCity(city) {
-    // Get all events for the city
-    getAllEventsForCity(city, createEvent.bind(this, city));
 }
 
-function createEvent(city, event) {
 
-    let dbEvent = new Event(
-        event.id,
-        null,
-        [city],
-        event.title,
-        event.description,
-        event.popularity_score,
-        {
-            lat: event.latitude,
-            lng: event.longitude
-        },
-        event.start_time,
-        event.stop_time,
-        event.image,
-        {
-            address: event.venue_address,
-            name: event.venue_name,
-            url: event.venue_url
-        },
-        event.url,
-        event.price,
-        _.pluck(event.categories.category, 'name')
-    );
-    dbEvent.save(function (err, res) {
-        if (err) {
-            Logger.error('ERROR: could not save event %s', event.id, err);
-        }
-    });
+export function updateAllEventsForCity(city) {
+    // Get all events for the city
+    getAllEventsForCity(city, createEventfulEvent.bind(this, city));
 }

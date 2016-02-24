@@ -1,4 +1,8 @@
 // Create Preference collection
+import Event from './Event';
+import{ updateAllEventsForCity } from 'App/server/cache/refresh';
+
+
 const PreferenceSets = new Meteor.Collection("preferencesets", {
     transform: function (doc) {
         return new PreferenceSet(
@@ -72,9 +76,59 @@ export default class PreferenceSet {
 
         // If the preference object already exists, modify it
         if (this.id) {
+
+            let existingSet = PreferenceSets.findOne({_id: this.id});
+
+            // Check if location has changed.
+            if (existingSet.location != this.location) {
+
+                // If there are no events for this city, then fetch some.
+                let eventsAlreadyExistForNewLocation = Event.numEventsInCity(this.location) > 0;
+
+                // If there are no events for this city yet, then fetch events for it.
+                if (!eventsAlreadyExistForNewLocation) {
+
+                    // Fetch more events for this city
+                    updateAllEventsForCity(this.location);
+
+                    // Add a cron job to automatically refresh this city every 24 hours.
+                    SyncedCron.add({
+                        name: 'eventful-' + this.location,
+                        schedule: function (parser) {
+                            // parser is a later.parse object
+                            return parser.text(Meteor.settings.refreshEventsEvery || 'every 2 hours');
+                        },
+                        job: updateAllEventsForCity.bind(this, this.location)
+                    });
+                }
+
+                // Check if the old city still has any users. If not, then remove the cron job for it, and remove
+                // it from the list of relevant cities.
+                if (existingSet.location && PreferenceSets.find({location: existingSet.location}).count() == 1) {
+
+                    // Remove the cron job.
+                    SyncedCron.remove('eventful-' + existingSet.location);
+
+                    // Remove the old location from the list of relevant cities for events.
+                    _.each(Event.findEventsInCity(existingSet.location).fetch(), function (event) {
+                        let newRelevantCities = _.without(event.relevant_cities, existingSet.location);
+                        if (newRelevantCities.length > 0) {
+                            event.relevant_cities = newRelevantCities;
+                            event.save(function (err, res) {
+
+                            });
+                        } else {
+                            event.remove();
+                        }
+                    });
+                }
+            }
+
             PreferenceSets.update(this.id, {$set: doc}, callback);
             // Else create new
         } else {
+            // Don't have to worry about location change here because PreferenceSets are only
+            // created once per user, right after user creation. The location is initially null.
             var that = this;
             PreferenceSets.insert(doc, function (error, result) {
                 that._id = result;

@@ -1,3 +1,5 @@
+import PreferenceSet from 'App/collections/PreferenceSet';
+
 Meteor.methods({
     "log": function (level, logArguments) {
         logArguments.unshift(level);
@@ -16,5 +18,14 @@ Meteor.methods({
     "guessUserLocation": function () {
         let ip = this.connection.clientAddress;
         console.log(ip);
+    },
+    "updatePreferences": function(preferences, callback) {
+        let newPrefs = new PreferenceSet(
+            preferences._id,
+            preferences._userId,
+            preferences._indices,
+            preferences._location
+        );
+        newPrefs.save(callback);
     }
 });

@@ -26,11 +26,15 @@ export default class Dashboard extends React.Component {
     subs = [];
 
     getMeteorData() {
-        this.subs.push(Meteor.subscribe('userpreferences'));
-
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         return {preferences}
+    };
+
+    componentWillMount() {
+        // Get all necessary subscriptions
+        this.subs.push(Meteor.subscribe('userpreferences'));
+        this.subs.push(Meteor.subscribe('events'));
     };
 
     componentDidMount() {

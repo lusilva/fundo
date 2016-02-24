@@ -116,8 +116,20 @@ export default class Event {
         return this._popularity_score;
     };
 
+    set relevant_cities(relevant_cities) {
+        this._relevant_cities = relevant_cities;
+    };
+
     static getCollection() {
         return Events;
+    };
+
+    static numEventsInCity(city) {
+        return Event.findEventsInCity(city).count() > 0;
+    };
+
+    static findEventsInCity(city) {
+        return Event.getCollection().find({relevant_cities: {$in: [city]}});
     };
 
     save(callback) {
@@ -183,7 +195,7 @@ export default class Event {
         }
     };
 
-    delete(callback) {
+    remove(callback) {
         if (Events.find({_id: this.id}).count() > 0)
             Events.remove(this.id, callback);
         else
