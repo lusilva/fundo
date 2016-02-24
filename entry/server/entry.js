@@ -19,6 +19,15 @@ Accounts.onCreateUser(function (options, user) {
 
 // Do server-rendering only in production mode
 if (process.env.NODE_ENV === 'production') {
+    
+    //-- Application name
+    Accounts.emailTemplates.siteName = 'fundo';
+
+    //-- Subject line of the email.
+    Accounts.emailTemplates.verifyEmail.subject = function (user) {
+        return 'Welcome to fundo, the ultimate event discovery tool!';
+    };
+
     // Load Webpack infos for SSR
     ReactRouterSSR.LoadWebpackStats(WebpackStats);
 
