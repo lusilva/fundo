@@ -1,4 +1,5 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
+import Logger from 'App/logger';
 
 Meteor.methods({
     "log": function (level, logArguments) {
@@ -19,13 +20,19 @@ Meteor.methods({
         let ip = this.connection.clientAddress;
         console.log(ip);
     },
-    "updatePreferences": function (preferences, callback) {
+    "updatePreferences": function (preferences) {
         let newPrefs = new PreferenceSet(
             preferences._id,
             this.userId,
             preferences._indices,
             preferences._location
         );
-        newPrefs.save(callback);
+        newPrefs.save(function (err, res) {
+            if (err) {
+                Logger.error('could not update preference set for user %s', this.userId, err);
+            } else {
+                Logger.debug('successfully updated preference set for user %s', this.userId, res);
+            }
+        }.bind(this));
     }
 });

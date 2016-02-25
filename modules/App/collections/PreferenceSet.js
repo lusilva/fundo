@@ -1,6 +1,7 @@
 // Create Preference collection
 import Event from './Event';
 import{ updateAllEventsForCity } from 'App/server/cache/refresh';
+import Logger from 'App/logger';
 
 
 const PreferenceSets = new Meteor.Collection("preferencesets", {
@@ -114,10 +115,16 @@ export default class PreferenceSet {
                         if (newRelevantCities.length > 0) {
                             event.relevant_cities = newRelevantCities;
                             event.save(function (err, res) {
-
+                                if (err) {
+                                    Logger.error('error saving event %s', event.id, event, err);
+                                }
                             });
                         } else {
-                            event.remove();
+                            event.remove(function(err, res) {
+                                if (err) {
+                                    Logger.error('error deleting event %s', event.id, event, err);
+                                }
+                            });
                         }
                     });
                 }

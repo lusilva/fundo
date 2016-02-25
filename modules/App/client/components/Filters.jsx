@@ -5,6 +5,10 @@ import GeoSuggest from 'react-geosuggest';
  * The view for the filters shown in the sidebar on the dashboard.
  */
 export default class Filters extends React.Component {
+    static propTypes = {
+        filterChangeCallback: React.PropTypes.func.isRequired,
+        preferences: React.PropTypes.object
+    };
 
     /**
      * The state of the filters.
@@ -29,7 +33,7 @@ export default class Filters extends React.Component {
 
 
     /** @inheritDoc */
-    compnentWillUnmount() {
+    componentWillUnmount() {
         this._clearMessage();
     };
 
@@ -70,21 +74,29 @@ export default class Filters extends React.Component {
     /**
      * Shows a message to the user.
      *
-     * @param isError {boolean} - Whether or not this message is an error.
-     * @param message {string) - The message to display.
-     * @param opt_duration {number} - The number of milliseconds to show this message for.
+     * @param isError {boolean} - Whether or not this is an error message
+     * @param messageText {string} - The message to display
+     * @param opt_duration - The number of milliseconds to display the message for.
      * @private
      */
-    _showMessage(isError, message, opt_duration) {
+    _showMessage(isError, messageText, opt_duration) {
         this._clearMessage();
         let className = isError ? 'negative' : 'positive';
-        this.setState({message: {text: message, className: className}});
+        this.setState({message: {text: messageText, className: className}});
         if (opt_duration) {
-            this.timeoutHandle = Meteor.setTimeout(function () {
-                this.setState({message: null});
-            }.bind(this), duration);
+            this.timeoutHandle =
+                Meteor.setTimeout(this._clearMessage.bind(this), opt_duration);
         }
+    };
 
+
+    /**
+     * Stop displaying the loading message.
+     *
+     * @private
+     */
+    _filterChangeCallback(newPreferences) {
+        this.props.filterChangeCallback(newPreferences);
     };
 
 
@@ -97,7 +109,7 @@ export default class Filters extends React.Component {
     _updateUserLocation(suggest) {
         // Check is this is a valid place.
         if (!suggest.placeId && suggest.label != this.state.preferences.location) {
-            this._showMessage(true, suggest.label + ' is not a valid location!');
+            this._showMessage(true, (suggest.label + ' is not a valid location!'));
             this.refs.geosuggest.update(this.state.preferences.location || '');
             return;
         }
@@ -107,15 +119,16 @@ export default class Filters extends React.Component {
             return;
 
         // Show the loading spinner while preferences are updated on the server.
-        this.setState({loading: true});
         preferences.location = suggest.label;
+        let that = this;
         Meteor.call("updatePreferences", preferences, function (err, res) {
-            this.setState({loading: false});
             if (!err) {
-                this._showMessage(false, 'Location updated to ' + suggest.label, 5000);
+                let message = 'Location updated to ' + suggest.label;
+                that._showMessage(false, message, 5000);
             } else {
                 Alert.error('Error occurred while updating location');
             }
+            this._filterChangeCallback(preferences);
         }.bind(this));
     };
 
@@ -137,30 +150,28 @@ export default class Filters extends React.Component {
         let initialLocation = (this.state.preferences && this.state.preferences.location) ?
             this.state.preferences.location : null;
 
-        let filters =
-            (typeof window != 'undefined') && window.google && window.google.maps && !this.state.loading ?
-                (
-                    <div className="ui container">
-                        {this._getMessage()}
-                        <div className="ui header item center">Select Location</div>
-                        <div className="ui item center">
-                            <GeoSuggest country="us"
-                                        types={['(cities)']}
-                                        initialValue={initialLocation || ''}
-                                        autoActivateFirstSuggest={true}
-                                        onSuggestSelect={this._updateUserLocation.bind(this)}
-                                        skipSuggest={this._skipSuggestFunc.bind(this)}
-                                        ref='geosuggest'
-                            />
-                        </div>
-                        <div className="ui header item center">Select Price</div>
+        return (typeof window != 'undefined') && window.google && window.google.maps && !this.state.loading ?
+            (
+                <div className="ui container">
+                    {this._getMessage()}
+                    <div className="ui header item center">Select Location</div>
+                    <div className="ui item center">
+                        <GeoSuggest country="us"
+                                    types={['(cities)']}
+                                    initialValue={initialLocation || ''}
+                                    autoActivateFirstSuggest={true}
+                                    onSuggestSelect={this._updateUserLocation.bind(this)}
+                                    skipSuggest={this._skipSuggestFunc.bind(this)}
+                                    ref='geosuggest'
+                        />
                     </div>
-                ) :
-                (
-                    <div className="ui active dimmer">
-                        <div className="ui text loader">Loading</div>
-                    </div>
-                );
-        return filters;
+                    <div className="ui header item center">Select Price</div>
+                </div>
+            ) :
+            (
+                <div className="ui active dimmer">
+                    <div className="ui text loader">Loading</div>
+                </div>
+            );
     }
 }

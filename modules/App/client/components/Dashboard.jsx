@@ -36,7 +36,8 @@ export default class Dashboard extends React.Component {
             open: false
         },
         isSendingEmail: false,
-        location: null
+        location: null,
+        loading: false
     };
 
     /**
@@ -151,12 +152,30 @@ export default class Dashboard extends React.Component {
         return <FeaturedEvents />
     };
 
+
+    /**
+     * The callback function called when a user updates his/her preferences via the filters.
+     *
+     * @param newPrefs {PreferenceSet} - The user's new preference set.
+     * @private
+     */
+    _filterChangeCallback(newPrefs) {
+        // TODO: do something here to reload the events, or maybe show a loading.
+        console.log(newPrefs);
+    };
+
+    
     /** @inheritDoc */
     render() {
 
         let mastheadContent = isUserVerified(this.props.currentUser) ?
             this._showHeadContent() :
             this._getVerifyEmailHeader();
+
+        let loading = this.state.loading ?
+            <div className="ui active dimmer">
+                <div className="ui text loader">Loading</div>
+            </div> : null;
 
         return (
             <div>
@@ -183,11 +202,13 @@ export default class Dashboard extends React.Component {
                 </div>
                 <div className="ui bottom attached segment pushable">
                     <div className="ui left vertical sidebar menu">
-                        <Filters preferences={this.data.preferences}/>
+                        <Filters preferences={this.data.preferences}
+                                 filterChangeCallback={this._filterChangeCallback.bind(this)}/>
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            <EventGrid />
+                            {loading}
+                            <EventGrid />;
                         </div>
                     </div>
                 </div>
