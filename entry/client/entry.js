@@ -1,3 +1,9 @@
+/**
+ * This is the main entry point in the client. Import any code here that you want the client
+ * to see/execute when it initially starts up.
+ */
+
+
 import './routes';
 import 'App/collections/Event';
 import 'App/collections/PreferenceSet';

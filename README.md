@@ -59,7 +59,13 @@ fundo is a web application which will allow users to discover nearby events. It'
             "eventfulAPIKey": <EVENTFUL_API_KEY_GOES_HERE>,
             "maxPagesPerCity": <NUMBER>,
             "hoursEventsExpiresIn": <NUMBER>,
-            "refreshEventsEvery": <STRING (eg "every 2 hours")>
+            "refreshEventsEvery": <STRING (eg "every 2 hours")>,
+            "mail": {
+                "server": <STRING>,
+                "username": <STRING>,
+                "password": <STRING>,
+                "port": <STRING>
+              }
         }
 
 #### Run in production mode (with SSR enabled)

@@ -1,60 +1,57 @@
-/**
- * Created by lusilva on 2/21/16.
- */
+/* global React, Meteor */
 
 import GridEvent from './GridEvent';
-import AbsoluteGrid from 'react-absolute-grid';
+import Alert from 'react-s-alert';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
+import ReactMixin from 'react-mixin';
 
+import ReactShuffle from "react-shuffle";
+
+/**
+ * The grid view of all the events at the bottom of the dashboard.
+ *
+ * @class
+ * @extends React.Component
+ */
+@ReactMixin.decorate(PureRenderMixin)
 export default class EventGrid extends React.Component {
 
-    state = {
-        events: [],
-        preferences: this.props.preferences
+    static propTypes = {
+        events: React.PropTypes.array.isRequired
     };
 
-    componentDidMount() {
-        if (this.state.preferences)
-            this._updateEvents(this.state.preferences);
+    state = {
+        eventsSet: []
     };
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
-        if (nextProps.preferences != this.state.preferences)
-            this._updateEvents(nextProps.preferences);
+        if (!_.isEqual(nextProps.events, this.state.events)) {
+            this._updateEventsSet(nextProps.events);
+        }
     };
 
-    _updateEvents(preferences){
-        console.log('GETTING EVENTS!');
-        Meteor.call("getEventsForUser", preferences, function(error, result) {
-            console.log(result);
-            // loop through each event in result
-            _.map(result, function(event, index){
-                var filtered = 0;
-                if (index > 20 ){
-                    filtered = 1;
-                }
-                console.log(event.id);
-                return {key: event._id, event: event, sort: 0, filtered: filtered}
+    resetEvents() {
+        this.setState({eventSet: []});
+    };
 
-            });
+    _updateEventsSet(newEvents) {
+        let events = [];
+        _.each(newEvents, function (event) {
+            if (!_.contains(this.state.eventsSet, event)) {
+                events.push(event);
+            }
+        }.bind(this));
+        this.setState({eventsSet: events});
+    };
 
-            //check for error first
-
-            // make each item
-            this.setState({events: result, preferences: preferences});
-        }.bind(this) );
-    }
-
+    /** @inheritDoc */
     render() {
         return (
             <div className="ui container">
-                <div className="ui grid-events">
-                    <AbsoluteGrid items={this.state.events}
-                                  displayObject={<GridEvent />}
-                                  responsive={true}
-                                  itemHeight={463}
-                                  itemWidth={290}
-                    />
+                <div className="ui cards">
+                    {_.map(this.state.eventsSet, function (event) {
+                        return (<GridEvent key={event.id} event={event}/>);
+                    })}
                 </div>
             </div>
         )

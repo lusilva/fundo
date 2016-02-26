@@ -1,4 +1,4 @@
-export default class Event extends React.Component {
+export default class GridEvent extends React.Component {
 
     componentDidMount() {
 
@@ -11,11 +11,11 @@ export default class Event extends React.Component {
 
     render() {
         return (
-            <div className="ui card small">
+            <div className="ui centered card">
                 <div className="content">
                     <i className="right floated thumbs up large icon"/>
                     <i className="right floated thumbs down large icon"/>
-                    <div className="header">Event Name</div>
+                    <div className="header">{this.props.event.title}</div>
                 </div>
                 <div className="blurring image dimmable dimmer-image">
                     <div className="ui dimmer">

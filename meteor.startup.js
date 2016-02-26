@@ -76,3 +76,11 @@ if (Meteor.isClient) {
         });
     });
 }
+
+
+if (Meteor.settings.mail) {
+    process.env.MAIL_URL = 'smtp://' +
+        encodeURIComponent(Meteor.settings.mail.username) + ':' +
+        encodeURIComponent(Meteor.settings.mail.password) + '@' +
+        encodeURIComponent(Meteor.settings.mail.server) + ':' + Meteor.settings.mail.port;
+}

@@ -1,5 +1,7 @@
-import PreferenceSet from "App/collections/PreferenceSet";
+import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from "App/collections/Event";
+import Logger from 'App/logger';
+
 
 Meteor.methods({
     "log": function (level, logArguments) {
@@ -20,27 +22,25 @@ Meteor.methods({
         let ip = this.connection.clientAddress;
         console.log(ip);
     },
-
     "getEventsForUser": function (userPref) {
-        
-        // var userID = this.userId;
-        // // else get and return events for user's city from db
-        // var userPref = PreferenceSet.getCollection().findOne({userId: userID});
-        
-
-        // null check
-
         var userCity = userPref._location;
+        return Event.findEventsInCity(userCity);
+    },
+    "updatePreferences": function (preferences) {
+        let newPrefs = new PreferenceSet(
+            preferences._id,
+            this.userId,
+            preferences._indices,
+            preferences._location
+        );
+        newPrefs.save(function (err, res) {
+            if (err) {
+                Logger.error('could not update preference set for user %s', this.userId, err);
+            } else {
+                Logger.debug('successfully updated preference set for user %s', this.userId, res);
+            }
+        }.bind(this));
 
-        console.log(Event.getCollection().find({}).fetch()[0]);
-
-        console.log(userPref);
-
-
-        var events = [Event.getCollection().findOne({relevant_cities: { $in: [userCity] } } )];
-
-        console.log(events);
-
-        return events;
+        return Event.getCollection().find({relevant_cities: {$in: [newPrefs.location]}}).fetch();
     }
 });
