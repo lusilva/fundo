@@ -6,7 +6,9 @@ import FeaturedEvents from './FeaturedEvents';
 import EventGrid from './EventGrid';
 import ReactMixin from 'react-mixin';
 import PreferenceSet from 'App/collections/PreferenceSet';
+import Event from 'App/collections/Event';
 import Filters from './Filters';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -14,6 +16,7 @@ import Filters from './Filters';
  * @class
  * @extends React.Component
  */
+@ReactMixin.decorate(PureRenderMixin)
 @ReactMixin.decorate(ReactMeteorData)
 export default class Dashboard extends React.Component {
 
@@ -37,7 +40,8 @@ export default class Dashboard extends React.Component {
         },
         isSendingEmail: false,
         location: null,
-        loading: false
+        loading: false,
+        limit: 20
     };
 
     /**
@@ -54,8 +58,12 @@ export default class Dashboard extends React.Component {
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-        // Return the preference. This is available in this.data.preferences.
-        return {preferences}
+        Meteor.subscribe('events', this.state.limit, preferences ? preferences.location : null);
+
+        let events = Event.getCollection().find().fetch();
+
+        // Return the preference and the user's events. This is available in this.data.
+        return {preferences, events}
     };
 
     componentDidMount() {
@@ -159,23 +167,24 @@ export default class Dashboard extends React.Component {
      * @param newPrefs {PreferenceSet} - The user's new preference set.
      * @private
      */
-    _filterChangeCallback(newPrefs) {
-        // TODO: do something here to reload the events, or maybe show a loading.
-        console.log(newPrefs);
+    _filterChangeCallback() {
+        this.refs.EventGrid.resetEvents();
     };
 
-    
+
+    /**
+     *
+     */
+    _setLoadingCallback(isLoading) {
+        this.setState({loading: isLoading});
+    };
+
+
     /** @inheritDoc */
     render() {
-
         let mastheadContent = isUserVerified(this.props.currentUser) ?
             this._showHeadContent() :
             this._getVerifyEmailHeader();
-
-        let loading = this.state.loading ?
-            <div className="ui active dimmer">
-                <div className="ui text loader">Loading</div>
-            </div> : null;
 
         return (
             <div>
@@ -203,12 +212,21 @@ export default class Dashboard extends React.Component {
                 <div className="ui bottom attached segment pushable">
                     <div className="ui left vertical sidebar menu">
                         <Filters preferences={this.data.preferences}
-                                 filterChangeCallback={this._filterChangeCallback.bind(this)}/>
+                                 filterChangeCallback={this._filterChangeCallback.bind(this)}
+                                 setLoadingCallback={this._setLoadingCallback.bind(this)}
+                        />
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {loading}
-                            <EventGrid />;
+                            {
+                                this.state.loading || this.data.events.length == 0 ?
+                                    <div className="ui active dimmer">
+                                        <div className="ui loader"></div>
+                                    </div> :
+                                    <EventGrid events={this.data.events}
+                                               preferences={this.data.preferences}
+                                               ref="EventGrid"/>
+                            }
                         </div>
                     </div>
                 </div>

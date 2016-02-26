@@ -1,7 +1,11 @@
 /* global React, Meteor */
 
 import GridEvent from './GridEvent';
-import AbsoluteGrid from 'react-absolute-grid';
+import Alert from 'react-s-alert';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
+import ReactMixin from 'react-mixin';
+
+import ReactShuffle from "react-shuffle";
 
 /**
  * The grid view of all the events at the bottom of the dashboard.
@@ -9,31 +13,45 @@ import AbsoluteGrid from 'react-absolute-grid';
  * @class
  * @extends React.Component
  */
+@ReactMixin.decorate(PureRenderMixin)
 export default class EventGrid extends React.Component {
 
+    static propTypes = {
+        events: React.PropTypes.array.isRequired
+    };
+
     state = {
-        items: [
-            {key: 1, name: 'Test', sort: 0, filtered: 0},
-            {key: 2, name: 'Test 1', sort: 1, filtered: 0},
-            {key: 3, name: 'Test', sort: 0, filtered: 0},
-            {key: 4, name: 'Test 1', sort: 1, filtered: 0},
-            {key: 5, name: 'Test', sort: 0, filtered: 0},
-            {key: 6, name: 'Test 1', sort: 1, filtered: 0}
-        ]
+        eventsSet: []
+    };
+
+    componentWillReceiveProps(nextProps) {
+        if (!_.isEqual(nextProps.events, this.state.events)) {
+            this._updateEventsSet(nextProps.events);
+        }
+    };
+
+    resetEvents() {
+        this.setState({eventSet: []});
+    };
+
+    _updateEventsSet(newEvents) {
+        let events = [];
+        _.each(newEvents, function (event) {
+            if (!_.contains(this.state.eventsSet, event)) {
+                events.push(event);
+            }
+        }.bind(this));
+        this.setState({eventsSet: events});
     };
 
     /** @inheritDoc */
     render() {
         return (
             <div className="ui container">
-                <div className="ui grid-events">
-                    <AbsoluteGrid items={this.state.items}
-                                  displayObject={<GridEvent />}
-                                  responsive={true}
-                                  itemHeight={463}
-                                  itemWidth={290}
-                                  zoom={1}
-                    />
+                <div className="ui cards">
+                    {_.map(this.state.eventsSet, function (event) {
+                        return (<GridEvent key={event.id} event={event}/>);
+                    })}
                 </div>
             </div>
         )

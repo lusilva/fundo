@@ -7,6 +7,7 @@ import GeoSuggest from 'react-geosuggest';
 export default class Filters extends React.Component {
     static propTypes = {
         filterChangeCallback: React.PropTypes.func.isRequired,
+        setLoadingCallback: React.PropTypes.func.isRequired,
         preferences: React.PropTypes.object
     };
 
@@ -100,6 +101,11 @@ export default class Filters extends React.Component {
     };
 
 
+    _setLoading(isLoading) {
+        this.props.setLoadingCallback(isLoading);
+    };
+
+
     /**
      * Updates the user's location preference
      *
@@ -121,6 +127,8 @@ export default class Filters extends React.Component {
         // Show the loading spinner while preferences are updated on the server.
         preferences.location = suggest.label;
         let that = this;
+        this._filterChangeCallback();
+        this._setLoading(true);
         Meteor.call("updatePreferences", preferences, function (err, res) {
             if (!err) {
                 let message = 'Location updated to ' + suggest.label;
@@ -128,7 +136,7 @@ export default class Filters extends React.Component {
             } else {
                 Alert.error('Error occurred while updating location');
             }
-            this._filterChangeCallback(preferences);
+            this._setLoading(false);
         }.bind(this));
     };
 
