@@ -8,9 +8,19 @@ export default class GridEvent extends React.Component {
 
     componentDidMount() {
         var rootNode = ReactDOM.findDOMNode(this);
-        $(rootNode).find('.dimmer-image').dimmer({
-            on: 'hover'
-        });
+        $(rootNode).find('img')
+            .visibility({
+                type: 'image',
+                transition: 'fade in',
+                duration: 1000
+            });
+    };
+
+
+    _sanitizeHTML(htmlString, fallbackText) {
+        let div = document.createElement("div");
+        div.innerHTML = htmlString;
+        return div.textContent || div.innerText || fallbackText;
     };
 
     render() {
@@ -28,18 +38,18 @@ export default class GridEvent extends React.Component {
                             line={1}
                             truncateText="…"
                             text={this.props.event.title}
-                            showTitle={true}/>
+                            showTitle={false}/>
                     </div>
                 </div>
-                <div className="blurring image dimmable dimmer-image">
-                    <div className="ui dimmer">
-                        <div className="content">
-                            <div className="center">
-                                {this.props.event.description}
-                            </div>
-                        </div>
+                <div className="ui slide masked reveal event-grid-image">
+                    <img src={eventImage} data-src={eventImage} className="visible transition content image"/>
+                    <div className="ui hidden content text event-description">
+                        <TextTruncate
+                            line={14}
+                            truncateText="…"
+                            text={this._sanitizeHTML(this.props.event.description, "No Description Available")}
+                            showTitle={false}/>
                     </div>
-                    <img src={eventImage}/>
                 </div>
                 <div className="content">
                     <a className="header">Team Fu</a>

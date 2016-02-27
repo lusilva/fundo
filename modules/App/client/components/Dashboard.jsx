@@ -208,6 +208,18 @@ export default class Dashboard extends React.Component {
                 <div className="ui loader"></div>
             </div> : null;
 
+        let getSelectLocationOverlay = this.data.preferences && !this.data.preferences.location ?
+            <div className="ui active dimmer">
+                <div className="content">
+                    <div className="center">
+                        <img className="ui image centered medium" src={require('../img/fundo.png')}/>
+                        <h2 className="ui inverted header">
+                            Unfortunately we're not psychic. Please select a location for us to show you events for.
+                        </h2>
+                    </div>
+                </div>
+            </div> : null;
+
         return (
             <div>
                 <div className="ui inverted vertical segment dashboard-masthead primary-color">
@@ -240,7 +252,7 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {loading}
+                            {loading || getSelectLocationOverlay}
                             <EventGrid events={this.data.events}
                                        preferences={this.data.preferences}
                                        ref="EventGrid"/>
