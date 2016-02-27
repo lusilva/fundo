@@ -147,7 +147,6 @@ export default class Layout extends React.Component {
                                         <a href="https://rcos.io" className="item">RCOS Website</a>
                                         <a href="https://github.com/lusilva/fundo" className="item">GitHub</a>
                                     </div>
-
                                 </div>
                                 <div className="seven wide column">
                                     <h4 className="ui inverted header">Who We Are</h4>

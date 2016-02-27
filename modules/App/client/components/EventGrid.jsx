@@ -64,7 +64,7 @@ export default class EventGrid extends React.Component {
     render() {
         return (
             <div className="ui container">
-                <div className="ui cards">
+                <div className="ui stackable three column grid">
                     {_.map(_.values(this.state.eventsSet), function (event) {
                         return (<GridEvent key={event.id} event={event}/>);
                     })}
