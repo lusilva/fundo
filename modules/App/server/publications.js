@@ -8,7 +8,7 @@ Meteor.publish('userpreferences', function () {
 Meteor.publish('events', function (limit, city) {
     if (this.userId) {
         var dl = limit || 10;
-        return Event.getCollection().find({relevant_cities: {$in: [city]}}, {limit: dl});
+        return Event.getCollection().find({relevant_cities: {$in: [city]}}, {limit: dl, sort: {popularity_score: -1}});
     }
     return null;
 });

@@ -16,13 +16,6 @@
     min-height: 500px;
 }
 
-.dashboard.grid-event {
-    display: block;
-    float: left;
-    margin: 20px;
-
-}
-
 .verify-email {
     left: 0;
     right: 0;

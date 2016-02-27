@@ -41,7 +41,7 @@ export default class Dashboard extends React.Component {
         isSendingEmail: false,
         location: null,
         loading: false,
-        limit: 20
+        limit: 10
     };
 
     /**
@@ -84,12 +84,28 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
+        $(rootNode).find('.main-content')
+            .visibility({
+                once: false,
+                // update size when new content loads
+                observeChanges: true,
+                // load content on bottom edge visible
+                onBottomVisible: this._loadMoreEvents.bind(this)
+            })
+        ;
+
         /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
         //Meteor.call('guessUserLocation', function (err, res) {
         //    console.log(err);
         //    console.log(res);
         //});
     };
+
+
+    _loadMoreEvents() {
+        this.setState({limit: Math.min(this.state.limit + 10, 100)});
+    };
+
 
     /**
      * Toggles the filter menu sidebar.
@@ -168,6 +184,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
+        this.setState({limit: 10});
         this.refs.EventGrid.resetEvents();
     };
 
@@ -185,6 +202,11 @@ export default class Dashboard extends React.Component {
         let mastheadContent = isUserVerified(this.props.currentUser) ?
             this._showHeadContent() :
             this._getVerifyEmailHeader();
+
+        let loading = this.state.loading ?
+            <div className="ui active dimmer">
+                <div className="ui loader"></div>
+            </div> : null;
 
         return (
             <div>
@@ -218,15 +240,10 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {
-                                this.state.loading || this.data.events.length == 0 ?
-                                    <div className="ui active dimmer">
-                                        <div className="ui loader"></div>
-                                    </div> :
-                                    <EventGrid events={this.data.events}
-                                               preferences={this.data.preferences}
-                                               ref="EventGrid"/>
-                            }
+                            {loading}
+                            <EventGrid events={this.data.events}
+                                       preferences={this.data.preferences}
+                                       ref="EventGrid"/>
                         </div>
                     </div>
                 </div>

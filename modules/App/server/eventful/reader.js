@@ -30,7 +30,8 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 units: 'miles',
                 sort_order: 'popularity',
                 page_number: page,
-                include: "price,categories"
+                include: "price,categories",
+                image_sizes: "medium,block,large,edpborder250,dropshadow250,dropshadow170,block178"
             }
         },
         function (error, result) {

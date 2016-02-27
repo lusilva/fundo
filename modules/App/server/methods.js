@@ -24,7 +24,7 @@ Meteor.methods({
     },
     "getEventsForUser": function (userPref) {
         var userCity = userPref._location;
-        return Event.findEventsInCity(userCity);
+        return Event.findEventsInCity(userCity).fetch();
     },
     "updatePreferences": function (preferences) {
         let newPrefs = new PreferenceSet(
