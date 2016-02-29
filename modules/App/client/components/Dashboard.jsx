@@ -1,14 +1,18 @@
 /* global React, Meteor, ReactMeteorData */
 
-import { isUserVerified } from 'App/helpers';
-import Alert from 'react-s-alert';
-import FeaturedEvents from './FeaturedEvents';
-import EventGrid from './EventGrid';
-import ReactMixin from 'react-mixin';
 import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from 'App/collections/Event';
-import Filters from './Filters';
+import Category from 'App/collections/Category';
+
+import Alert from 'react-s-alert';
+import ReactMixin from 'react-mixin';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
+
+import { isUserVerified } from 'App/helpers';
+import FeaturedEvents from './FeaturedEvents';
+import EventGrid from './EventGrid';
+import Filters from './Filters';
+
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -29,6 +33,7 @@ export default class Dashboard extends React.Component {
         currentUser: React.PropTypes.object
     };
 
+
     /**
      * The state of the dashboard.
      *
@@ -43,6 +48,7 @@ export default class Dashboard extends React.Component {
         loading: false,
         limit: 20
     };
+
 
     /**
      * Function that runs automatically everytime the data that its subscribed to changes.
@@ -62,10 +68,15 @@ export default class Dashboard extends React.Component {
 
         let events = Event.getCollection().find().fetch();
 
+        Meteor.subscribe('categories');
+
+        let categories = Category.getCollection().find().fetch();
+
         // Return the preference and the user's events. This is available in this.data.
-        return {preferences, events}
+        return {preferences, events, categories}
     };
 
+    /** @inheritDoc */
     componentDidMount() {
         // Localize the selector instead of having jQuery search globally
         var rootNode = ReactDOM.findDOMNode(this);
@@ -102,8 +113,13 @@ export default class Dashboard extends React.Component {
     };
 
 
+    /**
+     * Loads more events from the database, called when a user scrolls to the bottom of the page.
+     *
+     * @private
+     */
     _loadMoreEvents() {
-        this.setState({limit: Math.min(this.state.limit + 10, 100)});
+        this.setState({limit: Math.min(this.state.limit + 20, 100)});
     };
 
 
@@ -117,6 +133,7 @@ export default class Dashboard extends React.Component {
         let rootNode = ReactDOM.findDOMNode(this);
         $(rootNode).find('.ui.sidebar').sidebar('toggle');
     };
+
 
     /**
      * Sends the verification email when the user clicks the 'Send Again' button.
@@ -134,6 +151,7 @@ export default class Dashboard extends React.Component {
             }
         }.bind(this))
     };
+
 
     /**
      * Gets the header for the page if the user is not verified.
@@ -165,6 +183,7 @@ export default class Dashboard extends React.Component {
             </div>
         )
     };
+
 
     /**
      * Shows the header content when the user is verified.
@@ -212,9 +231,9 @@ export default class Dashboard extends React.Component {
             <div className="ui active dimmer">
                 <div className="content">
                     <div className="center">
-                        <img className="ui image centered medium" src={require('../img/fundo.png')}/>
-                        <h2 className="ui inverted header">
-                            Unfortunately we're not psychic. Please select a location for us to show you events for.
+                        <h2 className="ui inverted header container">
+                            Unfortunately we're not psychic.
+                            Please select a location for us to show you events for.
                         </h2>
                     </div>
                 </div>
@@ -246,6 +265,7 @@ export default class Dashboard extends React.Component {
                 <div className="ui bottom attached segment pushable">
                     <div className="ui left vertical sidebar menu">
                         <Filters preferences={this.data.preferences}
+                                 categories={this.data.categories}
                                  filterChangeCallback={this._filterChangeCallback.bind(this)}
                                  setLoadingCallback={this._setLoadingCallback.bind(this)}
                         />

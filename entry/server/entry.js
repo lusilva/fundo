@@ -5,6 +5,7 @@
 
 import PreferenceSet from 'App/collections/PreferenceSet';
 import 'App/collections/Event';
+import 'App/collections/Category';
 import 'App/server/methods';
 import 'App/logger';
 import 'App/server/publications';

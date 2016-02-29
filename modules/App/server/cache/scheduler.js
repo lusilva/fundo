@@ -1,5 +1,14 @@
 import { refresh } from './refresh';
 
+// Refresh when the server first starts up.
+Meteor.startup(function () {
+    refresh();
+});
+
+Meteor.methods({
+    "refresh": refresh
+});
+
 // Add a cron job to run periodically and run the refresh function to refresh the cache.
 // This mainly just checks for expired events and removes them.
 SyncedCron.add({

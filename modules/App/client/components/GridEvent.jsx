@@ -17,6 +17,11 @@ export default class GridEvent extends React.Component {
         event: React.PropTypes.object.isRequired
     };
 
+    state = {
+        liked: false,
+        disliked: false
+    };
+
     /** @inheritDoc */
     componentDidMount() {
         let rootNode = ReactDOM.findDOMNode(this);
@@ -35,7 +40,63 @@ export default class GridEvent extends React.Component {
 
         $(rootNode).find('.ui.modal.event-details')
             .modal('setting', 'transition', 'horizontal flip')
-            .modal('attach events', $(rootNode).find(".ui.fluid.card"), 'show')
+            .modal('attach events', $(rootNode).find(".more-info-button"), 'show');
+
+        this.setState({liked: _.contains(this.props.event.likes, Meteor.userId())});
+    };
+
+    _like(clickEvent) {
+        clickEvent.preventDefault();
+        this.props.event.like(function (err, res) {
+            if (err) {
+                this.setState({liked: false});
+            }
+        }.bind(this));
+        this.setState({liked: true});
+    };
+
+    _dislike(clickEvent) {
+        clickEvent.preventDefault();
+        this.props.event.dislike(function (err, res) {
+            if (err) {
+                this.setState({disliked: false});
+            }
+        }.bind(this));
+        this.setState({disliked: true});
+
+    };
+
+    _getLikes() {
+        let event = this.props.event;
+
+        if (this.state.disliked) {
+            return null;
+        }
+
+        return (
+            <span className="right floated">
+                <i className={"heart " + (this.state.liked ? "" : "outline") + " like icon"}
+                   onClick={this._like.bind(this)}/>
+                {event.likes.length} likes
+            </span>
+        );
+    };
+
+    _getDislikes() {
+        let event = this.props.event;
+
+        if (this.state.liked) {
+            return null;
+        }
+
+        return (
+            <span className="right floated">
+                <i className={"thumbs down " + (this.state.disliked ? "" : "outline") + " like icon"}
+                   onClick={this._dislike.bind(this)}/>
+                {event.dislikes.length} dislikes
+            </span>
+
+        );
     };
 
     _getCategoryRibbon() {
@@ -107,10 +168,10 @@ export default class GridEvent extends React.Component {
         //TODO: change this to be placeholder image based on category.
         let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";
         // First check if event has a medium image, if not then check if it has a large image.
-        if (event.image && event.image.medium) {
-            eventImage = event.image.medium.url;
-        } else if (event.image && event.image.large) {
+        if (event.image && event.image.large) {
             eventImage = event.image.large.url;
+        } else if (event.image && event.image.medium) {
+            eventImage = event.image.medium.url;
         }
 
         // Get the venue information, doing all necessary null checking.
@@ -120,10 +181,10 @@ export default class GridEvent extends React.Component {
         return (
             <div className="ui column">
                 <div className="ui fluid card">
-                        <div className="ui container header">
-                            {this._getCategoryRibbon()}
-                        </div>
-                    <div className="content">
+                    <div className="ui content">
+                        {this._getCategoryRibbon()}
+                    </div>
+                    <div className="ui content">
                         <div className="container header event-title" data-content={event.title}>
                             <TextTruncate
                                 line={1}
@@ -166,12 +227,13 @@ export default class GridEvent extends React.Component {
                                 {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
                             </span>
                         </div>
+                        <div className="meta">
+                            {this._getDislikes()}
+                            {this._getLikes()}
+                        </div>
                     </div>
-                    <div className="content">
-                    <span className="right floated">
-                        <i className="heart outline like icon"/>
-                            17 likes
-                    </span>
+                    <div className="ui bottom attached primary button more-info-button">
+                        More Info
                     </div>
                 </div>
                 <div className="ui modal event-details">

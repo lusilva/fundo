@@ -8,8 +8,10 @@ export default class Filters extends React.Component {
     static propTypes = {
         filterChangeCallback: React.PropTypes.func.isRequired,
         setLoadingCallback: React.PropTypes.func.isRequired,
-        preferences: React.PropTypes.object
+        preferences: React.PropTypes.object,
+        categories: React.PropTypes.array
     };
+
 
     /**
      * The state of the filters.

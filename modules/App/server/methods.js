@@ -45,19 +45,25 @@ Meteor.methods({
         return Event.getCollection().find({relevant_cities: {$in: [newPrefs.location]}}).fetch();
     },
     "like": function (eventId) {
-        if (this.userId)
+        let city = PreferenceSet.getCollection().findOne({userId: Meteor.userId()}).location;
+        if (this.userId && city && eventId) {
+            let event = Event.getCollection().findOne({_id: eventId});
+            if (!event || _.contains(event.likes, this.userId)) return;
+            Raccoon.city = city;
             Raccoon.liked(this.userId, eventId);
+        } else {
+            throw new Meteor.Error('invalid request');
+        }
     },
-    "getRecommendations": function (count) {
-        if (this.userId)
+    "getRecommendations": function () {
+        let city = PreferenceSet.getCollection().findOne({userId: Meteor.userId()}).location;
+        if (this.userId && city) {
+            Raccoon.city = city;
             Raccoon.recommendFor(this.userId, 10, function (results) {
                 console.log(results);
             });
-    },
-    "likedCount": function (eventId) {
-        Raccoon.likedCount(eventId, function (results) {
-            console.log(results);
-            // returns the number of users who have liked that item.
-        });
+        } else {
+            throw new Meteor.Error('invalid request');
+        }
     }
 });

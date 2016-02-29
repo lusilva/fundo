@@ -13,10 +13,15 @@ export default function createEvent(city, event) {
     // KEEP TRACK OF SAVED EVENTS.
     let existingEvent = Event.getCollection().findOne({_id: event.id});
     let owners = [];
+    let likes = [];
+    let dislikes = [];
     let relevant_cities = [city];
     if (!!existingEvent) {
         owners = existingEvent.owners;
         relevant_cities = _.union(relevant_cities, existingEvent.relevant_cities);
+
+        likes = _.union(likes, existingEvent.likes);
+        dislikes = _.union(dislikes, existingEvent.dislikes);
     }
 
     event = {
@@ -25,11 +30,12 @@ export default function createEvent(city, event) {
         relevant_cities: relevant_cities,
         title: event.title,
         description: event.description,
-        popularity_score: event.popularity_score,
+        popularity_score: event.popularity,
         position: {
             lat: event.latitude,
             lng: event.longitude
         },
+        tickets: event.tickets,
         start_time: event.start_time,
         stop_time: event.stop_time,
         image: event.image,
@@ -41,7 +47,9 @@ export default function createEvent(city, event) {
         url: event.url,
         links: event.links,
         price: event.price,
-        categories: event.categories.category
+        categories: event.categories.category,
+        likes: likes,
+        dislikes: dislikes
     };
 
 
