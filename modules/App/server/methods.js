@@ -1,6 +1,7 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from "App/collections/Event";
 import Logger from 'App/logger';
+import Raccoon from '../lib/raccoon/index';
 
 
 Meteor.methods({
@@ -42,5 +43,21 @@ Meteor.methods({
         }.bind(this));
 
         return Event.getCollection().find({relevant_cities: {$in: [newPrefs.location]}}).fetch();
+    },
+    "like": function (eventId) {
+        if (this.userId)
+            Raccoon.liked(this.userId, eventId);
+    },
+    "getRecommendations": function (count) {
+        if (this.userId)
+            Raccoon.recommendFor(this.userId, 10, function (results) {
+                console.log(results);
+            });
+    },
+    "likedCount": function (eventId) {
+        Raccoon.likedCount(eventId, function (results) {
+            console.log(results);
+            // returns the number of users who have liked that item.
+        });
     }
 });
