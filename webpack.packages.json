@@ -26,5 +26,8 @@
   "react-s-alert": "^1.0.2",
   "google-map-react": "^0.10.5",
   "immutable": "^3.7.6",
-  "react-geosuggest": "^1.18.1"
+  "react-geosuggest": "^1.18.1",
+  "fs": "^0.0.2",
+  "get-urls": "^5.0.0",
+  "html-to-text": "^2.0.0"
 }

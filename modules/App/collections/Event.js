@@ -22,6 +22,7 @@ export default class Event {
         this._stop_time = doc.stop_time;
         this._image = doc.image;
         this._venue = doc.venue;
+        this._links = doc.links;
         this._url = doc.url;
         this._price = doc.price;
         this._categories = doc.categories;
@@ -85,6 +86,10 @@ export default class Event {
         return this._popularity_score;
     };
 
+    get links() {
+        return this._links;
+    };
+
     set relevant_cities(relevant_cities) {
         this._relevant_cities = relevant_cities;
     };
@@ -133,7 +138,8 @@ export default class Event {
             venue: this.venue,
             url: this.url,
             price: this.price,
-            categories: this.categories
+            categories: this.categories,
+            links: this.links
         };
 
         // If this event already exists, then modify it.

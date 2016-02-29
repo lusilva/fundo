@@ -39,6 +39,7 @@ export default function createEvent(city, event) {
             url: event.venue_url
         },
         url: event.url,
+        links: event.links,
         price: event.price,
         categories: _.pluck(event.categories.category, 'name')
     };

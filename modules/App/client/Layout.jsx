@@ -11,6 +11,7 @@ if (Meteor.isClient) {
     require('App/lib/semantic-ui/definitions/modules/dimmer');
     require('App/lib/semantic-ui/definitions/modules/transition');
     require('App/lib/semantic-ui/definitions/modules/modal');
+    require('App/lib/semantic-ui/definitions/modules/popup');
     require('App/lib/semantic-ui/definitions/behaviors/visibility');
 }
 
