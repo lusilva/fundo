@@ -49,6 +49,8 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 // Popularity score is a simple measure the order of the results from 0 to 1. Since we
                 // are sorting our query by popularity, more popular items should be higher on each page.
                 event.popularity_score = 1 - ((page - 1) * page_size + index) / resultJSON.total_items;
+
+                // Parse out all html tags from the description, and convert it to normal text.
                 let description = htmlToText.fromString(
                     event.description,
                     {
@@ -60,7 +62,17 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 description = !description || description == 'null' || description.length == 0 ?
                     "No Description Available" : description;
 
+
+                // Extract any links from the description.
                 event.links = event.description ? getUrls(event.description) : [];
+
+
+                _.map(event.categories.category, function (category) {
+                    category.name = htmlToText.fromString(category.name);
+                    return category;
+                });
+
+
                 event.description = description;
                 eventCreatorCallback(event);
             });

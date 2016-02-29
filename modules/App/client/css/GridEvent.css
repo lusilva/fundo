@@ -10,7 +10,7 @@
 }
 
 .eventful-small {
-    width: 150px;
+    max-width: 150px;
     font-size: 11px;
     line-height: 11px;
 }

@@ -58,7 +58,7 @@ export default class Dashboard extends React.Component {
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-        Meteor.subscribe('events', this.state.limit, preferences ? preferences.location : null);
+        Meteor.subscribe('events', this.state.limit, new Date(), preferences ? preferences.location : null);
 
         let events = Event.getCollection().find().fetch();
 

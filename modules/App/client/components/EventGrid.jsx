@@ -1,6 +1,7 @@
 /* global React, Meteor */
 
 import GridEvent from './GridEvent';
+
 import Alert from 'react-s-alert';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
@@ -24,6 +25,8 @@ export default class EventGrid extends React.Component {
         preferences: null
     };
 
+
+    /** @inheritDoc */
     componentWillReceiveProps(nextProps) {
         if (!_.isEqual(nextProps.preferences, this.state.preferences)) {
             this.setState({preferences: nextProps.preferences});
@@ -33,10 +36,21 @@ export default class EventGrid extends React.Component {
         }
     };
 
+
+    /**
+     * Resets the event set, removing all events.
+     */
     resetEvents() {
         this.setState({eventsSet: {}});
     };
 
+
+    /**
+     * Updates the hashed set of events and prevents duplicates from showing.
+     *
+     * @param newEvents - The array of new events to add to the DOM.
+     * @private
+     */
     _updateEventsSet(newEvents) {
         let newEventsSet = this.state.eventsSet;
 
@@ -60,13 +74,16 @@ export default class EventGrid extends React.Component {
         this.setState({eventsSet: newEventsSet});
     };
 
+
     /** @inheritDoc */
     render() {
         return (
             <div className="ui container">
-                <div className="ui stackable three column grid">
+                <div className="ui doubling four column grid">
                     {_.map(_.values(this.state.eventsSet), function (event) {
-                        return (<GridEvent key={event.id} event={event}/>);
+                        return (
+                            <GridEvent key={event.id}
+                                       event={event}/>);
                     })}
                 </div>
             </div>

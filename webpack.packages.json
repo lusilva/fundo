@@ -29,5 +29,6 @@
   "react-geosuggest": "^1.18.1",
   "fs": "^0.0.2",
   "get-urls": "^5.0.0",
-  "html-to-text": "^2.0.0"
+  "html-to-text": "^2.0.0",
+  "parse-link": "^0.3.0"
 }
