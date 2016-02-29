@@ -54,12 +54,6 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                     return;
                 }
 
-                if (event.performers) {
-                    console.log(JSON.stringify(event.performers));
-                }
-
-                console.log(JSON.stringify(event.categories));
-
                 // Parse out all html tags from the description, and convert it to normal text.
                 let description = htmlToText.fromString(
                     event.description,

@@ -155,6 +155,26 @@ export default class Event {
         }.bind(this));
     };
 
+    unlike(callback) {
+        if (!Meteor.userId()) {
+            callback(new Meteor.Error('user not valid!'), null);
+        }
+
+        if (!_.contains(this.likes, Meteor.userId())) {
+            callback(null, this.id);
+        }
+
+        this.likes = _.without(this.likes, Meteor.userId());
+
+        Meteor.call("unlike", this.id, function (err, res) {
+            if (!err) {
+                this.save(callback);
+            } else {
+                callback(err, res);
+            }
+        }.bind(this));
+    };
+
     dislike(callback) {
         if (!Meteor.userId()) {
             callback(new Meteor.Error('user not valid!'), null);
@@ -168,7 +188,34 @@ export default class Event {
         let dislikes = [Meteor.userId()];
 
         this.dislikes = _.union(dislikes, this.dislikes);
-        this.save(callback);
+
+        Meteor.call("dislike", this.id, function (err, res) {
+            if (!err) {
+                this.save(callback);
+            } else {
+                callback(err, res);
+            }
+        }.bind(this));
+    };
+
+    undislike(callback) {
+        if (!Meteor.userId()) {
+            callback(new Meteor.Error('user not valid!'), null);
+        }
+
+        if (!_.contains(this.dislikes, Meteor.userId())) {
+            callback(null, this.id);
+        }
+
+        this.dislikes = _.without(this.dislikes, Meteor.userId());
+
+        Meteor.call("undislike", this.id, function (err, res) {
+            if (!err) {
+                this.save(callback);
+            } else {
+                callback(err, res);
+            }
+        }.bind(this));
     };
 
     save(callback) {
@@ -264,8 +311,8 @@ Events.allow({
         return false;
     },
     update: function (userId, doc, fields, modifier) {
-        let acceptableFields = ['likes', 'dislikes', 'like_count', 'dislike_count'];
-        return userId && _.difference(fields, acceptableFields).length == 0
+        // TODO: Make sure only likes and dislikes fields can be modified for security.
+        return userId;
     },
     remove: function (userId, doc) {
         return false;

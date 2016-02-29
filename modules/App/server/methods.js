@@ -45,20 +45,43 @@ Meteor.methods({
         return Event.getCollection().find({relevant_cities: {$in: [newPrefs.location]}}).fetch();
     },
     "like": function (eventId) {
-        let city = PreferenceSet.getCollection().findOne({userId: Meteor.userId()}).location;
-        if (this.userId && city && eventId) {
+        if (this.userId && eventId) {
             let event = Event.getCollection().findOne({_id: eventId});
             if (!event || _.contains(event.likes, this.userId)) return;
-            Raccoon.city = city;
             Raccoon.liked(this.userId, eventId);
         } else {
             throw new Meteor.Error('invalid request');
         }
     },
+    "dislike": function (eventId) {
+        if (this.userId && eventId) {
+            let event = Event.getCollection().findOne({_id: eventId});
+            if (!event || _.contains(event.dislikes, this.userId)) return;
+            Raccoon.disliked(this.userId, eventId);
+        } else {
+            throw new Meteor.Error('invalid request');
+        }
+    },
+    "unlike": function(eventId) {
+        if (this.userId && eventId) {
+            let event = Event.getCollection().findOne({_id: eventId});
+            if (!event || !_.contains(event.likes, this.userId)) return;
+            Raccoon.unliked(this.userId, eventId);
+        } else {
+            throw new Meteor.Error('invalid request');
+        }
+    },
+    "undislike": function(eventId) {
+        if (this.userId && eventId) {
+            let event = Event.getCollection().findOne({_id: eventId});
+            if (!event || !_.contains(event.dislikes, this.userId)) return;
+            Raccoon.undisliked(this.userId, eventId);
+        } else {
+            throw new Meteor.Error('invalid request');
+        }
+    },
     "getRecommendations": function () {
-        let city = PreferenceSet.getCollection().findOne({userId: Meteor.userId()}).location;
-        if (this.userId && city) {
-            Raccoon.city = city;
+        if (this.userId) {
             Raccoon.recommendFor(this.userId, 10, function (results) {
                 console.log(results);
             });

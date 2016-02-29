@@ -64,9 +64,23 @@ export default class Dashboard extends React.Component {
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
+        // Subscribe to events.
         Meteor.subscribe('events', this.state.limit, new Date(), preferences ? preferences.location : null);
 
-        let events = Event.getCollection().find().fetch();
+        // Get events from the database.
+        let events = Event.getCollection().find(
+            {
+                // Do not show events that this user has already liked.
+                // These events should go in the 'My Events' page.
+                likes: {
+                    $nin: [Meteor.userId()]
+                },
+                // Do not show events that this user has already disliked.
+                dislikes: {
+                    $nin: [Meteor.userId()]
+                }
+            }
+        ).fetch();
 
         Meteor.subscribe('categories');
 

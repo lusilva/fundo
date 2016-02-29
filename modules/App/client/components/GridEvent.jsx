@@ -45,25 +45,55 @@ export default class GridEvent extends React.Component {
         this.setState({liked: _.contains(this.props.event.likes, Meteor.userId())});
     };
 
-    _like(clickEvent) {
+    _toggleLike(clickEvent) {
         clickEvent.preventDefault();
-        this.props.event.like(function (err, res) {
-            if (err) {
-                this.setState({liked: false});
-            }
-        }.bind(this));
-        this.setState({liked: true});
+
+        let event = this.props.event;
+
+        // If this event has already been liked, then unlike it.
+        if (this.state.liked) {
+            event.unlike(function (err, res) {
+                if (err) {
+                    console.log(err);
+                    this.setState({liked: true});
+                }
+            }.bind(this));
+            this.setState({liked: false});
+
+            // Else, if this event isn't liked yet then like it.
+        } else {
+            event.like(function (err, res) {
+                if (err) {
+                    console.log(err);
+                    this.setState({liked: false});
+                }
+            }.bind(this));
+            this.setState({liked: true});
+        }
     };
 
-    _dislike(clickEvent) {
+    _toggleDislike(clickEvent) {
         clickEvent.preventDefault();
-        this.props.event.dislike(function (err, res) {
-            if (err) {
-                this.setState({disliked: false});
-            }
-        }.bind(this));
-        this.setState({disliked: true});
 
+        let event = this.props.event;
+
+        // If this event is already disliked, then undislike it.
+        if (this.state.disliked) {
+            event.undislike(function (err, res) {
+                if (err) {
+                    this.setState({disliked: true});
+                }
+            }.bind(this));
+            this.setState({disliked: false});
+            // Else, dislike this event.
+        } else {
+            event.dislike(function (err, res) {
+                if (err) {
+                    this.setState({disliked: false});
+                }
+            }.bind(this));
+            this.setState({disliked: true});
+        }
     };
 
     _getLikes() {
@@ -76,7 +106,7 @@ export default class GridEvent extends React.Component {
         return (
             <span className="right floated">
                 <i className={"heart " + (this.state.liked ? "" : "outline") + " like icon"}
-                   onClick={this._like.bind(this)}/>
+                   onClick={this._toggleLike.bind(this)}/>
                 {event.likes.length} likes
             </span>
         );
@@ -92,7 +122,7 @@ export default class GridEvent extends React.Component {
         return (
             <span className="right floated">
                 <i className={"thumbs down " + (this.state.disliked ? "" : "outline") + " like icon"}
-                   onClick={this._dislike.bind(this)}/>
+                   onClick={this._toggleDislike.bind(this)}/>
                 {event.dislikes.length} dislikes
             </span>
 
