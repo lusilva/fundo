@@ -72,6 +72,9 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                     return category;
                 });
 
+                event.start_time = event.start_time ? new Date(event.start_time) : null;
+                event.stop_time = event.stop_time ? new Date(event.stop_time) : null;
+
 
                 event.description = description;
                 eventCreatorCallback(event);

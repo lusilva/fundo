@@ -12,13 +12,10 @@ Meteor.publish('events', function (limit, currentDate, city) {
             {
                 relevant_cities: {
                     $in: [city]
+                },
+                start_time: {
+                    $gte: new Date(currentDate)
                 }
-                //expires: {
-                //    $lt: new Date().toISOString()
-                //},
-                //start_time: {
-                //    $gte: new Date(currentDate)
-                //}
             },
             {
                 limit: dl,
