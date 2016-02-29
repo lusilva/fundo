@@ -66,18 +66,25 @@ export default class GridEvent extends React.Component {
 
         return (
             <div>
-                <br/>
-                <h4 className="ui horizontal divider header">
-                    <i className="tag icon"/>
-                    Relevant Links
+                <h4 className="ui horizontal section divider header">
+                    <i className="linkify icon"/>
+                    Links
                 </h4>
                 <div className="ui list">
-                    {_.map(links, function (link, index) {
+                    {_.map(_.uniq(links), function (link, index) {
+                        let parsedLink = parseLink(link);
+
                         return (
                             <a className="ui item"
                                href={link}
                                key={event.id + '-link-' + index}>
-                                {parseLink(link).hostname}
+                                {
+                                    parsedLink.hostname +
+                                    (
+                                        parsedLink.path && parsedLink.path.split('/').length > 1 ?
+                                        '/' + parsedLink.path.split('/')[1] : ''
+                                    )
+                                }
                             </a>
                         )
                     })}
@@ -140,7 +147,7 @@ export default class GridEvent extends React.Component {
                             </div>
                             <div className="ui divider"></div>
                             <TextTruncate
-                                line={10}
+                                line={7}
                                 truncateText="…"
                                 text={event.description}
                                 showTitle={false}/>
@@ -186,10 +193,26 @@ export default class GridEvent extends React.Component {
                             </div>
                         </div>
                         <div className="ui content twelve wide column">
+                            <h4 className="ui ui horizontal section divider hidden">Description</h4>
                             <div className="description">
                                 {event.description}
                             </div>
-                            {this._getRelevantLinks()}
+                            <div className="ui horizontal section divider"></div>
+
+                            <div className="ui two column grid">
+                                <div className="column">
+                                    <h4 className="ui horizontal section divider header">
+                                        <i className="home icon"/>
+                                        Venue
+                                    </h4>
+                                    <div className="description center">
+                                        <a href={event.venue.url}>{event.venue.name}, {event.venue.address}</a>
+                                    </div>
+                                </div>
+                                <div className="column">
+                                    {this._getRelevantLinks()}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <br/>

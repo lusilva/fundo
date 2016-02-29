@@ -41,7 +41,7 @@ export default class Dashboard extends React.Component {
         isSendingEmail: false,
         location: null,
         loading: false,
-        limit: 10
+        limit: 20
     };
 
     /**
