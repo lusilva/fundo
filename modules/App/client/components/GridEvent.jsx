@@ -120,9 +120,9 @@ export default class GridEvent extends React.Component {
         return (
             <div className="ui column">
                 <div className="ui fluid card">
-                    <div className="ui content">
-                        {this._getCategoryRibbon()}
-                    </div>
+                        <div className="ui container header">
+                            {this._getCategoryRibbon()}
+                        </div>
                     <div className="content">
                         <div className="container header event-title" data-content={event.title}>
                             <TextTruncate
