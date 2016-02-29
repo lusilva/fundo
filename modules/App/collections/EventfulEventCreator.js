@@ -19,29 +19,33 @@ export default function createEvent(city, event) {
         relevant_cities = _.union(relevant_cities, existingEvent.relevant_cities);
     }
 
-    let dbEvent = new Event(
-        event.id,
-        owners,
-        relevant_cities,
-        event.title,
-        event.description,
-        event.popularity_score,
-        {
+    event = {
+        _id: event.id,
+        owners: owners,
+        relevant_cities: relevant_cities,
+        title: event.title,
+        description: event.description,
+        popularity_score: event.popularity_score,
+        position: {
             lat: event.latitude,
             lng: event.longitude
         },
-        event.start_time,
-        event.stop_time,
-        event.image,
-        {
+        start_time: event.start_time,
+        stop_time: event.stop_time,
+        image: event.image,
+        venue: {
             address: event.venue_address,
             name: event.venue_name,
             url: event.venue_url
         },
-        event.url,
-        event.price,
-        _.pluck(event.categories.category, 'name')
-    );
+        url: event.url,
+        links: event.links,
+        price: event.price,
+        categories: event.categories.category
+    };
+
+
+    let dbEvent = new Event(event);
     dbEvent.save(function (err, res) {
         if (err) {
             Logger.error('ERROR: could not save event %s', event.id, err);

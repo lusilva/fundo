@@ -5,10 +5,28 @@ Meteor.publish('userpreferences', function () {
     return PreferenceSet.getCollection().find({userId: this.userId});
 });
 
-Meteor.publish('events', function (limit, city) {
+Meteor.publish('events', function (limit, currentDate, city) {
     if (this.userId) {
         var dl = limit || 10;
-        return Event.getCollection().find({relevant_cities: {$in: [city]}}, {limit: dl});
+        return Event.getCollection().find(
+            {
+                relevant_cities: {
+                    $in: [city]
+                }
+                //expires: {
+                //    $lt: new Date().toISOString()
+                //},
+                //start_time: {
+                //    $gte: new Date(currentDate)
+                //}
+            },
+            {
+                limit: dl,
+                sort: {
+                    popularity_score: -1
+                }
+            }
+        );
     }
     return null;
 });

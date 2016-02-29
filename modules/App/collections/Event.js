@@ -3,59 +3,29 @@ import Logger from 'App/logger';
 // Create Events MongoDB collection
 const Events = new Meteor.Collection("events", {
     transform: function (doc) {
-        return new Event(
-            doc._id,
-            doc.owners,
-            doc.relevant_cities,
-            doc.title,
-            doc.description,
-            doc.popularity_score,
-            doc.position,
-            doc.start_time,
-            doc.stop_time,
-            doc.image,
-            doc.venue,
-            doc.url,
-            doc.price,
-            doc.categories
-        );
+        return new Event(doc);
     }
 });
 
 // A Event class that takes a document in its constructor
 export default class Event {
 
-    constructor(id,
-                ownerIds,
-                relevant_cities,
-                title,
-                description,
-                popularity_score,
-                position,
-                start_time,
-                stop_time,
-                image,
-                venue,
-                url,
-                price,
-                categories) {
-        this._id = id;
-        if (!ownerIds) {
-            ownerIds = [];
-        }
-        this._relevant_cities = relevant_cities;
-        this._owners = ownerIds;
-        this._title = title;
-        this._description = description;
-        this._popularity_score = popularity_score;
-        this._position = position;
-        this._start_time = start_time;
-        this._stop_time = stop_time;
-        this._image = image;
-        this._venue = venue;
-        this._url = url;
-        this._price = price;
-        this._categories = categories;
+    constructor(doc) {
+        this._id = doc._id;
+        this._relevant_cities = doc.relevant_cities;
+        this._owners = doc.owners || [];
+        this._title = doc.title;
+        this._description = doc.description;
+        this._popularity_score = doc.popularity_score;
+        this._position = doc.position;
+        this._start_time = doc.start_time;
+        this._stop_time = doc.stop_time;
+        this._image = doc.image;
+        this._venue = doc.venue;
+        this._links = doc.links;
+        this._url = doc.url;
+        this._price = doc.price;
+        this._categories = doc.categories;
     };
 
     get id() {
@@ -116,6 +86,10 @@ export default class Event {
         return this._popularity_score;
     };
 
+    get links() {
+        return this._links;
+    };
+
     set relevant_cities(relevant_cities) {
         this._relevant_cities = relevant_cities;
     };
@@ -164,7 +138,8 @@ export default class Event {
             venue: this.venue,
             url: this.url,
             price: this.price,
-            categories: this.categories
+            categories: this.categories,
+            links: this.links
         };
 
         // If this event already exists, then modify it.

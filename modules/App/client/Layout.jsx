@@ -11,6 +11,7 @@ if (Meteor.isClient) {
     require('App/lib/semantic-ui/definitions/modules/dimmer');
     require('App/lib/semantic-ui/definitions/modules/transition');
     require('App/lib/semantic-ui/definitions/modules/modal');
+    require('App/lib/semantic-ui/definitions/modules/popup');
     require('App/lib/semantic-ui/definitions/behaviors/visibility');
 }
 
@@ -147,7 +148,6 @@ export default class Layout extends React.Component {
                                         <a href="https://rcos.io" className="item">RCOS Website</a>
                                         <a href="https://github.com/lusilva/fundo" className="item">GitHub</a>
                                     </div>
-
                                 </div>
                                 <div className="seven wide column">
                                     <h4 className="ui inverted header">Who We Are</h4>

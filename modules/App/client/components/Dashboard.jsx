@@ -58,7 +58,7 @@ export default class Dashboard extends React.Component {
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-        Meteor.subscribe('events', this.state.limit, preferences ? preferences.location : null);
+        Meteor.subscribe('events', this.state.limit, new Date(), preferences ? preferences.location : null);
 
         let events = Event.getCollection().find().fetch();
 
@@ -84,12 +84,28 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
+        $(rootNode).find('.main-content')
+            .visibility({
+                once: false,
+                // update size when new content loads
+                observeChanges: true,
+                // load content on bottom edge visible
+                onBottomVisible: this._loadMoreEvents.bind(this)
+            })
+        ;
+
         /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
         //Meteor.call('guessUserLocation', function (err, res) {
         //    console.log(err);
         //    console.log(res);
         //});
     };
+
+
+    _loadMoreEvents() {
+        this.setState({limit: Math.min(this.state.limit + 10, 100)});
+    };
+
 
     /**
      * Toggles the filter menu sidebar.
@@ -168,6 +184,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
+        this.setState({limit: 10});
         this.refs.EventGrid.resetEvents();
     };
 
@@ -185,6 +202,23 @@ export default class Dashboard extends React.Component {
         let mastheadContent = isUserVerified(this.props.currentUser) ?
             this._showHeadContent() :
             this._getVerifyEmailHeader();
+
+        let loading = this.state.loading ?
+            <div className="ui active dimmer">
+                <div className="ui loader"></div>
+            </div> : null;
+
+        let getSelectLocationOverlay = this.data.preferences && !this.data.preferences.location ?
+            <div className="ui active dimmer">
+                <div className="content">
+                    <div className="center">
+                        <img className="ui image centered medium" src={require('../img/fundo.png')}/>
+                        <h2 className="ui inverted header">
+                            Unfortunately we're not psychic. Please select a location for us to show you events for.
+                        </h2>
+                    </div>
+                </div>
+            </div> : null;
 
         return (
             <div>
@@ -218,15 +252,10 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {
-                                this.state.loading || this.data.events.length == 0 ?
-                                    <div className="ui active dimmer">
-                                        <div className="ui loader"></div>
-                                    </div> :
-                                    <EventGrid events={this.data.events}
-                                               preferences={this.data.preferences}
-                                               ref="EventGrid"/>
-                            }
+                            {loading || getSelectLocationOverlay}
+                            <EventGrid events={this.data.events}
+                                       preferences={this.data.preferences}
+                                       ref="EventGrid"/>
                         </div>
                     </div>
                 </div>

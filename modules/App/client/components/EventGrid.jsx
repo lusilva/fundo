@@ -1,11 +1,10 @@
 /* global React, Meteor */
 
 import GridEvent from './GridEvent';
+
 import Alert from 'react-s-alert';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
-
-import ReactShuffle from "react-shuffle";
 
 /**
  * The grid view of all the events at the bottom of the dashboard.
@@ -17,40 +16,74 @@ import ReactShuffle from "react-shuffle";
 export default class EventGrid extends React.Component {
 
     static propTypes = {
-        events: React.PropTypes.array.isRequired
+        events: React.PropTypes.array.isRequired,
+        preferences: React.PropTypes.object
     };
 
     state = {
-        eventsSet: []
+        eventsSet: {},
+        preferences: null
     };
 
+
+    /** @inheritDoc */
     componentWillReceiveProps(nextProps) {
+        if (!_.isEqual(nextProps.preferences, this.state.preferences)) {
+            this.setState({preferences: nextProps.preferences});
+        }
         if (!_.isEqual(nextProps.events, this.state.events)) {
             this._updateEventsSet(nextProps.events);
         }
     };
 
+
+    /**
+     * Resets the event set, removing all events.
+     */
     resetEvents() {
-        this.setState({eventSet: []});
+        this.setState({eventsSet: {}});
     };
 
+
+    /**
+     * Updates the hashed set of events and prevents duplicates from showing.
+     *
+     * @param newEvents - The array of new events to add to the DOM.
+     * @private
+     */
     _updateEventsSet(newEvents) {
-        let events = [];
-        _.each(newEvents, function (event) {
-            if (!_.contains(this.state.eventsSet, event)) {
-                events.push(event);
+        let newEventsSet = this.state.eventsSet;
+
+        // Remove all events where city does not correspond with current city.
+        _.each(_.keys(newEventsSet), function (key) {
+            let event = newEventsSet[key];
+            if (!_.contains(event.relevant_cities, this.state.preferences.location)) {
+                delete newEventsSet[key];
             }
         }.bind(this));
-        this.setState({eventsSet: events});
+
+        // Add all new events.
+        _.each(newEvents, function (event) {
+            if (!_.has(newEventsSet, event.id) &&
+                _.contains(event.relevant_cities, this.state.preferences.location)) {
+                newEventsSet[event.id] = event;
+            }
+        }.bind(this));
+
+        // Finally, update the state.
+        this.setState({eventsSet: newEventsSet});
     };
+
 
     /** @inheritDoc */
     render() {
         return (
             <div className="ui container">
-                <div className="ui cards">
-                    {_.map(this.state.eventsSet, function (event) {
-                        return (<GridEvent key={event.id} event={event}/>);
+                <div className="ui doubling four column grid">
+                    {_.map(_.values(this.state.eventsSet), function (event) {
+                        return (
+                            <GridEvent key={event.id}
+                                       event={event}/>);
                     })}
                 </div>
             </div>
