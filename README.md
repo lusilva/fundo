@@ -51,7 +51,7 @@ Redis holds the entire dataset in memory.
 
 ##### In order to install/run redis:
 
-        npm install redis
+        brew install redis
         redis-server
 
 
