@@ -1,14 +1,17 @@
+/**
+ * Logger to log information, using Winston. All logs are server-side.
+ */
 export default {
-    info: function() {
+    info: function () {
         Meteor.call("log", 'info', arguments);
     },
-    error: function() {
+    error: function () {
         Meteor.call("log", 'error', arguments);
     },
-    debug: function() {
+    debug: function () {
         Meteor.call("log", 'debug', arguments);
     },
-    warn: function() {
+    warn: function () {
         Meteor.call("log", 'warn', arguments);
     }
 };

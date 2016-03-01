@@ -5,35 +5,60 @@ import Raccoon from '../lib/raccoon/index';
 
 
 Meteor.methods({
+    /**
+     * Log method used by the Logger, not meant to be used by itself.
+     *
+     * @param level
+     * @param logArguments
+     */
     "log": function (level, logArguments) {
         logArguments.unshift(level);
         if (Meteor.isServer)
             Winston.log.apply(this, logArguments);
     },
+    /**
+     * Method to resend the verification email to the user.
+     */
     "resendEmailVerification": function () {
         Accounts.sendVerificationEmail(Meteor.userId());
     },
-    "checkIfUserValid": function (callback) {
+    /**
+     * Check if a user has verfied their email.
+     *
+     * @returns {*}
+     */
+    "checkIfUserValid": function () {
         if (!!Meteor.user() && Meteor.user().emails.length > 0)
             return Meteor.user().emails[0].verified;
         else
             return !!this.userId;
     },
+    /**
+     * TODO: maybe guess the user's location based on their ip address.
+     */
     "guessUserLocation": function () {
         let ip = this.connection.clientAddress;
         console.log(ip);
     },
-    "getEventsForUser": function (userPref) {
-        var userCity = userPref._location;
-        return Event.findEventsInCity(userCity).fetch();
-    },
+    /**
+     * Method to update user preferences.
+     *
+     * @param preferences
+     * @returns {any}
+     */
     "updatePreferences": function (preferences) {
+
+        //TODO: sanitize the incoming preferences object for security.
+
+        // create new preference set.
         let newPrefs = new PreferenceSet(
             preferences._id,
             this.userId,
             preferences._indices,
             preferences._location
         );
+
+        // save it in the database.
         newPrefs.save(function (err, res) {
             if (err) {
                 Logger.error('could not update preference set for user %s', this.userId, err);
@@ -41,8 +66,6 @@ Meteor.methods({
                 Logger.debug('successfully updated preference set for user %s', this.userId, res);
             }
         }.bind(this));
-
-        return Event.getCollection().find({relevant_cities: {$in: [newPrefs.location]}}).fetch();
     },
     /**
      * Method to like an event.
@@ -67,6 +90,11 @@ Meteor.methods({
             throw new Meteor.Error('invalid request');
         }
     },
+    /**
+     * Method to dislike an event.
+     *
+     * @param eventId
+     */
     "dislike": function (eventId) {
         if (this.userId && eventId) {
             // Get the event and make sure its valid.
@@ -84,6 +112,11 @@ Meteor.methods({
             throw new Meteor.Error('invalid request');
         }
     },
+    /**
+     * Undo of like.
+     *
+     * @param eventId
+     */
     "unlike": function (eventId) {
         if (this.userId && eventId) {
             // Get the event and make sure its valid.
@@ -101,6 +134,11 @@ Meteor.methods({
             throw new Meteor.Error('invalid request');
         }
     },
+    /**
+     * Undo of dislike.
+     *
+     * @param eventId
+     */
     "undislike": function (eventId) {
         if (this.userId && eventId) {
             // Get the event and make sure its valid.
