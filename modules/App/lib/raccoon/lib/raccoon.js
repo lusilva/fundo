@@ -519,6 +519,6 @@ class Raccoon {
     }
 }
 
-const raccoon = new Raccoon(6379, '127.0.0.1');
+const raccoon = Meteor.settings.enableRedisRecommendations ? new Raccoon(6379, '127.0.0.1') : null;
 export default raccoon;
 

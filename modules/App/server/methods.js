@@ -1,6 +1,7 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from "App/collections/Event";
 import Logger from 'App/logger';
+
 import Raccoon from '../lib/raccoon/index';
 
 
@@ -81,7 +82,8 @@ Meteor.methods({
             // Call like on the event.
             event.like(function (err, res) {
                 if (!err) {
-                    Raccoon.liked(this.userId, eventId);
+                    if (Raccoon)
+                        Raccoon.liked(this.userId, eventId);
                 } else {
                     Logger.error('error liking event %s', eventId, err);
                 }
@@ -103,7 +105,8 @@ Meteor.methods({
 
             event.dislike(function (err, res) {
                 if (!err) {
-                    Raccoon.disliked(this.userId, eventId);
+                    if (Raccoon)
+                        Raccoon.disliked(this.userId, eventId);
                 } else {
                     Logger.error('error disliking event %s', eventId, err);
                 }
@@ -125,7 +128,8 @@ Meteor.methods({
 
             event.unlike(function (err, res) {
                 if (!err) {
-                    Raccoon.unliked(this.userId, eventId);
+                    if (Raccoon)
+                        Raccoon.unliked(this.userId, eventId);
                 } else {
                     Logger.error('error unliking event %s', eventId, err);
                 }
@@ -147,7 +151,8 @@ Meteor.methods({
 
             event.undislike(function (err, res) {
                 if (!err) {
-                    Raccoon.undisliked(this.userId, eventId);
+                    if (Raccoon)
+                        Raccoon.undisliked(this.userId, eventId);
                 } else {
                     Logger.error('error undisliking event %s', eventId, err);
                 }
@@ -158,9 +163,10 @@ Meteor.methods({
     },
     "getRecommendations": function () {
         if (this.userId) {
-            Raccoon.recommendFor(this.userId, 10, function (results) {
-                console.log(results);
-            });
+            if (Raccoon)
+                Raccoon.recommendFor(this.userId, 10, function (results) {
+                    console.log(results);
+                });
         } else {
             throw new Meteor.Error('invalid request');
         }
