@@ -31,6 +31,10 @@ export default class Category {
         return Categories;
     };
 
+    static findById(category_id) {
+        return Category.getCollection().findOne({category_id: category_id});
+    };
+
     save(callback) {
         if (!this.category_id) {
             throw new Meteor.Error("Category ID is missing!");

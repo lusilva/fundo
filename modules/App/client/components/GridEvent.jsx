@@ -1,5 +1,9 @@
+/* global Meteor, React */
+
 import TextTruncate from 'react-text-truncate';
 import parseLink from 'parse-link';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
+import ReactMixin from 'react-mixin';
 
 /**
  * The view component for an event card.
@@ -7,20 +11,28 @@ import parseLink from 'parse-link';
  * @class
  * @extends React.Component
  */
+@ReactMixin.decorate(PureRenderMixin)
 export default class GridEvent extends React.Component {
 
     /**
      * The props this component receives.
-     * @type {{event: *}}
+     *
+     * @type {{event: Event}}
      */
     static propTypes = {
         event: React.PropTypes.object.isRequired
     };
 
+    /**
+     * The state of this component.
+     *
+     * @type {{liked: boolean, disliked: boolean, category: string}}
+     */
     state = {
         liked: false,
         disliked: false
     };
+
 
     /** @inheritDoc */
     componentDidMount() {
@@ -42,9 +54,19 @@ export default class GridEvent extends React.Component {
             .modal('setting', 'transition', 'horizontal flip')
             .modal('attach events', $(rootNode).find(".more-info-button"), 'show');
 
-        this.setState({liked: _.contains(this.props.event.likes, Meteor.userId())});
+        this.setState({
+            liked: _.contains(this.props.event.likes, Meteor.userId()),
+            disliked: _.contains(this.props.event.dislikes, Meteor.userId())
+        });
     };
 
+
+    /**
+     * Toggle liking/unliking of this event.
+     *
+     * @param clickEvent
+     * @private
+     */
     _toggleLike(clickEvent) {
         clickEvent.preventDefault();
 
@@ -52,26 +74,33 @@ export default class GridEvent extends React.Component {
 
         // If this event has already been liked, then unlike it.
         if (this.state.liked) {
-            event.unlike(function (err, res) {
+            Meteor.call('unlike', event.id, function (err, res) {
                 if (err) {
-                    console.log(err);
                     this.setState({liked: true});
                 }
             }.bind(this));
             this.setState({liked: false});
+            event.unlike();
 
             // Else, if this event isn't liked yet then like it.
         } else {
-            event.like(function (err, res) {
+            Meteor.call('like', event.id, function (err, res) {
                 if (err) {
-                    console.log(err);
                     this.setState({liked: false});
                 }
             }.bind(this));
             this.setState({liked: true});
+            event.like();
         }
     };
 
+
+    /**
+     * Toggle disliking/undisliking this event.
+     *
+     * @param clickEvent
+     * @private
+     */
     _toggleDislike(clickEvent) {
         clickEvent.preventDefault();
 
@@ -79,23 +108,31 @@ export default class GridEvent extends React.Component {
 
         // If this event is already disliked, then undislike it.
         if (this.state.disliked) {
-            event.undislike(function (err, res) {
+            Meteor.call('undislike', event.id, function (err, res) {
                 if (err) {
                     this.setState({disliked: true});
                 }
             }.bind(this));
             this.setState({disliked: false});
+            event.undislike();
             // Else, dislike this event.
         } else {
-            event.dislike(function (err, res) {
+            Meteor.call('dislike', event.id, function (err, res) {
                 if (err) {
                     this.setState({disliked: false});
                 }
             }.bind(this));
             this.setState({disliked: true});
+            event.dislike();
         }
     };
 
+    /**
+     * Get likes icon and count for this event.
+     *
+     * @returns {?JSX} - null if user has disliked this event.
+     * @private
+     */
     _getLikes() {
         let event = this.props.event;
 
@@ -112,6 +149,13 @@ export default class GridEvent extends React.Component {
         );
     };
 
+
+    /**
+     * Get dislikes icon and count for this event.
+     *
+     * @returns {?JSX} - null if user has liked this event.
+     * @private
+     */
     _getDislikes() {
         let event = this.props.event;
 
@@ -129,10 +173,15 @@ export default class GridEvent extends React.Component {
         );
     };
 
-    _getCategoryRibbon() {
+    /**
+     * Get the category for this event.
+     *
+     * @returns {XML}
+     * @private
+     */
 
-        let event = this.props.event;
-        let category = event.categories[0] || {name: "Eventful Event"};
+    _getCategoryRibbon() {
+        let category = {name: 'Eventful Event'};
 
         return (
             <div className="ui black ribbon label">
@@ -141,6 +190,13 @@ export default class GridEvent extends React.Component {
         )
     };
 
+
+    /**
+     * Get relevant links for this event, shown in the more info modal.
+     *
+     * @returns {*}
+     * @private
+     */
     _getRelevantLinks() {
         let event = this.props.event;
         let links = event.links || [];
@@ -156,17 +212,18 @@ export default class GridEvent extends React.Component {
         }
 
         return (
-            <div>
+            <div className="column">
                 <h4 className="ui horizontal section divider header">
                     <i className="linkify icon"/>
                     Links
                 </h4>
-                <div className="ui list">
+                <div className="ui relaxed list">
                     {_.map(_.uniq(links), function (link, index) {
                         let parsedLink = parseLink(link);
 
                         return (
                             <a className="ui item"
+                               target="_blank"
                                href={link}
                                key={event.id + '-link-' + index}>
                                 {
@@ -182,8 +239,47 @@ export default class GridEvent extends React.Component {
                 </div>
             </div>
         )
-
     };
+
+
+    /**
+     * Get the info for tickets if available.
+     *
+     * @private
+     */
+    _getTicketInfo() {
+        let event = this.props.event;
+
+        if (!event.tickets || event.tickets.length == 0) {
+            return null;
+        }
+
+        let ticketLinks = event.tickets.link || [];
+
+        return (
+            <div className="column">
+                <h4 className="ui horizontal section divider header">
+                    <i className="ticket icon"/>
+                    Get Tickets
+                </h4>
+                <div className="ui relaxed list">
+                    {_.map(ticketLinks, function (link, index) {
+                        if (!link.url) return null;
+                        return (
+                            <a href={link.url}
+                               target="_blank"
+                               key={event.id+'-tickets-'+index}
+                               className="ui item">
+                                {link.provider || ('Ticket Link ' + index)}
+                            </a>
+                        );
+                    })}
+                </div>
+            </div>
+
+        );
+    };
+
 
     /** @inheritDoc */
     render() {
@@ -298,12 +394,14 @@ export default class GridEvent extends React.Component {
                                         Venue
                                     </h4>
                                     <div className="description center">
-                                        <a href={event.venue.url}>{event.venue.name}, {event.venue.address}</a>
+                                        <div className="date">
+                                            {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
+                                        </div>
+                                        <a target="_blank" href={event.venue.url}>{venueName}, {venueAddress}</a>
                                     </div>
                                 </div>
-                                <div className="column">
-                                    {this._getRelevantLinks()}
-                                </div>
+                                {this._getRelevantLinks()}
+                                {this._getTicketInfo()}
                             </div>
                         </div>
                     </div>

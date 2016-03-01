@@ -19,19 +19,29 @@ Meteor.publish('categories', function () {
 });
 
 // Publish events.
-// TODO: move like and dislike to server side, so that we can implement all filters here.
-Meteor.publish('events', function (limit, currentDate, city) {
+Meteor.publish('events', function (limit, currentDate) {
     if (this.userId) {
-        var dl = limit || 10;
+        let dl = limit || 10;
+        let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
+
         return Event.getCollection().find(
             {
                 // Get events in the user's city.
                 relevant_cities: {
-                    $in: [city]
+                    $in: [preferences.location]
                 },
                 // Get events that have not yet started.
                 start_time: {
                     $gte: new Date(currentDate)
+                },
+                // Do not show events that this user has already liked.
+                // These events should go in the 'My Events' page.
+                likes: {
+                    $nin: [this.userId]
+                },
+                // Do not show events that this user has already disliked.
+                dislikes: {
+                    $nin: [this.userId]
                 }
             },
             {
@@ -39,7 +49,7 @@ Meteor.publish('events', function (limit, currentDate, city) {
                 limit: dl,
                 sort: {
                     like_count: -1,
-                    //dislike_count: 1,
+                    dislike_count: 1,
                     popularity_score: -1
                 }
             }

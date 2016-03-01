@@ -49,8 +49,10 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
 
             _.each(events, function (event, index) {
 
-                // If this event is not in english, then don't save it.
-                if (!event.language || event.language.toLowerCase() != 'english') {
+                // If this event is not in english or undetermined, then don't save it.
+                // This is done because undetermined events can still be high quality.
+                if (!event.language ||
+                    (event.language.toLowerCase() != 'english' && event.language.toLowerCase() != 'undetermined')) {
                     return;
                 }
 
@@ -70,7 +72,7 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 // Extract any links from the description.
                 event.links = event.description ? getUrls(event.description) : [];
 
-
+                // Format the event category.
                 _.map(event.categories.category, function (category) {
                     category.name = htmlToText.fromString(category.name);
                     return category;

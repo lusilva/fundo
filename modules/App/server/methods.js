@@ -44,38 +44,76 @@ Meteor.methods({
 
         return Event.getCollection().find({relevant_cities: {$in: [newPrefs.location]}}).fetch();
     },
+    /**
+     * Method to like an event.
+     *
+     * @param eventId
+     */
     "like": function (eventId) {
         if (this.userId && eventId) {
+            // Get the event, and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
             if (!event || _.contains(event.likes, this.userId)) return;
-            Raccoon.liked(this.userId, eventId);
+
+            // Call like on the event.
+            event.like(function (err, res) {
+                if (!err) {
+                    Raccoon.liked(this.userId, eventId);
+                } else {
+                    Logger.error('error liking event %s', eventId, err);
+                }
+            }.bind(this));
         } else {
             throw new Meteor.Error('invalid request');
         }
     },
     "dislike": function (eventId) {
         if (this.userId && eventId) {
+            // Get the event and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
             if (!event || _.contains(event.dislikes, this.userId)) return;
-            Raccoon.disliked(this.userId, eventId);
+
+            event.dislike(function (err, res) {
+                if (!err) {
+                    Raccoon.disliked(this.userId, eventId);
+                } else {
+                    Logger.error('error disliking event %s', eventId, err);
+                }
+            }.bind(this));
         } else {
             throw new Meteor.Error('invalid request');
         }
     },
-    "unlike": function(eventId) {
+    "unlike": function (eventId) {
         if (this.userId && eventId) {
+            // Get the event and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
             if (!event || !_.contains(event.likes, this.userId)) return;
-            Raccoon.unliked(this.userId, eventId);
+
+            event.unlike(function (err, res) {
+                if (!err) {
+                    Raccoon.unliked(this.userId, eventId);
+                } else {
+                    Logger.error('error unliking event %s', eventId, err);
+                }
+            }.bind(this));
         } else {
             throw new Meteor.Error('invalid request');
         }
     },
-    "undislike": function(eventId) {
+    "undislike": function (eventId) {
         if (this.userId && eventId) {
+            // Get the event and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
             if (!event || !_.contains(event.dislikes, this.userId)) return;
-            Raccoon.undisliked(this.userId, eventId);
+
+            event.undislike(function (err, res) {
+                if (!err) {
+                    Raccoon.undisliked(this.userId, eventId);
+                } else {
+                    Logger.error('error undisliking event %s', eventId, err);
+                }
+            }.bind(this));
         } else {
             throw new Meteor.Error('invalid request');
         }

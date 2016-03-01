@@ -3,6 +3,9 @@ import GeoSuggest from 'react-geosuggest';
 
 /**
  * The view for the filters shown in the sidebar on the dashboard.
+ *
+ * @class
+ * @extends React.Component
  */
 export default class Filters extends React.Component {
     static propTypes = {
@@ -15,6 +18,7 @@ export default class Filters extends React.Component {
 
     /**
      * The state of the filters.
+     *
      * @type {{preferences: ?PreferenceSet, loading: boolean, message: ?string}}
      */
     state = {
@@ -75,6 +79,7 @@ export default class Filters extends React.Component {
 
     /**
      * Clears a message and hides it.
+     *
      * @private
      */
     _clearMessage() {
@@ -202,7 +207,7 @@ export default class Filters extends React.Component {
                                 let key = 'categories-' + category.id;
                                 return (
                                     <div key={key} className="item"
-                                         data-value={category.category_id}>
+                                         data-value={category.name}>
                                         {category.name}
                                     </div>
                                 )

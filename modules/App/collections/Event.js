@@ -133,31 +133,46 @@ export default class Event {
         return Event.getCollection().find({relevant_cities: {$in: [city]}});
     };
 
+    /**
+     * Like this event. This only actually saves the like on the server.
+     *
+     * @param callback
+     */
     like(callback) {
+        callback = callback || function () {
+            };
+
         if (!Meteor.userId()) {
             callback(new Meteor.Error('user not valid!'), null);
+            return;
         }
 
         if (_.contains(this.likes, Meteor.userId())) {
             callback(null, this.id);
+            return;
         }
 
         let likes = [Meteor.userId()];
 
         this.likes = _.union(likes, this.likes);
 
-        Meteor.call("like", this.id, function (err, res) {
-            if (!err) {
-                this.save(callback);
-            } else {
-                callback(err, res);
-            }
-        }.bind(this));
+        if (Meteor.isServer)
+            this.save(callback);
     };
 
+
+    /**
+     * Unlike this event. This actually only saves the unlike on the server.
+     *
+     * @param callback
+     */
     unlike(callback) {
+        callback = callback || function () {
+            };
+
         if (!Meteor.userId()) {
             callback(new Meteor.Error('user not valid!'), null);
+            return;
         }
 
         if (!_.contains(this.likes, Meteor.userId())) {
@@ -166,18 +181,24 @@ export default class Event {
 
         this.likes = _.without(this.likes, Meteor.userId());
 
-        Meteor.call("unlike", this.id, function (err, res) {
-            if (!err) {
-                this.save(callback);
-            } else {
-                callback(err, res);
-            }
-        }.bind(this));
+
+        if (Meteor.isServer)
+            this.save(callback);
     };
 
+
+    /**
+     * Dislike this event. This actually only saves the dislike on the server.
+     *
+     * @param callback
+     */
     dislike(callback) {
+        callback = callback || function () {
+            };
+
         if (!Meteor.userId()) {
             callback(new Meteor.Error('user not valid!'), null);
+            return;
         }
 
         if (_.contains(this.dislikes, Meteor.userId()) ||
@@ -189,16 +210,20 @@ export default class Event {
 
         this.dislikes = _.union(dislikes, this.dislikes);
 
-        Meteor.call("dislike", this.id, function (err, res) {
-            if (!err) {
-                this.save(callback);
-            } else {
-                callback(err, res);
-            }
-        }.bind(this));
+        if (Meteor.isServer)
+            this.save(callback);
     };
 
+
+    /**
+     * Undislike this event. This actually only saves the undislike on the server.
+     *
+     * @param callback
+     */
     undislike(callback) {
+        callback = callback || function () {
+            };
+
         if (!Meteor.userId()) {
             callback(new Meteor.Error('user not valid!'), null);
         }
@@ -209,15 +234,17 @@ export default class Event {
 
         this.dislikes = _.without(this.dislikes, Meteor.userId());
 
-        Meteor.call("undislike", this.id, function (err, res) {
-            if (!err) {
-                this.save(callback);
-            } else {
-                callback(err, res);
-            }
-        }.bind(this));
+
+        if (Meteor.isServer)
+            this.save(callback);
     };
 
+
+    /**
+     * Save this event to the database, or update it if it already exists.
+     *
+     * @param callback
+     */
     save(callback) {
         if (!this.id) {
             throw new Meteor.Error("ID is missing!");
@@ -280,6 +307,12 @@ export default class Event {
         }
     };
 
+
+    /**
+     * Remove this event from the database.
+     *
+     * @param callback
+     */
     remove(callback) {
         if (Events.find({_id: this.id}).count() > 0)
             Events.remove(this.id, callback);
@@ -288,6 +321,11 @@ export default class Event {
     }
 };
 
+
+/**
+ * START OF EVENT DB HOOKS
+ * Hooks to run before every event database update. These update the expiration time and log information.
+ */
 Events.before.insert(function (userId, doc) {
     let now = new Date();
     doc.expires = new Date(now.getTime() + (3600000 * (Meteor.settings.hoursEventsExpiresIn || 24)));
@@ -304,18 +342,23 @@ Events.before.update(function (userId, doc, fieldNames, modifier, options) {
 Events.before.remove(function (userId, doc) {
     Logger.debug('Removing event %s', doc._id, {expires: doc.expires});
 });
+/**
+ * END OF EVENT DB HOOKS
+ */
 
 
+/**
+ * Ensure the security of the database by preventing the client from changing events. All event
+ * updates MUST go through the server.
+ */
 Events.allow({
     insert: function (userId, doc) {
         return false;
     },
     update: function (userId, doc, fields, modifier) {
-        // TODO: Make sure only likes and dislikes fields can be modified for security.
-        return userId;
+        return false;
     },
     remove: function (userId, doc) {
         return false;
-    },
-    fetch: ["userId"]
+    }
 });

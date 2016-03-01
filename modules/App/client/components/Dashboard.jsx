@@ -50,6 +50,9 @@ export default class Dashboard extends React.Component {
     };
 
 
+    subs = [];
+
+
     /**
      * Function that runs automatically everytime the data that its subscribed to changes.
      * In this case, it provides the user preferences data. This is accessible in the rest of the
@@ -59,30 +62,18 @@ export default class Dashboard extends React.Component {
      */
     getMeteorData() {
         // Get all necessary subscriptions
-        Meteor.subscribe('userpreferences');
+        this.subs.push(Meteor.subscribe('userpreferences'));
 
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         // Subscribe to events.
-        Meteor.subscribe('events', this.state.limit, new Date(), preferences ? preferences.location : null);
+        this.subs.push(Meteor.subscribe('events', this.state.limit, new Date()));
 
         // Get events from the database.
-        let events = Event.getCollection().find(
-            {
-                // Do not show events that this user has already liked.
-                // These events should go in the 'My Events' page.
-                likes: {
-                    $nin: [Meteor.userId()]
-                },
-                // Do not show events that this user has already disliked.
-                dislikes: {
-                    $nin: [Meteor.userId()]
-                }
-            }
-        ).fetch();
+        let events = Event.getCollection().find().fetch();
 
-        Meteor.subscribe('categories');
+        this.subs.push(Meteor.subscribe('categories'));
 
         let categories = Category.getCollection().find().fetch();
 
@@ -124,6 +115,14 @@ export default class Dashboard extends React.Component {
         //    console.log(err);
         //    console.log(res);
         //});
+    };
+
+
+    /** @inheritDoc */
+    componentWillUnmount() {
+        _.each(this.subs, function(sub) {
+            sub.stop();
+        });
     };
 
 
