@@ -1,5 +1,11 @@
 import Logger from 'App/logger';
 
+// Only import racoon on the server.
+let Raccoon = {};
+if (Meteor.isServer) {
+    Raccoon = require('../lib/raccoon/index');
+}
+
 // Create Events MongoDB collection
 const Events = new Meteor.Collection("events", {
     transform: function (doc) {
@@ -341,6 +347,20 @@ Events.before.update(function (userId, doc, fieldNames, modifier, options) {
 
 Events.before.remove(function (userId, doc) {
     Logger.debug('Removing event %s', doc._id, {expires: doc.expires});
+
+    if (Meteor.isServer) {
+        if (doc.likes && doc.likes.length > 0) {
+            _.each(doc.likes, function (userId) {
+                Raccoon.unliked(userId, doc._id);
+            });
+        }
+
+        if (doc.dislikes && doc.dislikes.length > 0) {
+            _.each(doc.dislikes, function (userId) {
+                Raccoon.undisliked(userId, doc._id);
+            });
+        }
+    }
 });
 /**
  * END OF EVENT DB HOOKS
