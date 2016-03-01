@@ -79,7 +79,8 @@ Redis holds the entire dataset in memory.
                 "username": <STRING>,
                 "password": <STRING>,
                 "port": <STRING>
-              }
+              },
+              "enableRedisRecommendations": <true OR false>
         }
 
 #### Run in production mode (with SSR enabled)
