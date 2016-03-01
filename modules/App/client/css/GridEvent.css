@@ -19,3 +19,7 @@
     padding: 0 20px;
     white-space: normal;
 }
+
+.card-image {
+    max-height: 265px;
+}
