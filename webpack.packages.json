@@ -17,11 +17,13 @@
   "style-loader": "^0.13.0",
   "css-loader": "^0.23.0",
   "extract-text-webpack-plugin": "^0.9.1",
+  "ansi-to-html-umd": "^0.4.2",
 
   "react-transform-hmr": "^1.0.0",
   "react-transform-catch-errors": "^1.0.0",
   "redbox-react": "^1.2.0",
 
+  "async": "^1.5.2",
   "react-text-truncate": "^0.3.7",
   "react-s-alert": "^1.0.2",
   "google-map-react": "^0.10.5",

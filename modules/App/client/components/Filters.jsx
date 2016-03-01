@@ -3,16 +3,22 @@ import GeoSuggest from 'react-geosuggest';
 
 /**
  * The view for the filters shown in the sidebar on the dashboard.
+ *
+ * @class
+ * @extends React.Component
  */
 export default class Filters extends React.Component {
     static propTypes = {
         filterChangeCallback: React.PropTypes.func.isRequired,
         setLoadingCallback: React.PropTypes.func.isRequired,
-        preferences: React.PropTypes.object
+        preferences: React.PropTypes.object,
+        categories: React.PropTypes.array
     };
+
 
     /**
      * The state of the filters.
+     *
      * @type {{preferences: ?PreferenceSet, loading: boolean, message: ?string}}
      */
     state = {
@@ -30,6 +36,17 @@ export default class Filters extends React.Component {
         // Update the state of the preferences when the props/database changes.
         if (nextProps.preferences != this.state.preferences)
             this.setState({preferences: nextProps.preferences, loading: false});
+    };
+
+
+    /** @inheritDoc */
+    componentDidMount() {
+        var rootNode = ReactDOM.findDOMNode(this);
+        $(rootNode).find('.dropdown')
+            .dropdown({
+                context: $(rootNode),
+                direction: 'downward'
+            });
     };
 
 
@@ -62,6 +79,7 @@ export default class Filters extends React.Component {
 
     /**
      * Clears a message and hides it.
+     *
      * @private
      */
     _clearMessage() {
@@ -158,28 +176,46 @@ export default class Filters extends React.Component {
         let initialLocation = (this.state.preferences && this.state.preferences.location) ?
             this.state.preferences.location : null;
 
-        return (typeof window != 'undefined') && window.google && window.google.maps && !this.state.loading ?
+        let geosuggest = (typeof window != 'undefined') && window.google && window.google.maps && !this.state.loading ?
             (
+                <div className="ui item center">
+                    <GeoSuggest country="us"
+                                types={['(cities)']}
+                                initialValue={initialLocation || ''}
+                                autoActivateFirstSuggest={true}
+                                onSuggestSelect={this._updateUserLocation.bind(this)}
+                                skipSuggest={this._skipSuggestFunc.bind(this)}
+                                ref='geosuggest'
+                    />
+                </div>
+            ) : null;
+
+
+        return (
+            <div className="ui container">
+                {this._getMessage()}
+                <div className="ui header item center">Select Location</div>
+                {geosuggest}
+                <div className="ui header item center">Categories</div>
                 <div className="ui container">
-                    {this._getMessage()}
-                    <div className="ui header item center">Select Location</div>
-                    <div className="ui item center">
-                        <GeoSuggest country="us"
-                                    types={['(cities)']}
-                                    initialValue={initialLocation || ''}
-                                    autoActivateFirstSuggest={true}
-                                    onSuggestSelect={this._updateUserLocation.bind(this)}
-                                    skipSuggest={this._skipSuggestFunc.bind(this)}
-                                    ref='geosuggest'
-                        />
+                    <div className="ui multiple search selection dropdown">
+                        <input name="favorite-categories" type="hidden" value=""/>
+                        <i className="dropdown icon"/>
+                        <div className="default text">Select Categories</div>
+                        <div className="menu">
+                            {_.map(this.props.categories, function (category) {
+                                let key = 'categories-' + category.id;
+                                return (
+                                    <div key={key} className="item"
+                                         data-value={category.name}>
+                                        {category.name}
+                                    </div>
+                                )
+                            })}
+                        </div>
                     </div>
-                    <div className="ui header item center">Select Price</div>
                 </div>
-            ) :
-            (
-                <div className="ui active dimmer">
-                    <div className="ui text loader">Loading</div>
-                </div>
-            );
+            </div>
+        );
     }
 }

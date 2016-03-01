@@ -7,6 +7,7 @@
 import './routes';
 import 'App/collections/Event';
 import 'App/collections/PreferenceSet';
+import 'App/collections/Category';
 
 // To activate the unit tests:
 // - meteor add sanjo:jasmine

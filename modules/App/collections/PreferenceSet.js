@@ -120,7 +120,7 @@ export default class PreferenceSet {
                                 }
                             });
                         } else {
-                            event.remove(function(err, res) {
+                            event.remove(function (err, res) {
                                 if (err) {
                                     Logger.error('error deleting event %s', event.id, event, err);
                                 }
@@ -130,7 +130,7 @@ export default class PreferenceSet {
                 }
             }
 
-            PreferenceSets.update(this.id, {$set: doc}, callback);
+            PreferenceSets.update(this.id, {$set: _.omit(doc, '_id')}, callback);
             // Else create new
         } else {
             // Don't have to worry about location change here because PreferenceSets are only
@@ -228,18 +228,17 @@ export default class PreferenceSet {
             count: 0
         });
     };
-
 }
 
 PreferenceSets.allow({
     insert: function (userId, doc) {
-        return true;
+        return false;
     },
     update: function (userId, doc, fields, modifier) {
-        return true;
+        return userId == doc.userId;
     },
     remove: function (userId, doc) {
-        return (userId && userId == doc.userId);
+        return false;
     },
     fetch: ["userId"]
 });

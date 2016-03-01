@@ -32,8 +32,10 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 units: 'miles',
                 sort_order: 'popularity',
                 page_number: page,
-                include: "price,categories",
-                image_sizes: "medium,block,large,edpborder250,dropshadow250,dropshadow170,block178"
+                include: "price,categories,tickets,popularity,subcategories",
+                image_sizes: "medium,block,large,edpborder250,dropshadow250,dropshadow170,block178",
+                mature: "normal",
+                languages: "1"
             }
         },
         function (error, result) {
@@ -46,9 +48,13 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
             let events = resultJSON.events.event;
 
             _.each(events, function (event, index) {
-                // Popularity score is a simple measure the order of the results from 0 to 1. Since we
-                // are sorting our query by popularity, more popular items should be higher on each page.
-                event.popularity_score = 1 - ((page - 1) * page_size + index) / resultJSON.total_items;
+
+                // If this event is not in english or undetermined, then don't save it.
+                // This is done because undetermined events can still be high quality.
+                if (!event.language ||
+                    (event.language.toLowerCase() != 'english' && event.language.toLowerCase() != 'undetermined')) {
+                    return;
+                }
 
                 // Parse out all html tags from the description, and convert it to normal text.
                 let description = htmlToText.fromString(
@@ -66,7 +72,7 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 // Extract any links from the description.
                 event.links = event.description ? getUrls(event.description) : [];
 
-
+                // Format the event category.
                 _.map(event.categories.category, function (category) {
                     category.name = htmlToText.fromString(category.name);
                     return category;
