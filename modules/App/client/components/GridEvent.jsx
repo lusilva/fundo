@@ -173,6 +173,7 @@ export default class GridEvent extends React.Component {
         );
     };
 
+
     /**
      * Get the category for this event.
      *
@@ -181,11 +182,11 @@ export default class GridEvent extends React.Component {
      */
 
     _getCategoryRibbon() {
-        let category = {name: 'Eventful Event'};
+        let category = this.props.event.categories[0] || 'Eventful Event';
 
         return (
             <div className="ui black ribbon label">
-                {category.name}
+                {category}
             </div>
         )
     };

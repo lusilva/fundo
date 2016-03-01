@@ -11,7 +11,7 @@ fundo is a web application which will allow users to discover nearby events. It'
 
 - [x] Weeks 3-4: Rough app skeleton, integrate event APIs to draw event data from. Implement event cache and figure out how to manage the data.
 
-- [ ] Weeks 5-6: Play around with recommendation systems. Improve app infrastructure. Test recommendations using mock users with different preferences.
+- [x] Weeks 5-6: Play around with recommendation systems. Improve app infrastructure. Test recommendations using mock users with different preferences.
 
 - [ ] Weeks 7-8: Implement bulk of recommendation system. Plug into recommendation apis and figure out how to parse events to extract important/relevant data.
 
@@ -37,8 +37,22 @@ fundo is a web application which will allow users to discover nearby events. It'
 1. Install [Meteor](https://www.meteor.com/install)
 2. Create settings.json file in the root directory.
    More info [here.](http://docs.meteor.com/#/full/meteor_settings)
-3. Run `meteor run --settings settings.json`, which will install all dependencies and start up the meteor server.
-4. Go to `localhost:3000` in your web browser.
+3. Start up a redis server instance for the app to connect to. For more info, see next section.
+4. Run `meteor run --settings settings.json`, which will install all dependencies and start up the meteor server.
+5. Go to `localhost:3000` in your web browser.
+
+
+### Redis
+
+The recommendations and ratings are stored in an intermediate data 
+store called Redis which performs extremely well compared to database 
+systems that write every change to disk before committing the transaction. 
+Redis holds the entire dataset in memory.
+
+##### In order to install/run redis:
+
+        npm install redis
+        redis-server
 
 
 ### Example settings.json

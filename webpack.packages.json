@@ -17,6 +17,7 @@
   "style-loader": "^0.13.0",
   "css-loader": "^0.23.0",
   "extract-text-webpack-plugin": "^0.9.1",
+  "ansi-to-html-umd": "^0.4.2",
 
   "react-transform-hmr": "^1.0.0",
   "react-transform-catch-errors": "^1.0.0",
