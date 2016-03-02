@@ -1,4 +1,4 @@
-![fundo](https://raw.githubusercontent.com/lusilva/fundo/master/modules/App/client/img/fundo.png)
+![fundo](https://raw.githubusercontent.com/lusilva/fundo/master/apps/App/client/img/fundo.png)
 #### Find nearby events that interest you without getting bogged down by those who don't. 
 
 This is a project for RCOS (Rensselaer Center for Open Source), built with Meteor and React.
