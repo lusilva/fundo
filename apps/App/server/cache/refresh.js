@@ -3,7 +3,6 @@ import Event from 'App/collections/Event';
 import Category from 'App/collections/Category';
 import createEventfulEvent from 'App/collections/EventfulEventCreator';
 import Logger from 'App/logger';
-import htmlToText from 'html-to-text';
 
 /**
  * Updates the cache by removing expired collections.
@@ -56,7 +55,7 @@ function updateAllCategories() {
     let data = result.data;
     _.each(data.category, function (category) {
         let categoryDoc = new Category({
-            name: htmlToText.fromString(category.name),
+            name: category.name,
             category_id: category.id
         });
         categoryDoc.save(function (err, res) {

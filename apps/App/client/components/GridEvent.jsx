@@ -4,6 +4,7 @@ import TextTruncate from 'react-text-truncate';
 import parseLink from 'parse-link';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
+import renderHTML from 'react-render-html';
 
 /**
  * The view component for an event card.
@@ -334,11 +335,7 @@ export default class GridEvent extends React.Component {
                                 </div>
                             </div>
                             <div className="ui divider"></div>
-                            <TextTruncate
-                                line={7}
-                                truncateText="…"
-                                text={event.description}
-                                showTitle={false}/>
+                            {renderHTML(event.description)}
                         </div>
                     </div>
                     <div className="content">
@@ -384,7 +381,7 @@ export default class GridEvent extends React.Component {
                         <div className="ui content twelve wide column">
                             <h4 className="ui ui horizontal section divider hidden">Description</h4>
                             <div className="description">
-                                {event.description}
+                                {renderHTML(event.description)}
                             </div>
                             <div className="ui horizontal section divider"></div>
 

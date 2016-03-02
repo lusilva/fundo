@@ -78,9 +78,9 @@ random@1.0.5
 rate-limit@1.0.0
 react@0.14.3
 react-meteor-data@0.2.4
-react-runtime@0.14.4
-react-runtime-dev@0.14.4
-react-runtime-prod@0.14.4
+react-runtime@0.14.3
+react-runtime-dev@0.14.3
+react-runtime-prod@0.14.3
 reactive-dict@1.1.3
 reactive-var@1.0.6
 reactrouter:react-router@2.0.0
@@ -112,6 +112,7 @@ webapp-hashing@1.0.5
 webpack:assets@1.0.0
 webpack:core-config@1.0.0
 webpack:css@1.0.0
+webpack:json@1.0.0
 webpack:npmworkaround@1.0.0
 webpack:react@1.0.0
 webpack:reload@1.0.0

@@ -4,8 +4,8 @@
 
 
 import Logger from 'App/logger';
-import htmlToText from 'html-to-text';
 import getUrls from 'get-urls';
+import truncate from 'truncate-html';
 
 export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
     const page_size = 50;
@@ -56,15 +56,15 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                     return;
                 }
 
-                // Parse out all html tags from the description, and convert it to normal text.
-                let description = htmlToText.fromString(
-                    event.description,
-                    {
-                        ignoreHref: true,
-                        ignoreImage: true,
-                        preserveNewlines: true
-                    }
-                );
+                //Parse out all html tags from the description, and convert it to normal text.
+                let description = truncate(event.description || "", {
+                    length: 1000,
+                    stripTags: false,
+                    ellipsis: '...',
+                    excludes: ['img', 'br'],
+                    decodeEntities: true
+                });
+
                 description = !description || description == 'null' || description.length == 0 ?
                     "No Description Available" : description;
 
@@ -74,7 +74,13 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
 
                 // Format the event category.
                 _.map(event.categories.category, function (category) {
-                    category.name = htmlToText.fromString(category.name);
+                    category.name = truncate(category.name, {
+                        length: 100,
+                        stripTags: true,
+                        ellipsis: '...',
+                        excludes: ['img', 'br'],
+                        decodeEntities: true
+                    });
                     return category;
                 });
 
