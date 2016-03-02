@@ -26,7 +26,7 @@ fundo is a web application which will allow users to discover nearby events. It'
 - ES6 modules
 - Meteor
 - React.js
-- react-router with server-rendering (you can disable it by editing `server/entry.js`)
+- react-router with server-rendering
 - Webpack (bundle your app / assets and send them to Meteor)
 - Hot-reload with no page refresh in development mode
 - Optimize your code in production mode
@@ -38,8 +38,9 @@ fundo is a web application which will allow users to discover nearby events. It'
 2. Create settings.json file in the root directory.
    More info [here.](http://docs.meteor.com/#/full/meteor_settings)
 3. Start up a redis server instance for the app to connect to. For more info, see next section.
-4. Run `meteor run --settings settings.json`, which will install all dependencies and start up the meteor server.
-5. Go to `localhost:3000` in your web browser.
+4. Run `npm install` to install all npm packages.
+5. Run `meteor run --settings settings.json`, which will install all dependencies and start up the meteor server.
+6. Go to `localhost:3000` in your web browser.
 
 
 ### Redis
@@ -80,7 +81,7 @@ Redis holds the entire dataset in memory.
                 "password": <STRING>,
                 "port": <STRING>
               },
-              "enableRedisRecommendations": <true OR false>
+            "enableRedisRecommendations": <true OR false>
         }
 
 #### Run in production mode (with SSR enabled)
@@ -92,6 +93,9 @@ Redis holds the entire dataset in memory.
 
 ##### A little note about SSR
 This application uses SSR (Server Side Rendering) in production. Therefore, all code that relies on the global `window` object in any view must be wrapped in a conditional such as `if (typeof window != 'undefined') { code block } `, since `window` exists only on the browser and not on the server. This does not apply to code inside functions that are only run on the browser, such as `componentDidMount`.
+
+##### Known Issues
+One of our meteor package dependencies, `mrt:redis`, does not work on Windows. For now, in order to run this application on Windows you have to disable redis recommendations using the settings.json "enableRedisRecommendations" option, and set it to false.
 
 
 Thanks to [thereactivestack's kickstart project](https://github.com/thereactivestack/kickstart-simple), which this project is based upon.
