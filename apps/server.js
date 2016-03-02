@@ -1,7 +1,4 @@
-/**
- * This is the main entry point in the server. Import any code here that you want the server
- * to see/execute when it initially starts up.
- */
+import { ReactRouterSSR } from 'meteor/reactrouter:react-router-ssr';
 
 import PreferenceSet from 'App/collections/PreferenceSet';
 import 'App/collections/Event';
@@ -24,7 +21,10 @@ Accounts.onCreateUser(function (options, user) {
     return user;
 });
 
-// Do server-rendering only in production mode
+
+// Do server-rendering only in production
+// Otherwise, it will break the hot-reload
+// DO NOT REMOVE THIS LINE TO TEST, use: meteor --production
 if (process.env.NODE_ENV === 'production') {
 
     // Formatting for emails.
@@ -38,20 +38,5 @@ if (process.env.NODE_ENV === 'production') {
     // Load Webpack infos for SSR
     ReactRouterSSR.LoadWebpackStats(WebpackStats);
 
-    require('../client/routes');
-} else {
-    // To activate the unit tests:
-    // - meteor add sanjo:jasmine
-    // - meteor add velocity:html-reporter
-    // - uncomment them on entry/client/entry.js and entry/server/entry.js
-
-    // Add fixtures required for integration tests
-    /*const context = require.context('../../modules', true, /\/server\/(.*)\/integration\/(.*)\-fixtures\.jsx?$/);
-     context.keys().forEach(context);
-
-     if (process.env.FRAMEWORK === 'jasmine-server-integration') {
-     // Run integration tests on server
-     const context = require.context('../../modules', true, /\/server\/(.*)\/integration\/(.*)\-test\.jsx?$/);
-     context.keys().forEach(context);
-     }*/
+    require('./routes').default;
 }

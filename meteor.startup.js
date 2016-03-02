@@ -61,22 +61,6 @@ AccountsTemplates.configure({
     }
 });
 
-if (Meteor.isClient) {
-    /**
-     * Verify emails and log users in when they click on a verify
-     * email link.
-     */
-    Accounts.onEmailVerificationLink(function (token, done) {
-        Accounts.verifyEmail(token, function (error) {
-            if (!error) {
-                Accounts.loginWithToken(token);
-            }
-            done();
-            //TODO: show something if there was an error.
-        });
-    });
-}
-
 
 if (Meteor.settings.mail) {
     process.env.MAIL_URL = 'smtp://' +
