@@ -1,7 +1,8 @@
 /* global React, mui */
 
 import ReactMixin from 'react-mixin';
-import { History, Link } from 'react-router';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
+import { Link } from 'react-router';
 
 
 /**
@@ -9,7 +10,7 @@ import { History, Link } from 'react-router';
  * @className
  * @extends React.Component
  */
-@ReactMixin.decorate(History)
+@ReactMixin.decorate(PureRenderMixin)
 export default class Home extends React.Component {
 
     // The list of words that the hero text will cycle through

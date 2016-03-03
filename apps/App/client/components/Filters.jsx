@@ -1,5 +1,7 @@
 import Alert from 'react-s-alert';
 import GeoSuggest from 'react-geosuggest';
+import ReactMixin from 'react-mixin';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 /**
  * The view for the filters shown in the sidebar on the dashboard.
@@ -7,6 +9,7 @@ import GeoSuggest from 'react-geosuggest';
  * @class
  * @extends React.Component
  */
+@ReactMixin.decorate(PureRenderMixin)
 export default class Filters extends React.Component {
     static propTypes = {
         filterChangeCallback: React.PropTypes.func.isRequired,
