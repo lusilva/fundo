@@ -1,9 +1,9 @@
 import Helmet from 'react-helmet';
-import { History, Link } from 'react-router';
+import { Link } from 'react-router';
 import ReactMixin from 'react-mixin';
 import Alert from 'react-s-alert';
 
-import { userIsValid, getPathsForUser, pathIsValidForUser } from 'App/helpers';
+import { getPathsForUser } from 'App/helpers';
 import Logger from 'App/logger';
 
 if (Meteor.isClient) {
@@ -23,11 +23,14 @@ if (Meteor.isClient) {
  * @className
  * @extends React.Component
  */
-@ReactMixin.decorate(History)
 @ReactMixin.decorate(ReactMeteorData)
 export default class Layout extends React.Component {
     static propTypes = {
         children: React.PropTypes.any.isRequired
+    };
+
+    static contextTypes = {
+        router: React.PropTypes.object.isRequired
     };
 
     intervalId = null;
@@ -35,12 +38,13 @@ export default class Layout extends React.Component {
     /**
      * Get the current user of the application, or null if no user is logged in.
      * This method is reactive and runs every time the user changes.
+     *
      * @returns {{currentUser: any}}
      */
     getMeteorData() {
         if (!!Meteor.user() != !!this.data.currentUser) {
             let paths = getPathsForUser();
-            this.history.pushState(this.state, paths[0].path);
+            this.context.router.replace(paths[0].path);
         }
 
         return {
@@ -85,7 +89,7 @@ export default class Layout extends React.Component {
     _getNavBar() {
         let logo = null;
 
-        if (!this.history.isActive('/')) {
+        if (!this.context.router.isActive('/')) {
             logo = (
                 <Link to="/">
                     <img className="ui inverted item" src={require('./img/fundo-xsmall.png')}/>

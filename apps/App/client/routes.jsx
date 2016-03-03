@@ -1,5 +1,5 @@
-import { Route, IndexRoute } from 'react-router';
-import { userIsValid, getPathsForUser, pathIsValidForUser } from '../helpers';
+import { Route, IndexRoute, browserHistory } from 'react-router';
+import { getPathsForUser, pathIsValidForUser } from '../helpers';
 import Logger from 'App/logger';
 
 import Layout from './Layout';
@@ -8,7 +8,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
 export default (
-    <Route component={Layout}>
+    <Route component={Layout} history={browserHistory}>
         <Route path="/" component={Home}/>
         <Route path="/login" component={Login} onEnter={validateUser}/>
         <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
@@ -20,14 +20,15 @@ function validateUser(nextState, transitionFunc) {
     if (!pathIsValidForUser(nextState.location.pathname)) {
         let transitionURL = getPathsForUser()[0].path;
         Logger.debug('Redirecting to %s', transitionURL);
-        transitionFunc(null, transitionURL);
+        transitionFunc(transitionURL);
     }
 }
 
-function logoutUser(nextState, transitionFunc) {
+function logoutUser(nextState, transitionFunc, done) {
     Meteor.logout(function (err) {
         if (!err) {
-            transitionFunc(null, '/login');
+            transitionFunc('/login');
         }
+        done();
     });
 }

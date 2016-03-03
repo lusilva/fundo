@@ -231,7 +231,7 @@ export default class Dashboard extends React.Component {
 
     /** @inheritDoc */
     render() {
-        let mastheadContent = isUserVerified(this.props.currentUser) ?
+        let mastheadContent = this.props.currentUser && isUserVerified(this.props.currentUser) ?
             this._showHeadContent() :
             this._getVerifyEmailHeader();
 

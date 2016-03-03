@@ -1,7 +1,6 @@
 /* global mui, React */
 
 import ReactMixin from 'react-mixin';
-import { History } from 'react-router';
 
 
 const LoginForm = BlazeToReact('fullPageAtForm');
@@ -13,7 +12,6 @@ const LoginForm = BlazeToReact('fullPageAtForm');
  * @class
  * @extends React.Component
  */
-@ReactMixin.decorate(History)
 export default class Login extends React.Component {
 
     /** @inheritDoc */
