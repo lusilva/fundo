@@ -157,6 +157,12 @@ export default class Filters extends React.Component {
             } else {
                 Alert.error('Error occurred while updating location');
             }
+            // Result returns if there are events for this area already, if this is true then
+            // there were no events and we have fetched some from eventful.
+            if (!!res) {
+                let message = "Looks like we don't have any events for that area. Fetching them now, this may take a little while";
+                that._showMessage(false, message, 10000);
+            }
             this._setLoading(false);
         }.bind(this));
     };

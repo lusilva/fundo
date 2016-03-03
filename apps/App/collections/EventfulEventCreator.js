@@ -15,6 +15,7 @@ export default function createEvent(city, event) {
     let owners = [];
     let likes = [];
     let dislikes = [];
+    let similar_events = event.similar_events;
     let relevant_cities = [city];
     if (!!existingEvent) {
         owners = existingEvent.owners;
@@ -22,6 +23,8 @@ export default function createEvent(city, event) {
 
         likes = _.union(likes, existingEvent.likes);
         dislikes = _.union(dislikes, existingEvent.dislikes);
+
+        similar_events = _.union(similar_events, existingEvent.similar_events);
     }
 
     event = {
@@ -49,9 +52,9 @@ export default function createEvent(city, event) {
         price: event.price,
         categories: _.pluck(event.categories.category, 'name'),
         likes: likes,
-        dislikes: dislikes
+        dislikes: dislikes,
+        similar_events: similar_events
     };
-
 
     let dbEvent = new Event(event);
     dbEvent.save(function (err, res) {

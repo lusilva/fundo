@@ -29,6 +29,7 @@ export default class Event {
         this._tickets = doc.tickets;
         this._likes = doc.likes || [];
         this._dislikes = doc.dislikes || [];
+        this._similar_events = doc.similar_events || [];
 
         // Needed in order to sort events by number of likes.
         this._like_count = this._likes.length;
@@ -107,7 +108,11 @@ export default class Event {
 
     get tickets() {
         return this._tickets;
-    }
+    };
+
+    get similar_events() {
+        return this._similar_events;
+    };
 
     set likes(likes) {
         this._likes = likes;
@@ -282,6 +287,7 @@ export default class Event {
             links: this.links,
             likes: this.likes,
             dislikes: this.dislikes,
+            similar_events: this.similar_events,
 
             like_count: this.likes.length,
             dislike_count: this.dislikes.length

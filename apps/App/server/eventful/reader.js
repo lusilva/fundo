@@ -20,6 +20,7 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
     endDate.setDate(today.getDate() + days);
     let date = formatEventfulDate(today) + "-" + formatEventfulDate(endDate);
 
+
     Meteor.http.get("http://api.eventful.com/json/events/search",
         {
             timeout: 30000,
@@ -46,6 +47,10 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
             let resultJSON = JSON.parse(result.content);
 
             let events = resultJSON.events.event;
+
+            // If this isn't the last page, then recurse and get started on the next eventful fetch.
+            if (Math.min(resultJSON.page_count, MAX_PAGES_TO_FETCH) > page)
+                getEventsForCity(city, eventCreatorCallback, page + 1);
 
             _.each(events, function (event, index) {
 
@@ -84,6 +89,7 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                     return category;
                 });
 
+
                 event.start_time = event.start_time ? new Date(event.start_time) : null;
                 event.stop_time = event.stop_time ? new Date(event.stop_time) : null;
 
@@ -91,9 +97,6 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 event.description = description;
                 eventCreatorCallback(event);
             });
-
-            if (Math.min(resultJSON.page_count, MAX_PAGES_TO_FETCH) > page)
-                getEventsForCity(city, eventCreatorCallback, page + 1)
         });
 }
 

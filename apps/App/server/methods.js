@@ -45,7 +45,8 @@ Meteor.methods({
      * Method to update user preferences.
      *
      * @param preferences
-     * @returns {any}
+     * @param eventsReadyCallback
+     * @returns {boolean}
      */
     "updatePreferences": function (preferences) {
 
@@ -67,6 +68,8 @@ Meteor.methods({
                 Logger.debug('successfully updated preference set for user %s', this.userId, res);
             }
         }.bind(this));
+
+        return Event.findEventsInCity(preferences._location).count() == 0;
     },
     /**
      * Method to like an event.
