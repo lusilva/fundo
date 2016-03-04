@@ -18,6 +18,32 @@ Meteor.publish('categories', function () {
         });
 });
 
+
+// Publish saved events
+Meteor.publish('savedevents', function (limit) {
+    if (this.userId) {
+        let dl = limit || 10;
+
+        return Event.getCollection().find(
+            {
+                // Only show events that this user has liked.
+                likes: {
+                    $in: [this.userId]
+                }
+            },
+            {
+                // Assert limit and sorting for the events.
+                limit: dl,
+                sort: {
+                    start_time: 1
+                }
+            }
+        );
+    } else {
+        return null;
+    }
+});
+
 // Publish events.
 Meteor.publish('events', function (limit, currentDate) {
     if (this.userId) {

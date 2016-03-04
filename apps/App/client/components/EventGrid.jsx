@@ -36,6 +36,10 @@ export default class EventGrid extends React.Component {
         }
     };
 
+    componentWillUnmount() {
+        this.resetEvents();
+    };
+
 
     /**
      * Resets the event set, removing all events.
@@ -53,6 +57,11 @@ export default class EventGrid extends React.Component {
      */
     _updateEventsSet(newEvents) {
         let newEventsSet = this.state.eventsSet;
+
+        if (!this.state.preferences || !this.state.preferences.location) {
+            this.resetEvents();
+            return;
+        }
 
         // Remove all events where city does not correspond with current city.
         _.each(_.keys(newEventsSet), function (key) {
