@@ -120,7 +120,7 @@ export default class Dashboard extends React.Component {
 
     /** @inheritDoc */
     componentWillUnmount() {
-        _.each(this.subs, function(sub) {
+        _.each(this.subs, function (sub) {
             sub.stop();
         });
     };

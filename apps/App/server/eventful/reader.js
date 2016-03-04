@@ -7,7 +7,7 @@ import Logger from 'App/logger';
 import getUrls from 'get-urls';
 import truncate from 'truncate-html';
 
-export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
+export default function getEventsForCity(city, eventCreatorCallback, doneCallback, opt_page) {
     const page_size = 50;
     const days = 30;
     const page = opt_page || 1;
@@ -15,6 +15,7 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
 
     Logger.debug('CITY: %s | PAGE: %d', city, page, {time: new Date()});
 
+    let done = false;
     let today = new Date();
     let endDate = new Date();
     endDate.setDate(today.getDate() + days);
@@ -49,8 +50,11 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
             let events = resultJSON.events.event;
 
             // If this isn't the last page, then recurse and get started on the next eventful fetch.
-            if (Math.min(resultJSON.page_count, MAX_PAGES_TO_FETCH) > page)
-                getEventsForCity(city, eventCreatorCallback, page + 1);
+            if (Math.min(resultJSON.page_count, MAX_PAGES_TO_FETCH) > page) {
+                getEventsForCity(city, eventCreatorCallback, doneCallback, page + 1);
+            } else {
+                done = true;
+            }
 
             _.each(events, function (event, index) {
 
@@ -97,6 +101,10 @@ export default function getEventsForCity(city, eventCreatorCallback, opt_page) {
                 event.description = description;
                 eventCreatorCallback(event);
             });
+
+            if (done) {
+                doneCallback();
+            }
         });
 }
 

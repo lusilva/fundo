@@ -114,6 +114,10 @@ export default class Event {
         return this._similar_events;
     };
 
+    set similar_events(similarEvents) {
+        this._similar_events = similarEvents;
+    };
+
     set likes(likes) {
         this._likes = likes;
     };
@@ -326,46 +330,6 @@ export default class Event {
             callback.call(this);
     }
 };
-
-
-/**
- * START OF EVENT DB HOOKS
- * Hooks to run before every event database update. These update the expiration time and log information.
- */
-Events.before.insert(function (userId, doc) {
-    let now = new Date();
-    doc.expires = new Date(now.getTime() + (3600000 * (Meteor.settings.hoursEventsExpiresIn || 24)));
-    Logger.debug('Inserting event %s', doc._id);
-});
-
-Events.before.update(function (userId, doc, fieldNames, modifier, options) {
-    let now = new Date();
-    modifier.$set = modifier.$set || {};
-    modifier.$set.expires = new Date(now.getTime() + (3600000 * (Meteor.settings.hoursEventsExpiresIn || 24)));
-    Logger.debug('Updating event %s', doc._id);
-});
-
-Events.before.remove(function (userId, doc) {
-    Logger.debug('Removing event %s', doc._id, {expires: doc.expires});
-
-    // TODO: cleanup raccoon when removing events.
-    //if (Meteor.isServer && Raccoon) {
-    //    if (doc.likes && doc.likes.length > 0) {
-    //        _.each(doc.likes, function (userId) {
-    //            Raccoon.unliked(userId, doc._id);
-    //        });
-    //    }
-    //
-    //    if (doc.dislikes && doc.dislikes.length > 0) {
-    //        _.each(doc.dislikes, function (userId) {
-    //            Raccoon.undisliked(userId, doc._id);
-    //        });
-    //    }
-    //}
-});
-/**
- * END OF EVENT DB HOOKS
- */
 
 
 /**
