@@ -80,7 +80,8 @@ Redis holds the entire dataset in memory.
             "enableRedisRecommendations": <true OR false>
             "redis": {
                "port": <NUMBER>,
-               "url": <STRING>
+               "url": <STRING>,
+               "password": <STRING or null if no password needed>
             }
         }
 
