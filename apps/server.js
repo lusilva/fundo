@@ -5,6 +5,7 @@ import 'App/collections/Event';
 import 'App/collections/Category';
 import 'App/server/methods';
 import 'App/logger';
+import 'App/server/collectionHooks';
 import 'App/server/publications';
 import 'App/server/fixtures';
 import 'App/server/cache/scheduler';
