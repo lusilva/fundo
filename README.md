@@ -66,10 +66,6 @@ Redis holds the entire dataset in memory.
                 "authKey": <KADIRA_AUTH_KEY_GOES_HERE>
                 }
             },
-            "testUser": {
-                "email": <EXAMPLE EMAIL ADDRESS (eg "test@test.com")>,
-                "password": <EXAMPLE PASSWORD (eg "testpassword")>
-            },
             "debugEnabled": <true OR false>,
             "eventfulAPIKey": <EVENTFUL_API_KEY_GOES_HERE>,
             "maxPagesPerCity": <NUMBER>,
@@ -82,6 +78,10 @@ Redis holds the entire dataset in memory.
                 "port": <STRING>
               },
             "enableRedisRecommendations": <true OR false>
+            "redis": {
+               "port": <NUMBER>,
+               "url": <STRING>
+            }
         }
 
 #### Run in production mode (with SSR enabled)
