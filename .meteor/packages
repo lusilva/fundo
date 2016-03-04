@@ -40,6 +40,5 @@ matb33:collection-hooks
 useraccounts:semantic-ui
 meteorhacks:kadira
 appcache
-mrt:redis
 semantic:ui
 webpack:json

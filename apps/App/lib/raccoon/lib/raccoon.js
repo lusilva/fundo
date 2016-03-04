@@ -1,6 +1,7 @@
 // This is a custom made port of recommendationRaccoon npm package by Guy Morita.
 import async from 'async';
 import Logger from 'App/logger';
+import redis from 'redis';
 
 class Raccoon {
     constructor(port, url, auth) {
@@ -520,7 +521,10 @@ class Raccoon {
 }
 
 const raccoon = Meteor.settings.enableRedisRecommendations ?
-    new Raccoon(Meteor.settings.redis.port, Meteor.settings.redis.url) :
-    null;
+    new Raccoon(
+        Meteor.settings.redis.port,
+        Meteor.settings.redis.url,
+        Meteor.settings.redis.password
+    ) : null;
 export default raccoon;
 

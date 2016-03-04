@@ -94,8 +94,5 @@ Redis holds the entire dataset in memory.
 ##### A little note about SSR
 This application uses SSR (Server Side Rendering) in production. Therefore, all code that relies on the global `window` object in any view must be wrapped in a conditional such as `if (typeof window != 'undefined') { code block } `, since `window` exists only on the browser and not on the server. This does not apply to code inside functions that are only run on the browser, such as `componentDidMount`.
 
-##### Known Issues
-One of our meteor package dependencies, `mrt:redis`, does not work on Windows. For now, in order to run this application on Windows you have to disable redis recommendations using the settings.json "enableRedisRecommendations" option, and set it to false.
-
 
 Thanks to [thereactivestack's kickstart project](https://github.com/thereactivestack/kickstart-simple), which this project is based upon.
