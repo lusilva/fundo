@@ -56,8 +56,8 @@ export default class GridEvent extends React.Component {
             .modal('attach events', $(rootNode).find(".more-info-button"), 'show');
 
         this.setState({
-            liked: _.contains(this.props.event.likes, Meteor.userId()),
-            disliked: _.contains(this.props.event.dislikes, Meteor.userId())
+            liked: _.includes(this.props.event.likes, Meteor.userId()),
+            disliked: _.includes(this.props.event.dislikes, Meteor.userId())
         });
     };
 

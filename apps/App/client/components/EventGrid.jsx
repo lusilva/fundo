@@ -57,7 +57,7 @@ export default class EventGrid extends React.Component {
         // Remove all events where city does not correspond with current city.
         _.each(_.keys(newEventsSet), function (key) {
             let event = newEventsSet[key];
-            if (!_.contains(event.relevant_cities, this.state.preferences.location)) {
+            if (!_.includes(event.relevant_cities, this.state.preferences.location)) {
                 delete newEventsSet[key];
             }
         }.bind(this));
@@ -65,7 +65,7 @@ export default class EventGrid extends React.Component {
         // Add all new events.
         _.each(newEvents, function (event) {
             if (!_.has(newEventsSet, event.id) &&
-                _.contains(event.relevant_cities, this.state.preferences.location)) {
+                _.includes(event.relevant_cities, this.state.preferences.location)) {
                 newEventsSet[event.id] = event;
             }
         }.bind(this));
