@@ -42,3 +42,4 @@ meteorhacks:kadira
 appcache
 semantic:ui
 webpack:json
+raix:eventemitter

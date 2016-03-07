@@ -3,6 +3,10 @@
  * accounts configurations for the built-in user package. This provides
  * user authentication.x
  */
+
+if (Meteor.isClient)
+    AccountsEvents = new EventEmitter();
+
 AccountsTemplates.configure({
     // Behavior
     confirmPassword: true,
@@ -22,7 +26,7 @@ AccountsTemplates.configure({
     showResendVerificationEmailLink: false,
 
     // Client-side Validation
-    continuousValidation: true,
+    continuousValidation: false,
     negativeFeedback: true,
     negativeValidation: true,
     positiveValidation: true,
@@ -34,12 +38,17 @@ AccountsTemplates.configure({
     //termsUrl: 'terms-of-use',
 
     // Redirects
-    homeRoutePath: '/',
-    redirectTimeout: 4000,
+    //homeRoutePath: '/dashboard',
+    //redirectTimeout: 4000,
 
     // Hooks
     //onLogoutHook: myLogoutFunc,
-    //onSubmitHook: mySubmitFunc,
+    onSubmitHook: function (err, state) {
+        if (!err && Meteor.isClient) {
+            AccountsEvents.emit('loggedIn');
+        }
+        return true;
+    },
     //preSignUpHook: myPreSubmitFunc,
     //postSignUpHook: myPostSubmitFunc,
 
