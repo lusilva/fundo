@@ -1,5 +1,6 @@
 import Logger from 'App/logger';
 import Event from './Event';
+import _ from 'lodash';
 
 /**
  * Function to create an event object and save it to the database from eventful data.

@@ -6,6 +6,7 @@ import Category from 'App/collections/Category';
 
 import Alert from 'react-s-alert';
 import ReactMixin from 'react-mixin';
+import _ from 'lodash';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 import { isUserVerified } from 'App/helpers';

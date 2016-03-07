@@ -3,6 +3,7 @@
 import GridEvent from './GridEvent';
 
 import Alert from 'react-s-alert';
+import _ from 'lodash';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
 

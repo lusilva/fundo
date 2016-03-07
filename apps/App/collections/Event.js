@@ -1,4 +1,5 @@
 import Logger from 'App/logger';
+import _ from 'lodash';
 
 // Create Events MongoDB collection
 const Events = new Meteor.Collection("events", {

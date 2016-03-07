@@ -2,6 +2,8 @@ import Event from 'App/collections/Event';
 import Logger from 'App/logger';
 import Raccoon from 'App/lib/raccoon';
 
+import _ from 'lodash';
+
 const Events = Event.getCollection();
 
 /**

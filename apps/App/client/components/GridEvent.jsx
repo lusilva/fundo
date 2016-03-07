@@ -5,6 +5,7 @@ import parseLink from 'parse-link';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
 import renderHTML from 'react-render-html';
+import _ from 'lodash';
 
 /**
  * The view component for an event card.

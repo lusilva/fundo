@@ -2,6 +2,7 @@ import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from "App/collections/Event";
 import Logger from 'App/logger';
 
+import _ from 'lodash';
 import Raccoon from '../lib/raccoon/index';
 
 
@@ -80,7 +81,7 @@ Meteor.methods({
         if (this.userId && eventId) {
             // Get the event, and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
-            if (!event || _.contains(event.likes, this.userId)) return;
+            if (!event || _.includes(event.likes, this.userId)) return;
 
             // Call like on the event.
             event.like(function (err, res) {
@@ -104,7 +105,7 @@ Meteor.methods({
         if (this.userId && eventId) {
             // Get the event and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
-            if (!event || _.contains(event.dislikes, this.userId)) return;
+            if (!event || _.includes(event.dislikes, this.userId)) return;
 
             event.dislike(function (err, res) {
                 if (!err) {
@@ -127,7 +128,7 @@ Meteor.methods({
         if (this.userId && eventId) {
             // Get the event and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
-            if (!event || !_.contains(event.likes, this.userId)) return;
+            if (!event || !_.includes(event.likes, this.userId)) return;
 
             event.unlike(function (err, res) {
                 if (!err) {
@@ -150,7 +151,7 @@ Meteor.methods({
         if (this.userId && eventId) {
             // Get the event and make sure its valid.
             let event = Event.getCollection().findOne({_id: eventId});
-            if (!event || !_.contains(event.dislikes, this.userId)) return;
+            if (!event || !_.includes(event.dislikes, this.userId)) return;
 
             event.undislike(function (err, res) {
                 if (!err) {
