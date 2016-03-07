@@ -5,6 +5,7 @@ import parseLink from 'parse-link';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
 import renderHTML from 'react-render-html';
+import _ from 'lodash';
 
 /**
  * The view component for an event card.
@@ -56,8 +57,8 @@ export default class GridEvent extends React.Component {
             .modal('attach events', $(rootNode).find(".more-info-button"), 'show');
 
         this.setState({
-            liked: _.contains(this.props.event.likes, Meteor.userId()),
-            disliked: _.contains(this.props.event.dislikes, Meteor.userId())
+            liked: _.includes(this.props.event.likes, Meteor.userId()),
+            disliked: _.includes(this.props.event.dislikes, Meteor.userId())
         });
     };
 

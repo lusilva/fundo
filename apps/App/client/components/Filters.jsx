@@ -1,6 +1,7 @@
 import Alert from 'react-s-alert';
 import GeoSuggest from 'react-geosuggest';
 import ReactMixin from 'react-mixin';
+import _ from 'lodash';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 /**

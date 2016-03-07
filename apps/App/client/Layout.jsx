@@ -2,6 +2,7 @@ import Helmet from 'react-helmet';
 import { Link } from 'react-router';
 import ReactMixin from 'react-mixin';
 import Alert from 'react-s-alert';
+import _ from 'lodash';
 
 import { getPathsForUser } from 'App/helpers';
 import Logger from 'App/logger';

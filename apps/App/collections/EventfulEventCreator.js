@@ -1,5 +1,6 @@
 import Logger from 'App/logger';
 import Event from './Event';
+import _ from 'lodash';
 
 /**
  * Function to create an event object and save it to the database from eventful data.
@@ -27,6 +28,11 @@ export default function createEvent(city, event) {
         similar_events = _.union(similar_events, existingEvent.similar_events);
     }
 
+    let category_names = [];
+    _.each(event.categories.category, function (category) {
+        category_names.push(category['name']);
+    });
+
     event = {
         _id: event.id,
         owners: owners,
@@ -50,7 +56,7 @@ export default function createEvent(city, event) {
         url: event.url,
         links: event.links,
         price: event.price,
-        categories: _.pluck(event.categories.category, 'name'),
+        categories: category_names,
         likes: likes,
         dislikes: dislikes,
         similar_events: similar_events

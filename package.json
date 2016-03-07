@@ -9,6 +9,7 @@
     "async": "^1.5.2",
     "get-urls": "^5.0.0",
     "hiredis": "^0.4.1",
+    "lodash": "^4.6.1",
     "parse-link": "^0.3.0",
     "react": "~0.14.1",
     "react-geosuggest": "^1.18.1",

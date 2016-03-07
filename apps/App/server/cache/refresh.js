@@ -4,6 +4,7 @@ import Category from 'App/collections/Category';
 import createEventfulEvent from 'App/collections/EventfulEventCreator';
 import Logger from 'App/logger';
 
+import _ from 'lodash';
 import truncate from 'truncate-html';
 import stringSimilarity from 'string-similarity';
 

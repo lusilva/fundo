@@ -1,4 +1,5 @@
 import Logger from 'App/logger';
+import _ from 'lodash';
 
 // Create Events MongoDB collection
 const Events = new Meteor.Collection("events", {
@@ -156,7 +157,7 @@ export default class Event {
             return;
         }
 
-        if (_.contains(this.likes, Meteor.userId())) {
+        if (_.includes(this.likes, Meteor.userId())) {
             callback(null, this.id);
             return;
         }
@@ -184,7 +185,7 @@ export default class Event {
             return;
         }
 
-        if (!_.contains(this.likes, Meteor.userId())) {
+        if (!_.includes(this.likes, Meteor.userId())) {
             callback(null, this.id);
         }
 
@@ -210,8 +211,8 @@ export default class Event {
             return;
         }
 
-        if (_.contains(this.dislikes, Meteor.userId()) ||
-            _.contains(this.likes, Meteor.userId())) {
+        if (_.includes(this.dislikes, Meteor.userId()) ||
+            _.includes(this.likes, Meteor.userId())) {
             callback(null, this.id);
         }
 
@@ -237,7 +238,7 @@ export default class Event {
             callback(new Meteor.Error('user not valid!'), null);
         }
 
-        if (!_.contains(this.dislikes, Meteor.userId())) {
+        if (!_.includes(this.dislikes, Meteor.userId())) {
             callback(null, this.id);
         }
 

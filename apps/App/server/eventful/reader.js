@@ -6,6 +6,7 @@
 import Logger from 'App/logger';
 import getUrls from 'get-urls';
 import truncate from 'truncate-html';
+import _ from 'lodash';
 
 export default function getEventsForCity(city, eventCreatorCallback, doneCallback, opt_page) {
     const page_size = 50;

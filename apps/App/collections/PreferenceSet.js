@@ -2,6 +2,7 @@
 import Event from './Event';
 import{ updateAllEventsForCity } from 'App/server/cache/refresh';
 import Logger from 'App/logger';
+import _ from 'lodash';
 
 
 const PreferenceSets = new Meteor.Collection("preferencesets", {
