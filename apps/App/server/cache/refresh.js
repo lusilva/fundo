@@ -80,8 +80,14 @@ function findAndMarkSimilarEvents(city) {
                 return false;
             }
 
-            return (stringSimilarity.compareTwoStrings(possibleSimilarEvent.title, event.title) > 0.5 &&
-            stringSimilarity.compareTwoStrings(possibleSimilarEvent.description, event.description) > 0.5);
+            let descriptionsMatch = possibleSimilarEvent.description && event.description &&
+                stringSimilarity.compareTwoStrings(possibleSimilarEvent.description, event.description) > 0.5;
+
+
+            return (
+                stringSimilarity.compareTwoStrings(possibleSimilarEvent.title, event.title) > 0.5 &&
+                descriptionsMatch
+            );
         });
 
 

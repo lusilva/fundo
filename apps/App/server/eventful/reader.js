@@ -35,7 +35,7 @@ export default function getEventsForCity(city, eventCreatorCallback, doneCallbac
                 units: 'miles',
                 sort_order: 'popularity',
                 page_number: page,
-                include: "price,categories,tickets,popularity,subcategories",
+                include: "price,categories,tickets,popularity,subcategories,mature",
                 image_sizes: "medium,block,large,edpborder250,dropshadow250,dropshadow170,block178",
                 mature: "normal",
                 languages: "1"
@@ -76,7 +76,7 @@ export default function getEventsForCity(city, eventCreatorCallback, doneCallbac
                 });
 
                 description = !description || description == 'null' || description.length == 0 ?
-                    "No Description Available" : description;
+                    null : description;
 
 
                 // Extract any links from the description.

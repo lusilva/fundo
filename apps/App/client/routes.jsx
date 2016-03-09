@@ -6,12 +6,14 @@ import Layout from './Layout';
 import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import MyEvents from './components/MyEvents';
 
 export default (
     <Route component={Layout} history={browserHistory}>
         <Route path="/" component={Home}/>
         <Route path="/login" component={Login} onEnter={validateUser}/>
         <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
+        <Route path="/myevents" component={MyEvents} onEnter={validateUser}/>
         <Route path="/logout" onEnter={logoutUser}/>
     </Route>
 );

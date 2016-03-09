@@ -43,11 +43,6 @@ export default class Layout extends React.Component {
      * @returns {{currentUser: any}}
      */
     getMeteorData() {
-        if (!!Meteor.user() != !!this.data.currentUser) {
-            let paths = getPathsForUser();
-            this.context.router.replace(paths[0].path);
-        }
-
         return {
             currentUser: Meteor.user()
         }
@@ -63,6 +58,11 @@ export default class Layout extends React.Component {
                 context: $(rootNode)
             })
             .sidebar('setting', 'transition', 'overlay');
+
+        AccountsEvents.on('loggedIn', function () {
+            Logger.debug('Logged In! Redirecting to /dashboard');
+            this.context.router.replace('/dashboard');
+        }.bind(this));
     };
 
     _toggleSideMenu() {

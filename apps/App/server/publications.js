@@ -18,10 +18,38 @@ Meteor.publish('categories', function () {
         });
 });
 
-// Publish events.
-Meteor.publish('events', function (limit, currentDate) {
+
+// Publish saved events
+Meteor.publish('savedevents', function (limit) {
     if (this.userId) {
         let dl = limit || 10;
+
+        return Event.getCollection().find(
+            {
+                // Only show events that this user has liked.
+                likes: {
+                    $in: [this.userId]
+                }
+            },
+            {
+                // Assert limit and sorting for the events.
+                limit: dl,
+                sort: {
+                    start_time: 1
+                }
+            }
+        );
+    } else {
+        return null;
+    }
+});
+
+// Publish events.
+Meteor.publish('events', function (page, currentDate) {
+    if (this.userId) {
+        page = page || 1;
+        const pageSize = 50;
+        let skip = pageSize * (page - 1);
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
         return Event.getCollection().find(
@@ -46,12 +74,13 @@ Meteor.publish('events', function (limit, currentDate) {
             },
             {
                 // Assert limit and sorting for the events.
-                limit: dl,
+                limit: pageSize,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,
                     popularity_score: -1
-                }
+                },
+                skip: skip
             }
         );
     }

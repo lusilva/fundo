@@ -336,7 +336,7 @@ export default class GridEvent extends React.Component {
                                 </div>
                             </div>
                             <div className="ui divider"></div>
-                            {renderHTML(event.description)}
+                            {renderHTML(event.description || "No Description Available")}
                         </div>
                     </div>
                     <div className="content">
@@ -382,7 +382,7 @@ export default class GridEvent extends React.Component {
                         <div className="ui content twelve wide column">
                             <h4 className="ui ui horizontal section divider hidden">Description</h4>
                             <div className="description">
-                                {renderHTML(event.description)}
+                                {renderHTML(event.description || "No Description Available")}
                             </div>
                             <div className="ui horizontal section divider"></div>
 
