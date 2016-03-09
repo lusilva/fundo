@@ -49,7 +49,7 @@ Meteor.publish('savedevents', function (limit) {
 Meteor.publish('events', function (page, currentDate) {
     if (this.userId) {
         page = page || 1;
-        const pageSize = Meteor.settings.public.dashboardPageSize;
+        const pageSize = 50;
         let skip = pageSize * (page - 1);
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
@@ -85,7 +85,7 @@ Meteor.publish('events', function (page, currentDate) {
             eventFilters,
             {
                 // Assert limit and sorting for the events.
-                limit: pageSize * 2,
+                limit: pageSize,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,
