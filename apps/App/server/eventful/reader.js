@@ -59,10 +59,10 @@ export default function getEventsForCity(city, eventCreatorCallback, doneCallbac
 
             _.each(events, function (event, index) {
 
-                // If this event is not in english or undetermined, then don't save it.
+                // If this event is not in english or undetermined OR if it doesn't have a start time, then don't save it.
                 // This is done because undetermined events can still be high quality.
                 if (!event.language ||
-                    (event.language.toLowerCase() != 'english' && event.language.toLowerCase() != 'undetermined')) {
+                    (event.language.toLowerCase() != 'english' && event.language.toLowerCase() != 'undetermined') || !event.start_time) {
                     return;
                 }
 
@@ -94,10 +94,8 @@ export default function getEventsForCity(city, eventCreatorCallback, doneCallbac
                     return category;
                 });
 
-
                 event.start_time = event.start_time ? new Date(event.start_time) : null;
                 event.stop_time = event.stop_time ? new Date(event.stop_time) : null;
-
 
                 event.description = description;
                 eventCreatorCallback(event);
