@@ -45,9 +45,11 @@ Meteor.publish('savedevents', function (limit) {
 });
 
 // Publish events.
-Meteor.publish('events', function (limit, currentDate) {
+Meteor.publish('events', function (page, currentDate) {
     if (this.userId) {
-        let dl = limit || 10;
+        page = page || 1;
+        const pageSize = 50;
+        let skip = pageSize * (page - 1);
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
         return Event.getCollection().find(
@@ -72,12 +74,13 @@ Meteor.publish('events', function (limit, currentDate) {
             },
             {
                 // Assert limit and sorting for the events.
-                limit: dl,
+                limit: pageSize,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,
                     popularity_score: -1
-                }
+                },
+                skip: skip
             }
         );
     }

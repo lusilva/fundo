@@ -46,16 +46,14 @@ export default class Dashboard extends React.Component {
         },
         isSendingEmail: false,
         location: null,
-        loading: false,
-        limit: 20
+        loading: true,
+        page: 1
     };
 
-
-    subs = [];
-
+    eventSub = null;
 
     /**
-     * Function that runs automatically everytime the data that its subscribed to changes.
+     * Function that runs automatically every time the data that its subscribed to changes.
      * In this case, it provides the user preferences data. This is accessible in the rest of the
      * component through this.data.preferences.
      *
@@ -63,23 +61,34 @@ export default class Dashboard extends React.Component {
      */
     getMeteorData() {
         // Get all necessary subscriptions
-        this.subs.push(Meteor.subscribe('userpreferences'));
+        Meteor.subscribe('userpreferences');
 
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         // Subscribe to events.
-        this.subs.push(Meteor.subscribe('events', this.state.limit, new Date()));
+        if (this.eventSub && this.state.loading) {
+            this.eventSub.stop();
+        }
+        this.eventSub = Meteor.subscribe('events', this.state.page, new Date(), {
+            onReady: function () {
+                this.setState({loading: false});
+            }.bind(this)
+        });
 
         // Get events from the database.
-        let events = Event.getCollection().find().fetch();
+        let events = Event.getCollection().find({}, {reactive: false}).fetch();
 
-        this.subs.push(Meteor.subscribe('categories'));
+        Meteor.subscribe('categories');
 
         let categories = Category.getCollection().find().fetch();
 
         // Return the preference and the user's events. This is available in this.data.
         return {preferences, events, categories}
+    };
+
+    componentWillMount() {
+        this.setState({loading: true});
     };
 
     /** @inheritDoc */
@@ -101,16 +110,6 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
-        $(rootNode).find('.main-content')
-            .visibility({
-                once: false,
-                // update size when new content loads
-                observeChanges: true,
-                // load content on bottom edge visible
-                onBottomVisible: this._loadMoreEvents.bind(this)
-            })
-        ;
-
         /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
         //Meteor.call('guessUserLocation', function (err, res) {
         //    console.log(err);
@@ -118,22 +117,13 @@ export default class Dashboard extends React.Component {
         //});
     };
 
-
-    /** @inheritDoc */
-    componentWillUnmount() {
-        _.each(this.subs, function (sub) {
-            sub.stop();
-        });
-    };
-
-
     /**
      * Loads more events from the database, called when a user scrolls to the bottom of the page.
      *
      * @private
      */
     _loadMoreEvents() {
-        this.setState({limit: Math.min(this.state.limit + 20, 100)});
+        this.setState({page: this.state.page + 1, loading: true});
     };
 
 
@@ -217,8 +207,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
-        this.setState({limit: 10});
-        this.refs.EventGrid.resetEvents();
+        this.setState({page: 1});
     };
 
 
@@ -237,8 +226,8 @@ export default class Dashboard extends React.Component {
             this._getVerifyEmailHeader();
 
         let loading = this.state.loading ?
-            <div className="ui active dimmer">
-                <div className="ui loader"></div>
+            <div className="ui active inverted dimmer">
+                <div className="ui text large loader">Loading Events</div>
             </div> : null;
 
         let getSelectLocationOverlay = this.data.preferences && !this.data.preferences.location ?
@@ -252,6 +241,20 @@ export default class Dashboard extends React.Component {
                     </div>
                 </div>
             </div> : null;
+
+        let content = this.data.events && this.data.events.length > 0 ? (
+            <EventGrid events={this.data.events}/>
+        ) : (
+            <div className="ui active dimmer">
+                <div className="content">
+                    <div className="center">
+                        <h2 className="ui inverted header container">
+                            No More Events
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        );
 
         return (
             <div>
@@ -269,9 +272,9 @@ export default class Dashboard extends React.Component {
                             <i className="map icon"/>
                             Map View
                         </a>
-                        <a className="item">
-                            <i className="frown icon"/>
-                            Dislike All
+                        <a className="item" onClick={this._loadMoreEvents.bind(this)}>
+                            <i className="refresh icon"/>
+                            Load More
                         </a>
 
                     </div>
@@ -286,10 +289,7 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {loading || getSelectLocationOverlay}
-                            <EventGrid events={this.data.events}
-                                       preferences={this.data.preferences}
-                                       ref="EventGrid"/>
+                            {loading || getSelectLocationOverlay || content}
                         </div>
                     </div>
                 </div>
