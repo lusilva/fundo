@@ -44,37 +44,48 @@ Meteor.publish('savedevents', function (limit) {
     }
 });
 
+
 // Publish events.
 Meteor.publish('events', function (page, currentDate) {
     if (this.userId) {
         page = page || 1;
-        const pageSize = 25;
+        const pageSize = Meteor.settings.public.dashboardPageSize;
         let skip = pageSize * (page - 1);
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
-        return Event.getCollection().find(
-            {
-                // Get events in the user's city.
-                relevant_cities: {
-                    $in: [preferences.location]
-                },
-                // Get events that have not yet started.
-                start_time: {
-                    $gte: new Date(currentDate)
-                },
-                // Do not show events that this user has already liked.
-                // These events should go in the 'My Events' page.
-                likes: {
-                    $nin: [this.userId]
-                },
-                // Do not show events that this user has already disliked.
-                dislikes: {
-                    $nin: [this.userId]
-                }
+
+        let eventFilters = {
+            // Get events in the user's city.
+            relevant_cities: {
+                $in: [preferences.location]
             },
+            // Get events that have not yet started.
+            start_time: {
+                $gte: new Date(currentDate)
+            },
+            // Do not show events that this user has already liked.
+            // These events should go in the 'My Events' page.
+            likes: {
+                $nin: [this.userId]
+            },
+            // Do not show events that this user has already disliked.
+            dislikes: {
+                $nin: [this.userId]
+            }
+        };
+
+        Counts.publish(this, 'dashboard-event-count', Event.getCollection().find(eventFilters),
+            {
+                noReady: true,
+                nonReactive: true
+            }
+        );
+
+        return Event.getCollection().find(
+            eventFilters,
             {
                 // Assert limit and sorting for the events.
-                limit: pageSize,
+                limit: pageSize * 2,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,

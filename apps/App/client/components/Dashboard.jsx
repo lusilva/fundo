@@ -47,7 +47,8 @@ export default class Dashboard extends React.Component {
         isSendingEmail: false,
         location: null,
         loading: true,
-        page: 1
+        page: 1,
+        totalPages: 1
     };
 
     eventSub = null;
@@ -72,7 +73,8 @@ export default class Dashboard extends React.Component {
         }
         this.eventSub = Meteor.subscribe('events', this.state.page, new Date(), {
             onReady: function () {
-                this.setState({loading: false});
+                let eventCount = Counts.get('dashboard-event-count');
+                this.setState({loading: false, totalPages: Math.ceil(eventCount / 50)});
             }.bind(this)
         });
 
@@ -87,10 +89,12 @@ export default class Dashboard extends React.Component {
         return {preferences, events, categories}
     };
 
+    
     componentWillUnmount() {
         if (this.eventSub)
             this.eventSub.stop();
     };
+
 
     /** @inheritDoc */
     componentDidMount() {
@@ -119,12 +123,24 @@ export default class Dashboard extends React.Component {
     };
 
     /**
-     * Loads more events from the database, called when a user scrolls to the bottom of the page.
+     * Loads the next page of events.
      *
      * @private
      */
-    _loadMoreEvents() {
-        this.setState({page: this.state.page + 1, loading: true});
+    _loadNextPage() {
+        if (this.state.page < this.state.totalPages)
+            this.setState({page: this.state.page + 1, loading: true});
+    };
+
+
+    /**
+     * Loads the previous page of events.
+     *
+     * @private
+     */
+    _loadPreviousPage() {
+        if (this.state.page > 1)
+            this.setState({page: this.state.page - 1, loading: true});
     };
 
 
@@ -244,7 +260,23 @@ export default class Dashboard extends React.Component {
             </div> : null;
 
         let content = this.data.events && this.data.events.length > 0 ? (
-            <EventGrid events={this.data.events}/>
+            <div>
+                <div className="ui attached">
+                    <EventGrid events={this.data.events}/>
+                </div>
+                <br/>
+                <div className="ui two bottom attached massive buttons">
+                    <div className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
+                         onClick={this._loadPreviousPage.bind(this)}>
+                        Previous Page
+                    </div>
+                    <div className="or massive"></div>
+                    <div className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
+                         onClick={this._loadNextPage.bind(this)}>
+                        Next Page
+                    </div>
+                </div>
+            </div>
         ) : (
             <div className="ui active dimmer">
                 <div className="content">
@@ -273,11 +305,6 @@ export default class Dashboard extends React.Component {
                             <i className="map icon"/>
                             Map View
                         </a>
-                        <a className="item" onClick={this._loadMoreEvents.bind(this)}>
-                            <i className="refresh icon"/>
-                            Load More
-                        </a>
-
                     </div>
                 </div>
                 <div className="ui bottom attached segment pushable">
