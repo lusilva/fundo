@@ -29,10 +29,10 @@ export default class Dashboard extends React.Component {
     };
 
     state = {
-        limit: 20
+        loading: true
     };
 
-    subs = [];
+    eventSub = null;
 
 
     /**
@@ -42,66 +42,50 @@ export default class Dashboard extends React.Component {
      *
      */
     getMeteorData() {
-        this.subs.push(Meteor.subscribe('userpreferences'));
-
-        // Find the preference set for the current user.
-        let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
-
         // Subscribe to events.
-        this.subs.push(Meteor.subscribe('savedevents', this.state.limit, new Date()));
+        if (this.eventSub) {
+            this.eventSub.stop();
+        }
+        this.eventSub = Meteor.subscribe('savedevents', this.state.limit, new Date(), {
+            onReady: function () {
+                this.setState({loading: false});
+            }.bind(this)
+        });
 
         // Get events from the database.
-        let savedEvents = Event.getCollection().find().fetch();
-
+        let savedEvents = Event.getCollection().find({}, {reactive: false}).fetch();
 
         // Return the preference and the user's events. This is available in this.data.
-        return {savedEvents, preferences}
-    };
-
-    /** @inheritDoc */
-    componentDidMount() {
-        // Localize the selector instead of having jQuery search globally
-        var rootNode = ReactDOM.findDOMNode(this);
-
-
-        $(rootNode).find('.main-saved-events-content')
-            .visibility({
-                once: false,
-                // update size when new content loads
-                observeChanges: true,
-                // load content on bottom edge visible
-                onBottomVisible: this._loadMoreEvents.bind(this)
-            });
+        return {savedEvents}
     };
 
 
     /** @inheritDoc */
     componentWillUnmount() {
-        _.each(this.subs, function (sub) {
-            sub.stop();
-        });
-    };
-
-
-    /**
-     * Loads more events from the database, called when a user scrolls to the bottom of the page.
-     *
-     * @private
-     */
-    _loadMoreEvents() {
-        this.setState({limit: Math.min(this.state.limit + 20, 100)});
+        if (this.eventSub) {
+            this.eventSub.stop();
+        }
     };
 
 
     /** @inheritDoc */
     render() {
+
+        let content = this.state.loading ?
+            (
+                <div className="ui active inverted dimmer">
+                    <div className="ui text large loader">Loading Your Events</div>
+                </div>
+
+            ) :
+            (
+                <EventGrid events={this.data.savedEvents}/>
+            );
+
         return (
             <div className="ui basic segment main-saved-events-content">
-                <EventGrid events={this.data.savedEvents}
-                           preferences={this.data.preferences}
-                           ref="EventGrid"/>
+                {content}
             </div>
-
         )
     }
 }

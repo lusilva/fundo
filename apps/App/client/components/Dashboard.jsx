@@ -87,8 +87,9 @@ export default class Dashboard extends React.Component {
         return {preferences, events, categories}
     };
 
-    componentWillMount() {
-        this.setState({loading: true});
+    componentWillUnmount() {
+        if (this.eventSub)
+            this.eventSub.stop();
     };
 
     /** @inheritDoc */
