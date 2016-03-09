@@ -46,7 +46,7 @@ export default class Dashboard extends React.Component {
         },
         isSendingEmail: false,
         location: null,
-        loading: true,
+        loading: false,
         page: 1,
         totalPages: 1
     };
@@ -68,18 +68,26 @@ export default class Dashboard extends React.Component {
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         // Subscribe to events.
-        if (this.eventSub && this.state.loading) {
-            this.eventSub.stop();
-        }
         this.eventSub = Meteor.subscribe('events', this.state.page, new Date(), {
             onReady: function () {
                 let eventCount = Counts.get('dashboard-event-count');
-                this.setState({loading: false, totalPages: Math.ceil(eventCount / 50)});
+                this.setState({totalPages: Math.ceil(eventCount / 50)});
             }.bind(this)
         });
 
         // Get events from the database.
-        let events = Event.getCollection().find({}, {reactive: false}).fetch();
+        let events = Event.getCollection().find({},
+            {
+                // Assert limit and sorting for the events.
+                limit: 50,
+                sort: {
+                    like_count: -1,
+                    dislike_count: 1,
+                    popularity_score: -1
+                },
+                skip: (this.state.page - 1) * 50
+            }
+        ).fetch();
 
         Meteor.subscribe('categories');
 
@@ -129,7 +137,7 @@ export default class Dashboard extends React.Component {
      */
     _loadNextPage() {
         if (this.state.page < this.state.totalPages)
-            this.setState({page: this.state.page + 1, loading: true});
+            this.setState({page: this.state.page + 1, loading: false});
     };
 
 
@@ -140,7 +148,7 @@ export default class Dashboard extends React.Component {
      */
     _loadPreviousPage() {
         if (this.state.page > 1)
-            this.setState({page: this.state.page - 1, loading: true});
+            this.setState({page: this.state.page - 1, loading: false});
     };
 
 
@@ -265,16 +273,16 @@ export default class Dashboard extends React.Component {
                     <EventGrid events={this.data.events}/>
                 </div>
                 <br/>
-                <div className="ui two bottom attached massive buttons">
-                    <div className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
-                         onClick={this._loadPreviousPage.bind(this)}>
+                <div className="ui two bottom attached huge buttons">
+                    <button className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
+                            onClick={this._loadPreviousPage.bind(this)}>
                         Previous Page
-                    </div>
-                    <div className="or massive"></div>
-                    <div className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
-                         onClick={this._loadNextPage.bind(this)}>
+                    </button>
+                    <button
+                        className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
+                        onClick={this._loadNextPage.bind(this)}>
                         Next Page
-                    </div>
+                    </button>
                 </div>
             </div>
         ) : (

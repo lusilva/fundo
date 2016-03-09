@@ -85,13 +85,11 @@ Meteor.publish('events', function (page, currentDate) {
             eventFilters,
             {
                 // Assert limit and sorting for the events.
-                limit: pageSize,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,
                     popularity_score: -1
-                },
-                skip: skip
+                }
             }
         );
     }
