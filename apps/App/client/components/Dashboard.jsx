@@ -136,8 +136,10 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _loadNextPage() {
-        if (this.state.page < this.state.totalPages)
+        if (this.state.page < this.state.totalPages) {
+            $('#main-dashboard-container').scrollView();
             this.setState({page: this.state.page + 1, loading: false});
+        }
     };
 
 
@@ -147,8 +149,10 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _loadPreviousPage() {
-        if (this.state.page > 1)
+        if (this.state.page > 1) {
+            $('#main-dashboard-container').scrollView();
             this.setState({page: this.state.page - 1, loading: false});
+        }
     };
 
 
@@ -285,17 +289,7 @@ export default class Dashboard extends React.Component {
                     </button>
                 </div>
             </div>
-        ) : (
-            <div className="ui active dimmer">
-                <div className="content">
-                    <div className="center">
-                        <h2 className="ui inverted header container">
-                            No More Events
-                        </h2>
-                    </div>
-                </div>
-            </div>
-        );
+        ) : null;
 
         return (
             <div>
@@ -315,7 +309,7 @@ export default class Dashboard extends React.Component {
                         </a>
                     </div>
                 </div>
-                <div className="ui bottom attached segment pushable">
+                <div className="ui bottom attached segment pushable" id="main-dashboard-container">
                     <div className="ui left vertical sidebar menu">
                         <Filters preferences={this.data.preferences}
                                  categories={this.data.categories}
