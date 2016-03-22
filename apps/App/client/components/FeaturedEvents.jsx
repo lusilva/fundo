@@ -8,7 +8,7 @@ import Slider from 'react-slick';
  * Represents the featured events shown at the top of the page.
  *
  * TODO: Needs to be cleaned up a lot.
- * @class
+ * @className
  * @extends React.Component
  *
  */
@@ -65,8 +65,8 @@ export default class FeaturedEvents extends React.Component {
             speed: 500,
             slidesToShow: 3,
             centerMode: true,
-            centerPadding: '60px',
-            autoplay: true,
+            centerPadding: '20px',
+            autoplay: false,
             autoplaySpeed: 2000,
             pauseOnHover: true,
             dots: true,
@@ -81,9 +81,22 @@ export default class FeaturedEvents extends React.Component {
             <Slider {...settings}>
                 {_.map(this.state.events, function (event) {
                     return (
-                        <div key={event.id} className="featured-events">
-                            <h2>{event.title}</h2>
-                            <p>Lorem ipsum dolor sit amet.</p>
+                        <div key={event.id}>
+                            <div className="ui segment featured-event">
+                                <div className="content">
+                                    <img className="right floated mini ui image"
+                                         src="http://semantic-ui.com/images/avatar/large/elliot.jpg"/>
+                                    <div className="header">
+                                        Elliot Fu
+                                    </div>
+                                    <div className="meta">
+                                        Friends of Veronika
+                                    </div>
+                                    <div className="description">
+                                        Elliot requested permission to view your contact details
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )
                 })}
