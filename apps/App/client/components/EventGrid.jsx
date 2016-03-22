@@ -29,7 +29,7 @@ export default class EventGrid extends React.Component {
     render() {
         return (
             <div className="ui container">
-                <div className="ui doubling four column grid">
+                <div className="ui four stackable doubling cards">
                     {_.map(this.props.events, function (event) {
                         return (
                             <GridEvent key={event.id}

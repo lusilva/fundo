@@ -20,7 +20,7 @@ export default class FeaturedEvents extends React.Component {
     };
 
     state = {
-        events: []
+        events: null
     };
 
 
@@ -35,6 +35,10 @@ export default class FeaturedEvents extends React.Component {
     };
 
     _getRecommendedEvents(recommendedEventIds) {
+        if (!recommendedEventIds) {
+            this.setState({events: null});
+            return;
+        }
         let events = Event.getCollection().find(
             {
                 _id: {
@@ -57,7 +61,6 @@ export default class FeaturedEvents extends React.Component {
 
     render() {
         let settings = {
-            className: 'center',
             infinite: true,
             speed: 500,
             slidesToShow: 3,
@@ -66,14 +69,19 @@ export default class FeaturedEvents extends React.Component {
             autoplay: true,
             autoplaySpeed: 2000,
             pauseOnHover: true,
-            dots: true
+            dots: true,
+            arrows: false
         };
+
+        let loading = !this.state.events ? (
+            <div className="ui active inverted text large loader">Loading Recommendations</div>
+        ) : null;
 
         let slider = this.state.events && this.state.events.length > 0 ? (
             <Slider {...settings}>
                 {_.map(this.state.events, function (event) {
                     return (
-                        <div key={event.id}>
+                        <div key={event.id} className="featured-events">
                             <h2>{event.title}</h2>
                             <p>Lorem ipsum dolor sit amet.</p>
                         </div>
@@ -86,7 +94,7 @@ export default class FeaturedEvents extends React.Component {
 
         return (
             <div className="ui container">
-                {slider}
+                {loading || slider}
             </div>
         )
     }

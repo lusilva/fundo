@@ -308,58 +308,56 @@ export default class GridEvent extends React.Component {
         let venueAddress = event.venue && event.venue.address ? event.venue.address : "unknown address";
 
         return (
-            <div className="ui column">
-                <div className="ui fluid card">
-                    <div className="ui content">
-                        {this._getCategoryRibbon()}
+            <div className="ui card">
+                <div className="ui content">
+                    {this._getCategoryRibbon()}
+                </div>
+                <div className="ui content">
+                    <div className="container header event-title" data-content={event.title}>
+                        <TextTruncate
+                            line={1}
+                            truncateText="…"
+                            text={event.title}
+                            showTitle={false}/>
                     </div>
-                    <div className="ui content">
-                        <div className="container header event-title" data-content={event.title}>
-                            <TextTruncate
-                                line={1}
-                                truncateText="…"
-                                text={event.title}
-                                showTitle={false}/>
-                        </div>
-                    </div>
-                    <div className="ui slide masked reveal event-grid-image">
-                        <img src={eventImage}
-                             data-src={eventImage}
-                             className="visible transition content image card-image"/>
-                        <div className="ui hidden content text event-description">
-                            <div className="content bottom attached">
-                                <div className="eventful-badge eventful-small">
-                                    <img src="http://api.eventful.com/images/powered/eventful_58x20.gif"
-                                         alt="Local Events, Concerts, Tickets"
-                                    />
-                                    <p><a href="http://eventful.com/">Events</a> by Eventful</p>
-                                </div>
+                </div>
+                <div className="ui slide masked reveal event-grid-image">
+                    <img src={eventImage}
+                         data-src={eventImage}
+                         className="visible transition content image card-image"/>
+                    <div className="ui hidden content text event-description">
+                        <div className="content bottom attached">
+                            <div className="eventful-badge eventful-small">
+                                <img src="http://api.eventful.com/images/powered/eventful_58x20.gif"
+                                     alt="Local Events, Concerts, Tickets"
+                                />
+                                <p><a href="http://eventful.com/">Events</a> by Eventful</p>
                             </div>
-                            <div className="ui divider"></div>
-                            {renderHTML(event.description || "No Description Available")}
                         </div>
+                        <div className="ui divider"></div>
+                        {renderHTML(event.description || "No Description Available")}
                     </div>
-                    <div className="content">
-                        <div className="header">
-                            <TextTruncate
-                                line={1}
-                                truncateText="…"
-                                text={venueName}
-                                showTitle={false}/>
-                        </div>
-                        <div className="meta">
+                </div>
+                <div className="content">
+                    <div className="header">
+                        <TextTruncate
+                            line={1}
+                            truncateText="…"
+                            text={venueName}
+                            showTitle={false}/>
+                    </div>
+                    <div className="meta">
                             <span className="date">
                                 {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
                             </span>
-                        </div>
-                        <div className="meta">
-                            {this._getDislikes()}
-                            {this._getLikes()}
-                        </div>
                     </div>
-                    <div className="ui bottom attached primary button more-info-button">
-                        More Info
+                    <div className="meta">
+                        {this._getDislikes()}
+                        {this._getLikes()}
                     </div>
+                </div>
+                <div className="ui bottom attached primary button more-info-button">
+                    More Info
                 </div>
                 <div className="ui modal event-details">
                     <i className="close icon"/>

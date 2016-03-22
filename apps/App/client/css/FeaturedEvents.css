@@ -1,0 +1,9 @@
+.featured-events.slick-center {
+    color: #E5D042;
+    opacity: 1;
+    transform: scale(1.08);
+}
+.featured-events {
+    opacity: 0.8;
+    transition: all 300ms ease;
+}
