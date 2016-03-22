@@ -48,7 +48,8 @@ export default class Dashboard extends React.Component {
         location: null,
         loading: false,
         page: 1,
-        totalPages: 1
+        totalPages: 1,
+        recommendedEvents: null
     };
 
     eventSub = null;
@@ -71,6 +72,9 @@ export default class Dashboard extends React.Component {
         this.eventSub = Meteor.subscribe('events', this.state.page, new Date(), {
             onReady: function () {
                 let eventCount = Counts.get('dashboard-event-count');
+                if (!this.state.recommendedEvents) {
+                    this._updateRecommendations();
+                }
                 this.setState({totalPages: Math.ceil(eventCount / 50)});
             }.bind(this)
         });
@@ -80,6 +84,7 @@ export default class Dashboard extends React.Component {
             {
                 // Assert limit and sorting for the events.
                 limit: 50,
+                reactive: false,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,
@@ -140,6 +145,22 @@ export default class Dashboard extends React.Component {
             $('#main-dashboard-container').scrollView();
             this.setState({page: this.state.page + 1, loading: false});
         }
+    };
+
+
+    /**
+     * Updated the event recommendations for this user.
+     *
+     * @private
+     */
+    _updateRecommendations() {
+        Meteor.call('getRecommendations', function (err, res) {
+            if (err) {
+                console.log(err);
+            }
+            console.log(res);
+            this.setState({recommendedEvents: res || []});
+        }.bind(this));
     };
 
 
@@ -225,7 +246,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _showHeadContent() {
-        return <FeaturedEvents />
+        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents} />
     };
 
 

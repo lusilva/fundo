@@ -430,7 +430,7 @@ class Raccoon {
             0,
             numberOfRecs,
             function (err, results) {
-                callback(results);
+                callback(err, results);
             }
         );
     };
