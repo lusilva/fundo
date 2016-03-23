@@ -1,66 +1,26 @@
-/* global Meteor, React */
-
 import TextTruncate from 'react-text-truncate';
-import parseLink from 'parse-link';
-import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
-import ReactMixin from 'react-mixin';
 import renderHTML from 'react-render-html';
+import parseLink from 'parse-link';
 import _ from 'lodash';
 
-/**
- * The view component for an event card.
- *
- * @class
- * @extends React.Component
- */
-@ReactMixin.decorate(PureRenderMixin)
-export default class GridEvent extends React.Component {
+export default class FeaturedEvent extends React.Component {
 
-    /**
-     * The props this component receives.
-     *
-     * @type {{event: Event}}
-     */
     static propTypes = {
         event: React.PropTypes.object.isRequired
     };
 
-    /**
-     * The state of this component.
-     *
-     * @type {{liked: boolean, disliked: boolean, category: string}}
-     */
+
     state = {
         liked: false,
         disliked: false
     };
 
-
-    /** @inheritDoc */
     componentDidMount() {
         let rootNode = ReactDOM.findDOMNode(this);
-
-        // Lazy load the images until they are visible.
-        $(rootNode).find('.card-image')
-            .visibility({
-                type: 'image',
-                transition: 'fade in',
-                duration: 1000,
-                initialCheck: true
-            });
-
-        // Make a popup for event titles that are longer and get cut off.
-        $(rootNode).find('.event-title')
-            .popup();
 
         $(rootNode).find('.ui.modal.event-details')
             .modal('setting', 'transition', 'horizontal flip')
             .modal('attach events', $(rootNode).find(".more-info-button"), 'show');
-
-        this.setState({
-            liked: _.includes(this.props.event.likes, Meteor.userId()),
-            disliked: _.includes(this.props.event.dislikes, Meteor.userId())
-        });
     };
 
 
@@ -178,24 +138,6 @@ export default class GridEvent extends React.Component {
 
 
     /**
-     * Get the category for this event.
-     *
-     * @returns {XML}
-     * @private
-     */
-
-    _getCategoryRibbon() {
-        let category = this.props.event.categories[0] || 'Eventful Event';
-
-        return (
-            <div className="ui black ribbon label">
-                {category}
-            </div>
-        )
-    };
-
-
-    /**
      * Get relevant links for this event, shown in the more info modal.
      *
      * @returns {*}
@@ -285,15 +227,9 @@ export default class GridEvent extends React.Component {
     };
 
 
-    /** @inheritDoc */
     render() {
-        let event = this.props.event;
 
-        // Format the start and end time using moment.js
-        let time = event.start_time ? moment(event.start_time) : "unknown time";
-        if (event.start_time && event.stop_time) {
-            time = time.twix(event.stop_time);
-        }
+        let event = this.props.event;
 
         //TODO: change this to be placeholder image based on category.
         let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";
@@ -304,54 +240,36 @@ export default class GridEvent extends React.Component {
             eventImage = event.image.medium.url;
         }
 
+
+        // Format the start and end time using moment.js
+        let time = event.start_time ? moment(event.start_time) : "unknown time";
+        if (event.start_time && event.stop_time) {
+            time = time.twix(event.stop_time);
+        }
+
         // Get the venue information, doing all necessary null checking.
         let venueName = event.venue && event.venue.name ? event.venue.name : "unknown venue";
         let venueAddress = event.venue && event.venue.address ? event.venue.address : "unknown address";
 
         return (
-            <div className="ui card">
-                <div className="ui content">
-                    {this._getCategoryRibbon()}
-                </div>
-                <div className="ui content">
-                    <div className="container header event-title" data-content={event.title}>
+            <div className="ui fluid card featured-event">
+                <div className="content">
+                    <img className="right floated tiny ui image"
+                         src={eventImage}/>
+                    <div className="header">
                         <TextTruncate
                             line={1}
                             truncateText="…"
                             text={event.title}
                             showTitle={false}/>
                     </div>
-                </div>
-                <div className="ui slide masked reveal event-grid-image">
-                    <img src={eventImage}
-                         data-src={eventImage}
-                         className="visible transition content image card-image"/>
-                    <div className="ui hidden content text event-description">
-                        <div className="content bottom attached">
-                            <div className="eventful-badge eventful-small">
-                                <img src="http://api.eventful.com/images/powered/eventful_58x20.gif"
-                                     alt="Local Events, Concerts, Tickets"
-                                />
-                                <p><a href="http://eventful.com/">Events</a> by Eventful</p>
-                            </div>
+                    <div className="meta">
+                        <div className="date">
+                            {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
                         </div>
-                        <div className="ui divider"></div>
-                        {renderHTML(event.description || "No Description Available")}
                     </div>
                 </div>
                 <div className="content">
-                    <div className="header">
-                        <TextTruncate
-                            line={1}
-                            truncateText="…"
-                            text={venueName}
-                            showTitle={false}/>
-                    </div>
-                    <div className="meta">
-                            <span className="date">
-                                {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
-                            </span>
-                    </div>
                     <div className="meta">
                         {this._getDislikes()}
                         {this._getLikes()}
@@ -406,6 +324,6 @@ export default class GridEvent extends React.Component {
                     <br/>
                 </div>
             </div>
-        );
-    };
-}
+        )
+    }
+};

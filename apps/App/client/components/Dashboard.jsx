@@ -46,8 +46,10 @@ export default class Dashboard extends React.Component {
         },
         isSendingEmail: false,
         location: null,
-        loading: true,
-        page: 1
+        loading: false,
+        page: 1,
+        totalPages: 1,
+        recommendedEvents: null
     };
 
     eventSub = null;
@@ -67,17 +69,35 @@ export default class Dashboard extends React.Component {
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         // Subscribe to events.
-        if (this.eventSub && this.state.loading) {
-            this.eventSub.stop();
-        }
-        this.eventSub = Meteor.subscribe('events', this.state.page, new Date(), {
+        this.eventSub = Meteor.subscribe('events', new Date(), {
             onReady: function () {
-                this.setState({loading: false});
+                let eventCount = Counts.get('dashboard-event-count');
+                if (!this.state.recommendedEvents) {
+                    this._updateRecommendations();
+                }
+                this.setState({totalPages: Math.ceil(eventCount / 48)});
             }.bind(this)
         });
 
         // Get events from the database.
-        let events = Event.getCollection().find({}, {reactive: false}).fetch();
+        let events = Event.getCollection().find(
+            {
+                _id: {
+                    $nin: this.state.recommendedEvents || []
+                }
+            },
+            {
+                // Assert limit and sorting for the events.
+                limit: 48,
+                reactive: false,
+                sort: {
+                    like_count: -1,
+                    dislike_count: 1,
+                    popularity_score: -1
+                },
+                skip: (this.state.page - 1) * 48
+            }
+        ).fetch();
 
         Meteor.subscribe('categories');
 
@@ -87,10 +107,12 @@ export default class Dashboard extends React.Component {
         return {preferences, events, categories}
     };
 
+
     componentWillUnmount() {
         if (this.eventSub)
             this.eventSub.stop();
     };
+
 
     /** @inheritDoc */
     componentDidMount() {
@@ -119,12 +141,44 @@ export default class Dashboard extends React.Component {
     };
 
     /**
-     * Loads more events from the database, called when a user scrolls to the bottom of the page.
+     * Loads the next page of events.
      *
      * @private
      */
-    _loadMoreEvents() {
-        this.setState({page: this.state.page + 1, loading: true});
+    _loadNextPage() {
+        if (this.state.page < this.state.totalPages) {
+            $('#main-dashboard-container').scrollView();
+            this.setState({page: this.state.page + 1, loading: false});
+        }
+    };
+
+
+    /**
+     * Updated the event recommendations for this user.
+     *
+     * @private
+     */
+    _updateRecommendations() {
+        Meteor.call('getRecommendations', function (err, res) {
+            if (err) {
+                console.log(err);
+            }
+            console.log(res);
+            this.setState({recommendedEvents: res || []});
+        }.bind(this));
+    };
+
+
+    /**
+     * Loads the previous page of events.
+     *
+     * @private
+     */
+    _loadPreviousPage() {
+        if (this.state.page > 1) {
+            $('#main-dashboard-container').scrollView();
+            this.setState({page: this.state.page - 1, loading: false});
+        }
     };
 
 
@@ -178,7 +232,7 @@ export default class Dashboard extends React.Component {
 
         // Else, display the verify email message.
         return (
-            <div className="ui text container center aligned verify-email">
+            <div className="ui text container center aligned masthead-center">
                 <h2>An email was sent to {this.props.currentUser.emails[0].address}.</h2>
                 <h4>Please follow the instructions to verify your email.</h4>
                 <button className={"ui inverted button" + (this.state.isSendingEmail ? 'loading' : '')}
@@ -197,7 +251,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _showHeadContent() {
-        return <FeaturedEvents />
+        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents}/>
     };
 
 
@@ -244,18 +298,24 @@ export default class Dashboard extends React.Component {
             </div> : null;
 
         let content = this.data.events && this.data.events.length > 0 ? (
-            <EventGrid events={this.data.events}/>
-        ) : (
-            <div className="ui active dimmer">
-                <div className="content">
-                    <div className="center">
-                        <h2 className="ui inverted header container">
-                            No More Events
-                        </h2>
-                    </div>
+            <div>
+                <div className="ui attached">
+                    <EventGrid events={this.data.events}/>
+                </div>
+                <br/>
+                <div className="ui two bottom attached huge buttons">
+                    <button className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
+                            onClick={this._loadPreviousPage.bind(this)}>
+                        Previous Page
+                    </button>
+                    <button
+                        className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
+                        onClick={this._loadNextPage.bind(this)}>
+                        Next Page
+                    </button>
                 </div>
             </div>
-        );
+        ) : null;
 
         return (
             <div>
@@ -273,14 +333,9 @@ export default class Dashboard extends React.Component {
                             <i className="map icon"/>
                             Map View
                         </a>
-                        <a className="item" onClick={this._loadMoreEvents.bind(this)}>
-                            <i className="refresh icon"/>
-                            Load More
-                        </a>
-
                     </div>
                 </div>
-                <div className="ui bottom attached segment pushable">
+                <div className="ui bottom attached segment pushable" id="main-dashboard-container">
                     <div className="ui left vertical sidebar menu">
                         <Filters preferences={this.data.preferences}
                                  categories={this.data.categories}

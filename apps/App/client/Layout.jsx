@@ -132,6 +132,12 @@ export default class Layout extends React.Component {
                             { name: 'viewport', content: 'width=device-width, initial-scale=1' }
                         ]
                     }
+                    link={
+                        [
+                            {"rel": "stylesheet", "type":"text/css",
+                             "href": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.3.15/slick.css"}
+                        ]
+                    }
                     script={googleMapsScript}
                 />
 
