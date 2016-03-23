@@ -46,11 +46,8 @@ Meteor.publish('savedevents', function (limit) {
 
 
 // Publish events.
-Meteor.publish('events', function (page, currentDate) {
+Meteor.publish('events', function (currentDate) {
     if (this.userId) {
-        page = page || 1;
-        const pageSize = 50;
-        let skip = pageSize * (page - 1);
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
 

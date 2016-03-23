@@ -69,13 +69,13 @@ export default class Dashboard extends React.Component {
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         // Subscribe to events.
-        this.eventSub = Meteor.subscribe('events', this.state.page, new Date(), {
+        this.eventSub = Meteor.subscribe('events', new Date(), {
             onReady: function () {
                 let eventCount = Counts.get('dashboard-event-count');
                 if (!this.state.recommendedEvents) {
                     this._updateRecommendations();
                 }
-                this.setState({totalPages: Math.ceil(eventCount / 50)});
+                this.setState({totalPages: Math.ceil(eventCount / 48)});
             }.bind(this)
         });
 
@@ -83,14 +83,14 @@ export default class Dashboard extends React.Component {
         let events = Event.getCollection().find({},
             {
                 // Assert limit and sorting for the events.
-                limit: 50,
+                limit: 48,
                 reactive: false,
                 sort: {
                     like_count: -1,
                     dislike_count: 1,
                     popularity_score: -1
                 },
-                skip: (this.state.page - 1) * 50
+                skip: (this.state.page - 1) * 48
             }
         ).fetch();
 
@@ -227,7 +227,7 @@ export default class Dashboard extends React.Component {
 
         // Else, display the verify email message.
         return (
-            <div className="ui text container center aligned verify-email">
+            <div className="ui text container center aligned masthead-center">
                 <h2>An email was sent to {this.props.currentUser.emails[0].address}.</h2>
                 <h4>Please follow the instructions to verify your email.</h4>
                 <button className={"ui inverted button" + (this.state.isSendingEmail ? 'loading' : '')}
@@ -246,7 +246,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _showHeadContent() {
-        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents} />
+        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents}/>
     };
 
 

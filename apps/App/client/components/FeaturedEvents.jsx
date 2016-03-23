@@ -3,6 +3,8 @@
 import Event from 'App/collections/Event';
 
 import Slider from 'react-slick';
+import TextTruncate from 'react-text-truncate';
+import FeaturedEvent from './FeaturedEvent';
 
 /**
  * Represents the featured events shown at the top of the page.
@@ -62,15 +64,16 @@ export default class FeaturedEvents extends React.Component {
     render() {
         let settings = {
             infinite: true,
-            speed: 500,
+            speed: 1000,
             slidesToShow: 3,
             centerMode: true,
             centerPadding: '20px',
-            autoplay: false,
-            autoplaySpeed: 2000,
+            autoplay: true,
+            autoplaySpeed: 5000,
             pauseOnHover: true,
             dots: true,
-            arrows: false
+            arrows: true,
+            lazyLoad: true
         };
 
         let loading = !this.state.events ? (
@@ -81,28 +84,16 @@ export default class FeaturedEvents extends React.Component {
             <Slider {...settings}>
                 {_.map(this.state.events, function (event) {
                     return (
-                        <div key={event.id}>
-                            <div className="ui segment featured-event">
-                                <div className="content">
-                                    <img className="right floated mini ui image"
-                                         src="http://semantic-ui.com/images/avatar/large/elliot.jpg"/>
-                                    <div className="header">
-                                        Elliot Fu
-                                    </div>
-                                    <div className="meta">
-                                        Friends of Veronika
-                                    </div>
-                                    <div className="description">
-                                        Elliot requested permission to view your contact details
-                                    </div>
-                                </div>
-                            </div>
+                        <div key={'featured-' + event.id}>
+                            <FeaturedEvent event={event}/>
                         </div>
-                    )
+                    );
                 })}
             </Slider>
         ) : (
-            <div>No Recommended Events..</div>
+            <div className="ui text container center aligned masthead-center">
+                <h2>We currently don't have any recommended events for you. Let us know what events you like.</h2>
+            </div>
         );
 
         return (
