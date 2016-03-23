@@ -5,11 +5,11 @@ import Event from 'App/collections/Event';
 import Slider from 'react-slick';
 import TextTruncate from 'react-text-truncate';
 import FeaturedEvent from './FeaturedEvent';
+import _ from 'lodash';
 
 /**
  * Represents the featured events shown at the top of the page.
  *
- * TODO: Needs to be cleaned up a lot.
  * @className
  * @extends React.Component
  *
@@ -62,18 +62,32 @@ export default class FeaturedEvents extends React.Component {
     };
 
     render() {
+        let enoughEvents = !!this.state.events && this.state.events.length > 2;
+
         let settings = {
             infinite: true,
-            speed: 1000,
-            slidesToShow: 3,
-            centerMode: true,
+            speed: 500,
+            slidesToShow: Math.min(3, this.state.events ? this.state.events.length : 3),
+            centerMode: enoughEvents,
+            draggable: enoughEvents,
             centerPadding: '20px',
-            autoplay: true,
+            autoplay: enoughEvents,
             autoplaySpeed: 5000,
             pauseOnHover: true,
-            dots: true,
-            arrows: true,
-            lazyLoad: true
+            dots: enoughEvents,
+            arrows: enoughEvents,
+            lazyLoad: enoughEvents,
+            responsive: [{
+                breakpoint: 728,
+                settings: {
+                    slidesToShow: Math.min(2, this.state.events ? this.state.events.length : 2)
+                }
+            }, {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: Math.min(1, this.state.events ? this.state.events.length : 1)
+                }
+            }]
         };
 
         let loading = !this.state.events ? (
@@ -85,7 +99,9 @@ export default class FeaturedEvents extends React.Component {
                 {_.map(this.state.events, function (event) {
                     return (
                         <div key={'featured-' + event.id}>
-                            <FeaturedEvent event={event}/>
+                            <div className={enoughEvents ? '' : 'featured-scaled-event'}>
+                                <FeaturedEvent event={event}/>
+                            </div>
                         </div>
                     );
                 })}

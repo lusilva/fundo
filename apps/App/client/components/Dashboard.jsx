@@ -80,7 +80,12 @@ export default class Dashboard extends React.Component {
         });
 
         // Get events from the database.
-        let events = Event.getCollection().find({},
+        let events = Event.getCollection().find(
+            {
+                _id: {
+                    $nin: this.state.recommendedEvents || []
+                }
+            },
             {
                 // Assert limit and sorting for the events.
                 limit: 48,

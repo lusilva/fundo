@@ -45,7 +45,8 @@ export default class GridEvent extends React.Component {
             .visibility({
                 type: 'image',
                 transition: 'fade in',
-                duration: 1000
+                duration: 1000,
+                initialCheck: true
             });
 
         // Make a popup for event titles that are longer and get cut off.
