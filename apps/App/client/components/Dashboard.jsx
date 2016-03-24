@@ -15,6 +15,8 @@ import EventGrid from './EventGrid';
 import Filters from './Filters';
 
 
+import SimpleMapPage from './SimpleMapPage.jsx';
+
 /**
  * The dashboard view that the user sees upon logging in.
  *
@@ -47,7 +49,8 @@ export default class Dashboard extends React.Component {
         isSendingEmail: false,
         location: null,
         loading: false,
-        limit: 20
+        limit: 20,
+        mapView: false  // for adding map
     };
 
 
@@ -147,6 +150,44 @@ export default class Dashboard extends React.Component {
         let rootNode = ReactDOM.findDOMNode(this);
         $(rootNode).find('.ui.sidebar').sidebar('toggle');
     };
+
+
+
+    /**
+     * Toggles the google map view
+     *
+     * @private
+     */
+    _showMap() {
+
+        //toggle map on click
+        //
+        // let rootNode = ReactDOM.findDOMNode(this);
+        // $(rootNode).find('.main-content')
+
+        //     return simple_mapPage();
+        
+        this.setState( {mapView: !this.state.mapView} );
+        
+            //return GoogleMap;
+
+        //}
+        /* else {
+
+            this.setState( {mapView: true} );
+
+        }
+
+        if (this.state.mapView ) {
+            return GoogleMap;
+        }
+        else {
+            return "mapView == false";
+        }*/
+        
+
+    };
+
 
 
     /**
@@ -253,6 +294,19 @@ export default class Dashboard extends React.Component {
                 </div>
             </div> : null;
 
+        let content = this.state.mapView ? 
+            <div>
+                Put map here
+                <SimpleMapPage
+                    center = {[59.938043, 30.337157]}
+                    zoom = {9}
+                    greatPlaceCoords = {{lat: 59.724465, lng: 30.080121}}
+                />
+            </div> : 
+                <EventGrid events={this.data.events}
+                    preferences={this.data.preferences}
+                    ref="EventGrid"/>
+
         return (
             <div>
                 <div className="ui inverted vertical segment dashboard-masthead primary-color">
@@ -265,9 +319,11 @@ export default class Dashboard extends React.Component {
                         Filters
                     </a>
                     <div className="right menu">
-                        <a className="item">
+
+                        <a className="item" onClick={  this._showMap.bind(this) }>
                             <i className="map icon"/>
                             Map View
+
                         </a>
                         <a className="item">
                             <i className="frown icon"/>
@@ -283,15 +339,18 @@ export default class Dashboard extends React.Component {
                                  filterChangeCallback={this._filterChangeCallback.bind(this)}
                                  setLoadingCallback={this._setLoadingCallback.bind(this)}
                         />
-                    </div>
-                    <div className="dashboard pusher">
+                    </div>                  
+
+                    <div className="dashboard pusher">   
+
+                                      
                         <div className="ui basic segment main-content">
                             {loading || getSelectLocationOverlay}
-                            <EventGrid events={this.data.events}
-                                       preferences={this.data.preferences}
-                                       ref="EventGrid"/>
+                            {content}
                         </div>
+                        
                     </div>
+                    
                 </div>
             </div>
         )

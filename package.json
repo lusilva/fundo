@@ -41,6 +41,8 @@
     "react-transform-hmr": "^1.0.1",
     "react-transform-catch-errors": "^1.0.0",
     "redbox-react": "^1.2.0",
-    "json-loader": "^0.5.4"
+    "json-loader": "^0.5.4",
+    "google-map-react": "^0.10.5",
+    "react-pure-render": "^1.0.2"
   }
 }

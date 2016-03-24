@@ -38,7 +38,7 @@ export default class EventGrid extends React.Component {
     };
 
     componentWillUnmount() {
-        this.resetEvents();
+        //this.resetEvents();
     };
 
 

@@ -117,7 +117,7 @@ export default class Layout extends React.Component {
 
     render() {
 
-        let googleMapsScript = (typeof google != 'undefined') ? [] : [{
+        let googleMapsScript = (false) ? [] : [{
             "src": "https://maps.googleapis.com/maps/api/js?libraries=places",
             "type": "text/javascript"
         }];
