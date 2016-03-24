@@ -21,7 +21,6 @@ import Filters from './Filters';
  * @class
  * @extends React.Component
  */
-@ReactMixin.decorate(PureRenderMixin)
 @ReactMixin.decorate(ReactMeteorData)
 export default class Dashboard extends React.Component {
 

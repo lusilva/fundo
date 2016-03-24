@@ -117,11 +117,6 @@ export default class Layout extends React.Component {
 
     render() {
 
-        let googleMapsScript = (typeof google != 'undefined') ? [] : [{
-            "src": "https://maps.googleapis.com/maps/api/js?libraries=places",
-            "type": "text/javascript"
-        }];
-
         return (
             <div>
                 <Helmet
@@ -138,7 +133,6 @@ export default class Layout extends React.Component {
                              "href": "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.3.15/slick.css"}
                         ]
                     }
-                    script={googleMapsScript}
                 />
 
                 <div className="ui vertical inverted sidebar menu primary-color" id="sidebar-menu">
