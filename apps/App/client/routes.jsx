@@ -10,10 +10,8 @@ import Dashboard from './components/Dashboard';
 import MyEvents from './components/MyEvents';
 import Welcome from './components/WelcomePage';
 
-import $script from 'scriptjs';
-
 export default (
-    <Route component={Layout} history={browserHistory} onEnter={getGoogleMaps}>
+    <Route component={Layout} history={browserHistory}>
         <Route path="/" component={Home}/>
         <Route path="/login" component={Login} onEnter={validateNotUser}/>
         <Route path="/welcome" component={Welcome} onEnter={validateWelcome}/>
@@ -22,13 +20,6 @@ export default (
         <Route path="/logout" onEnter={logoutUser}/>
     </Route>
 );
-
-
-function getGoogleMaps(nextState, transitionFunc, done) {
-    $script("//maps.googleapis.com/maps/api/js?libraries=places", function () {
-        done();
-    });
-}
 
 
 function validateWelcome(nextState, transitionFunc, done) {
@@ -46,19 +37,29 @@ function validateWelcome(nextState, transitionFunc, done) {
         return;
     }
 
-    // Get all necessary subscriptions
-    Meteor.subscribe('userpreferences', {
-        onReady: function () {
-            // Find the preference set for the current user.
-            let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
+    if (Meteor.isClient) {
+        // Get all necessary subscriptions
+        Meteor.subscribe('userpreferences', {
+            onReady: function () {
+                // Find the preference set for the current user.
+                let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-            if (!Meteor.userId() || preferences.location) {
-                transitionFunc(getPathsForUser()[0].path);
+                if (!Meteor.userId() || preferences.location) {
+                    transitionFunc(getPathsForUser()[0].path);
+                }
+
+                done();
             }
+        });
+    } else {
+        let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-            done();
+        if (!Meteor.userId() || preferences.location) {
+            transitionFunc(getPathsForUser()[0].path);
         }
-    });
+
+        done();
+    }
 }
 
 
@@ -90,19 +91,30 @@ function validateUser(nextState, transitionFunc, done) {
         transitionFunc(getPathsForUser()[0].path);
         done();
     } else {
-        // Get all necessary subscriptions
-        Meteor.subscribe('userpreferences', {
-            onReady: function () {
-                // Find the preference set for the current user.
-                let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
+        if (Meteor.isClient) {
+            // Get all necessary subscriptions
+            Meteor.subscribe('userpreferences', {
+                onReady: function () {
+                    // Find the preference set for the current user.
+                    let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-                if (!preferences || !preferences.location) {
-                    transitionFunc('/welcome');
+                    if (!preferences || !preferences.location) {
+                        transitionFunc('/welcome');
+                    }
+
+                    done();
                 }
+            });
+        } else {
+            // Find the preference set for the current user.
+            let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-                done();
+            if (!preferences || !preferences.location) {
+                transitionFunc('/welcome');
             }
-        });
+
+            done();
+        }
     }
 
 

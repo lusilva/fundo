@@ -1,7 +1,6 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
 import GeoSuggest from 'react-geosuggest';
 
-
 export default class WelcomePage extends React.Component {
 
     static contextTypes = {
@@ -9,8 +8,16 @@ export default class WelcomePage extends React.Component {
     };
 
     state = {
-        loading: false,
+        loading: true,
         preferences: PreferenceSet.getCollection().findOne({userId: Meteor.userId()})
+    };
+
+    componentWillMount() {
+        let that = this;
+        let $script = require('scriptjs');
+        $script("//maps.googleapis.com/maps/api/js?libraries=places", function () {
+            that.setState({loading: false});
+        });
     };
 
     /** @inheritDoc */
@@ -18,12 +25,14 @@ export default class WelcomePage extends React.Component {
         // Add the dark purple background to the body, and remove it when
         // going to another page.
         document.body.classList.add('primary-color');
-    };
+    }
+    ;
 
     /** @inheritDoc */
     componentWillUnmount() {
         document.body.classList.remove('primary-color');
-    };
+    }
+    ;
 
     /**
      * Updates the user's location preference
@@ -50,7 +59,8 @@ export default class WelcomePage extends React.Component {
             that.setState({loading: false});
             that.context.router.replace('/dashboard');
         });
-    };
+    }
+    ;
 
 
     render() {
