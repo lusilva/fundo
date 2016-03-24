@@ -20,7 +20,14 @@ export function isUserVerified(user) {
  * @returns {Array}
  */
 export function getPathsForUser() {
-    if (!!Meteor.userId() || Meteor.loggingIn()) {
+    let loggedIn = false;
+    if (Meteor.isClient) {
+        loggedIn = !!Meteor.userId() || Meteor.loggingIn();
+    } else {
+        loggedIn = !!Meteor.userId();
+    }
+
+    if (loggedIn) {
         return Paths.loggedIn;
     } else {
         return Paths.loggedOut;

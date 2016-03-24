@@ -49,16 +49,19 @@ export default class Dashboard extends React.Component {
         isSendingEmail: false,
         location: null,
         loading: false,
-        limit: 20,
-        mapView: false  // for adding map
+
+        //limit: 20,
+        mapView: false,  // for adding map
+
+        page: 1,
+        totalPages: 1,
+        recommendedEvents: null
     };
 
-
-    subs = [];
-
+    eventSub = null;
 
     /**
-     * Function that runs automatically everytime the data that its subscribed to changes.
+     * Function that runs automatically every time the data that its subscribed to changes.
      * In this case, it provides the user preferences data. This is accessible in the rest of the
      * component through this.data.preferences.
      *
@@ -66,24 +69,56 @@ export default class Dashboard extends React.Component {
      */
     getMeteorData() {
         // Get all necessary subscriptions
-        this.subs.push(Meteor.subscribe('userpreferences'));
+        Meteor.subscribe('userpreferences');
 
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
         // Subscribe to events.
-        this.subs.push(Meteor.subscribe('events', this.state.limit, new Date()));
+        this.eventSub = Meteor.subscribe('events', new Date(), {
+            onReady: function () {
+                let eventCount = Counts.get('dashboard-event-count');
+                if (!this.state.recommendedEvents) {
+                    this._updateRecommendations();
+                }
+                this.setState({totalPages: Math.ceil(eventCount / 48)});
+            }.bind(this)
+        });
 
         // Get events from the database.
-        let events = Event.getCollection().find().fetch();
+        let events = Event.getCollection().find(
+            {
+                _id: {
+                    $nin: this.state.recommendedEvents || []
+                }
+            },
+            {
+                // Assert limit and sorting for the events.
+                limit: 48,
+                reactive: false,
+                sort: {
+                    like_count: -1,
+                    dislike_count: 1,
+                    popularity_score: -1
+                },
+                skip: (this.state.page - 1) * 48
+            }
+        ).fetch();
 
-        this.subs.push(Meteor.subscribe('categories'));
+        Meteor.subscribe('categories');
 
         let categories = Category.getCollection().find().fetch();
 
         // Return the preference and the user's events. This is available in this.data.
         return {preferences, events, categories}
     };
+
+
+    componentWillUnmount() {
+        if (this.eventSub)
+            this.eventSub.stop();
+    };
+
 
     /** @inheritDoc */
     componentDidMount() {
@@ -104,16 +139,6 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
-        $(rootNode).find('.main-content')
-            .visibility({
-                once: false,
-                // update size when new content loads
-                observeChanges: true,
-                // load content on bottom edge visible
-                onBottomVisible: this._loadMoreEvents.bind(this)
-            })
-        ;
-
         /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
         //Meteor.call('guessUserLocation', function (err, res) {
         //    console.log(err);
@@ -121,22 +146,45 @@ export default class Dashboard extends React.Component {
         //});
     };
 
-
-    /** @inheritDoc */
-    componentWillUnmount() {
-        _.each(this.subs, function (sub) {
-            sub.stop();
-        });
+    /**
+     * Loads the next page of events.
+     *
+     * @private
+     */
+    _loadNextPage() {
+        if (this.state.page < this.state.totalPages) {
+            $('#main-dashboard-container').scrollView();
+            this.setState({page: this.state.page + 1, loading: false});
+        }
     };
 
 
     /**
-     * Loads more events from the database, called when a user scrolls to the bottom of the page.
+     * Updated the event recommendations for this user.
      *
      * @private
      */
-    _loadMoreEvents() {
-        this.setState({limit: Math.min(this.state.limit + 20, 100)});
+    _updateRecommendations() {
+        Meteor.call('getRecommendations', function (err, res) {
+            if (err) {
+                console.log(err);
+            }
+            console.log(res);
+            this.setState({recommendedEvents: res || []});
+        }.bind(this));
+    };
+
+
+    /**
+     * Loads the previous page of events.
+     *
+     * @private
+     */
+    _loadPreviousPage() {
+        if (this.state.page > 1) {
+            $('#main-dashboard-container').scrollView();
+            this.setState({page: this.state.page - 1, loading: false});
+        }
     };
 
 
@@ -228,7 +276,7 @@ export default class Dashboard extends React.Component {
 
         // Else, display the verify email message.
         return (
-            <div className="ui text container center aligned verify-email">
+            <div className="ui text container center aligned masthead-center">
                 <h2>An email was sent to {this.props.currentUser.emails[0].address}.</h2>
                 <h4>Please follow the instructions to verify your email.</h4>
                 <button className={"ui inverted button" + (this.state.isSendingEmail ? 'loading' : '')}
@@ -247,7 +295,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _showHeadContent() {
-        return <FeaturedEvents />
+        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents}/>
     };
 
 
@@ -258,8 +306,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
-        this.setState({limit: 10});
-        this.refs.EventGrid.resetEvents();
+        this.setState({page: 1});
     };
 
 
@@ -278,8 +325,8 @@ export default class Dashboard extends React.Component {
             this._getVerifyEmailHeader();
 
         let loading = this.state.loading ?
-            <div className="ui active dimmer">
-                <div className="ui loader"></div>
+            <div className="ui active inverted dimmer">
+                <div className="ui text large loader">Loading Events</div>
             </div> : null;
 
         let getSelectLocationOverlay = this.data.preferences && !this.data.preferences.location ?
@@ -294,7 +341,41 @@ export default class Dashboard extends React.Component {
                 </div>
             </div> : null;
 
-        let content = this.state.mapView ? 
+/**
+*<<<<<<< HEAD
+*        let content = this.state.mapView ? 
+*            <div>
+*                Put map here
+*                <SimpleMapPage
+*                    center = {[59.938043, 30.337157]}
+*                    zoom = {9}
+*                    greatPlaceCoords = {{lat: 59.724465, lng: 30.080121}}
+*                />
+*            </div> : 
+*                <EventGrid events={this.data.events}
+*                    preferences={this.data.preferences}
+*                    ref="EventGrid"/>
+*======= 
+**/
+        let content = this.data.events && this.data.events.length > 0 && !this.state.mapView ? (
+            <div>
+                <div className="ui attached">
+                    <EventGrid events={this.data.events}/>
+                </div>
+                <br/>
+                <div className="ui two bottom attached huge buttons">
+                    <button className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
+                            onClick={this._loadPreviousPage.bind(this)}>
+                        Previous Page
+                    </button>
+                    <button
+                        className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
+                        onClick={this._loadNextPage.bind(this)}>
+                        Next Page
+                    </button>
+                </div>
+            </div>
+        ) : 
             <div>
                 Put map here
                 <SimpleMapPage
@@ -302,10 +383,8 @@ export default class Dashboard extends React.Component {
                     zoom = {9}
                     greatPlaceCoords = {{lat: 59.724465, lng: 30.080121}}
                 />
-            </div> : 
-                <EventGrid events={this.data.events}
-                    preferences={this.data.preferences}
-                    ref="EventGrid"/>
+            </div> ;
+
 
         return (
             <div>
@@ -325,14 +404,9 @@ export default class Dashboard extends React.Component {
                             Map View
 
                         </a>
-                        <a className="item">
-                            <i className="frown icon"/>
-                            Dislike All
-                        </a>
-
                     </div>
                 </div>
-                <div className="ui bottom attached segment pushable">
+                <div className="ui bottom attached segment pushable" id="main-dashboard-container">
                     <div className="ui left vertical sidebar menu">
                         <Filters preferences={this.data.preferences}
                                  categories={this.data.categories}
@@ -345,8 +419,9 @@ export default class Dashboard extends React.Component {
 
                                       
                         <div className="ui basic segment main-content">
-                            {loading || getSelectLocationOverlay}
-                            {content}
+
+                            {loading || getSelectLocationOverlay || content}
+
                         </div>
                         
                     </div>
