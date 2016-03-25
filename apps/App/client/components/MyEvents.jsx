@@ -15,7 +15,6 @@ import EventGrid from './EventGrid';
  * @class
  * @extends React.Component
  */
-@ReactMixin.decorate(PureRenderMixin)
 @ReactMixin.decorate(ReactMeteorData)
 export default class Dashboard extends React.Component {
 
@@ -42,10 +41,6 @@ export default class Dashboard extends React.Component {
      *
      */
     getMeteorData() {
-        // Subscribe to events.
-        if (this.eventSub) {
-            this.eventSub.stop();
-        }
         this.eventSub = Meteor.subscribe('savedevents', this.state.limit, new Date(), {
             onReady: function () {
                 this.setState({loading: false});
@@ -53,7 +48,17 @@ export default class Dashboard extends React.Component {
         });
 
         // Get events from the database.
-        let savedEvents = Event.getCollection().find({}, {reactive: false}).fetch();
+        let savedEvents = Event.getCollection().find(
+            {},
+            {
+                // Assert limit and sorting for the events.
+                limit: this.state.limit,
+                sort: {
+                    start_time: 1
+                },
+                reactive: false
+            }
+        ).fetch();
 
         // Return the preference and the user's events. This is available in this.data.
         return {savedEvents}

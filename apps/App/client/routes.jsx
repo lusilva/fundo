@@ -8,7 +8,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import MyEvents from './components/MyEvents';
-import Welcome from './components/WelcomePage';
+import Welcome from './components/Welcome';
 
 export default (
     <Route component={Layout} history={browserHistory}>
@@ -52,12 +52,6 @@ function validateWelcome(nextState, transitionFunc, done) {
             }
         });
     } else {
-        let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
-
-        if (!Meteor.userId() || preferences.location) {
-            transitionFunc(getPathsForUser()[0].path);
-        }
-
         done();
     }
 }
@@ -106,13 +100,6 @@ function validateUser(nextState, transitionFunc, done) {
                 }
             });
         } else {
-            // Find the preference set for the current user.
-            let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
-
-            if (!preferences || !preferences.location) {
-                transitionFunc('/welcome');
-            }
-
             done();
         }
     }

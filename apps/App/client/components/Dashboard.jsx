@@ -7,12 +7,12 @@ import Category from 'App/collections/Category';
 import Alert from 'react-s-alert';
 import ReactMixin from 'react-mixin';
 import _ from 'lodash';
-import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 import { isUserVerified } from 'App/helpers';
 import FeaturedEvents from './FeaturedEvents';
 import EventGrid from './EventGrid';
 import Filters from './Filters';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 
 /**
@@ -22,6 +22,7 @@ import Filters from './Filters';
  * @extends React.Component
  */
 @ReactMixin.decorate(ReactMeteorData)
+@ReactMixin.decorate(PureRenderMixin)
 export default class Dashboard extends React.Component {
 
     /**
@@ -37,21 +38,20 @@ export default class Dashboard extends React.Component {
     /**
      * The state of the dashboard.
      *
-     * @type {{filter: {open: boolean}, isSendingEmail: boolean, location: ?string}}
      */
     state = {
         filter: {
             open: false
         },
         isSendingEmail: false,
-        location: null,
-        loading: false,
+        loading: true,
         page: 1,
         totalPages: 1,
         recommendedEvents: null
     };
 
     eventSub = null;
+
 
     /**
      * Function that runs automatically every time the data that its subscribed to changes.
@@ -83,6 +83,15 @@ export default class Dashboard extends React.Component {
             {
                 _id: {
                     $nin: this.state.recommendedEvents || []
+                },
+                // Do not show events that this user has already liked.
+                // These events should go in the 'My Events' page.
+                likes: {
+                    $nin: [this.props.currentUser._id]
+                },
+                // Do not show events that this user has already disliked.
+                dislikes: {
+                    $nin: [this.props.currentUser._id]
                 }
             },
             {
@@ -106,8 +115,9 @@ export default class Dashboard extends React.Component {
         return {preferences, events, categories}
     };
 
-
+    /** @inheritDoc */
     componentWillUnmount() {
+        // Cleanup event subscription.
         if (this.eventSub)
             this.eventSub.stop();
     };
@@ -132,11 +142,33 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
+        if (!this.data.events || this.data.events.length == 0) {
+            this._pollForEvents();
+        } else {
+            this.setState({loading: false});
+        }
+
         /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
         //Meteor.call('guessUserLocation', function (err, res) {
         //    console.log(err);
         //    console.log(res);
         //});
+    };
+
+
+    _pollForEvents() {
+        let that = this;
+        let prevCount = null;
+        let intervalId = Meteor.setInterval(function () {
+            let eventCount = Event.getCollection().find({}, {reactive: false}).count();
+            if (eventCount > 0 && eventCount == prevCount) {
+                that.setState({loading: false});
+                Meteor.clearInterval(intervalId);
+            } else if (eventCount > prevCount) {
+                prevCount = eventCount;
+            }
+        }, 500);
+
     };
 
     /**

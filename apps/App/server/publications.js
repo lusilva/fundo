@@ -74,7 +74,7 @@ Meteor.publish('events', function (currentDate) {
         Counts.publish(this, 'dashboard-event-count', Event.getCollection().find(eventFilters),
             {
                 noReady: true,
-                nonReactive: true
+                nonReactive: false
             }
         );
 

@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === 'production') {
     };
 
     // Load Webpack infos for SSR
-    ReactRouterSSR.LoadWebpackStats(WebpackStats);
-
-    require('./routes').default;
+    //ReactRouterSSR.LoadWebpackStats(WebpackStats);
+    //
+    //require('./routes').default;
 }

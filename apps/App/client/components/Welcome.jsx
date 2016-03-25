@@ -1,7 +1,7 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
 import GeoSuggest from 'react-geosuggest';
 
-export default class WelcomePage extends React.Component {
+export default class Welcome extends React.Component {
 
     static contextTypes = {
         router: React.PropTypes.object.isRequired
