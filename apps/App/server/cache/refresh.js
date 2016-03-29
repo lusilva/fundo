@@ -140,7 +140,8 @@ function updateAllCategories() {
                 excludes: ['img', 'br'],
                 decodeEntities: true
             }),
-            category_id: category.id
+            category_id: category.id,
+            subcategory: category.name.indexOf(':') > -1
         });
         categoryDoc.save(function (err, res) {
             if (err) {

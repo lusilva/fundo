@@ -10,13 +10,14 @@ import EventGrid from './EventGrid';
 
 
 /**
- * The dashboard view that the user sees upon logging in.
+ * The MyEvents view displaying the user's liked events.
  *
  * @class
  * @extends React.Component
  */
 @ReactMixin.decorate(ReactMeteorData)
-export default class Dashboard extends React.Component {
+@ReactMixin.decorate(PureRenderMixin)
+export default class MyEvents extends React.Component {
 
     /**
      * The props that this component expects.
@@ -28,10 +29,8 @@ export default class Dashboard extends React.Component {
     };
 
     state = {
-        loading: true
+        loading: false
     };
-
-    eventSub = null;
 
 
     /**
@@ -41,35 +40,24 @@ export default class Dashboard extends React.Component {
      *
      */
     getMeteorData() {
-        this.eventSub = Meteor.subscribe('savedevents', this.state.limit, new Date(), {
-            onReady: function () {
-                this.setState({loading: false});
-            }.bind(this)
-        });
-
+        Meteor.subscribe('savedevents');
         // Get events from the database.
         let savedEvents = Event.getCollection().find(
-            {},
+            {
+                likes: {
+                    $in: [Meteor.userId()]
+                }
+            },
             {
                 // Assert limit and sorting for the events.
-                limit: this.state.limit,
                 sort: {
                     start_time: 1
-                },
-                reactive: false
+                }
             }
         ).fetch();
 
         // Return the preference and the user's events. This is available in this.data.
         return {savedEvents}
-    };
-
-
-    /** @inheritDoc */
-    componentWillUnmount() {
-        if (this.eventSub) {
-            this.eventSub.stop();
-        }
     };
 
 

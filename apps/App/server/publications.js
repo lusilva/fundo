@@ -20,10 +20,8 @@ Meteor.publish('categories', function () {
 
 
 // Publish saved events
-Meteor.publish('savedevents', function (limit) {
+Meteor.publish('savedevents', function () {
     if (this.userId) {
-        let dl = limit || 10;
-
         return Event.getCollection().find(
             {
                 // Only show events that this user has liked.
@@ -33,7 +31,6 @@ Meteor.publish('savedevents', function (limit) {
             },
             {
                 // Assert limit and sorting for the events.
-                limit: dl,
                 sort: {
                     start_time: 1
                 }
@@ -45,8 +42,29 @@ Meteor.publish('savedevents', function (limit) {
 });
 
 
+Meteor.publish('recommended', function (recommendedIds) {
+    if (this.userId && recommendedIds && recommendedIds.length > 0) {
+        return Event.getCollection().find(
+            {
+                // Only show events that this user has liked.
+                _id: {
+                    $in: recommendedIds
+                }
+            },
+            {
+                // Assert limit and sorting for the events.
+                sort: {
+                    start_time: 1
+                }
+            }
+        );
+    }
+    return null;
+});
+
+
 // Publish events.
-Meteor.publish('events', function (currentDate) {
+Meteor.publish('events', function (currentDate, category) {
     if (this.userId) {
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
@@ -71,21 +89,19 @@ Meteor.publish('events', function (currentDate) {
             }
         };
 
-        Counts.publish(this, 'dashboard-event-count', Event.getCollection().find(eventFilters),
-            {
-                noReady: true,
-                nonReactive: false
+        if (category) {
+            eventFilters.categories = {
+                $in: [category]
             }
-        );
+        }
 
         return Event.getCollection().find(
             eventFilters,
             {
                 // Assert limit and sorting for the events.
                 sort: {
-                    like_count: -1,
-                    dislike_count: 1,
-                    popularity_score: -1
+                    start_time: 1,
+                    dislike_count: 1
                 }
             }
         );

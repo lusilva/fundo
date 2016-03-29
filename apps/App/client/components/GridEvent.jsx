@@ -18,19 +18,9 @@ import BaseEvent from './BaseEvent';
 @ReactMixin.decorate(PureRenderMixin)
 export default class GridEvent extends BaseEvent {
 
-
     /** @inheritDoc */
     componentDidMount() {
         let rootNode = ReactDOM.findDOMNode(this);
-
-        // Lazy load the images until they are visible.
-        $(rootNode).find('.card-image')
-            .visibility({
-                type: 'image',
-                transition: 'fade in',
-                duration: 1000,
-                initialCheck: true
-            });
 
         // Make a popup for event titles that are longer and get cut off.
         $(rootNode).find('.event-title')
@@ -45,25 +35,6 @@ export default class GridEvent extends BaseEvent {
             disliked: _.includes(this.props.event.dislikes, Meteor.userId())
         });
     };
-
-
-    /**
-     * Get the category for this event.
-     *
-     * @returns {XML}
-     * @private
-     */
-
-    _getCategoryRibbon() {
-        let category = this.props.event.categories[0] || 'Eventful Event';
-
-        return (
-            <div className="ui black ribbon label">
-                {category}
-            </div>
-        )
-    };
-
 
     /** @inheritDoc */
     render() {
@@ -90,9 +61,6 @@ export default class GridEvent extends BaseEvent {
 
         return (
             <div className="ui card">
-                <div className="ui content">
-                    {this._getCategoryRibbon()}
-                </div>
                 <div className="ui content">
                     <div className="container header event-title" data-content={event.title}>
                         <TextTruncate

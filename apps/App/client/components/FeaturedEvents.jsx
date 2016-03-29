@@ -7,6 +7,8 @@ import TextTruncate from 'react-text-truncate';
 import FeaturedEvent from './FeaturedEvent';
 import _ from 'lodash';
 
+import ReactMixin from 'react-mixin';
+
 /**
  * Represents the featured events shown at the top of the page.
  *
@@ -14,60 +16,56 @@ import _ from 'lodash';
  * @extends React.Component
  *
  */
+@ReactMixin.decorate(ReactMeteorData)
 export default class FeaturedEvents extends React.Component {
 
-
-    static propTypes = {
-        recommendedEvents: React.PropTypes.array
-    };
-
     state = {
-        events: null
+        recommendedIds: null,
+        loading: true
     };
 
+    getMeteorData() {
+        Meteor.subscribe('recommended', this.state.recommendedIds, {
+            onReady: function () {
+                if (this.state.loading) {
+                    this.setState({loading: false});
+                }
+            }.bind(this)
+        });
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.recommendedEvents && !_.isEqual(this.props.recommendedEvents, nextProps.recommendedEvents)) {
-            this._getRecommendedEvents(nextProps.recommendedEvents);
-        }
-    };
-
-    componentWillMount() {
-        this._getRecommendedEvents();
-    };
-
-    _getRecommendedEvents(recommendedEventIds) {
-        if (!recommendedEventIds) {
-            this.setState({events: null});
-            return;
-        }
         let events = Event.getCollection().find(
             {
                 _id: {
-                    $in: recommendedEventIds || []
+                    $in: this.state.recommendedIds || []
                 }
             },
             {
-                // Assert limit and sorting for the events.
                 limit: 20,
-                reactive: false,
                 sort: {
-                    like_count: -1,
-                    dislike_count: 1,
-                    popularity_score: -1
-                }
+                    start_time: 1
+                },
+                reactive: false
+            }).fetch();
+
+        return {events}
+    };
+
+    componentDidMount() {
+        Meteor.call('getRecommendations', function (err, res) {
+            if (err) {
+                console.log(err);
             }
-        ).fetch();
-        this.setState({events: events});
+            this.setState({recommendedIds: res || [], loading: false});
+        }.bind(this));
     };
 
     render() {
-        let enoughEvents = !!this.state.events && this.state.events.length > 2;
+        let enoughEvents = !!this.data.events && this.data.events.length > 2;
 
         let settings = {
             infinite: true,
             speed: 500,
-            slidesToShow: Math.min(3, this.state.events ? this.state.events.length : 3),
+            slidesToShow: Math.min(3, this.data.events ? this.data.events.length : 3),
             centerMode: enoughEvents,
             draggable: enoughEvents,
             centerPadding: '20px',
@@ -80,32 +78,35 @@ export default class FeaturedEvents extends React.Component {
             responsive: [{
                 breakpoint: 728,
                 settings: {
-                    slidesToShow: Math.min(2, this.state.events ? this.state.events.length : 2)
+                    slidesToShow: Math.min(2, this.data.events ? this.data.events.length : 2)
                 }
             }, {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: Math.min(1, this.state.events ? this.state.events.length : 1)
+                    slidesToShow: Math.min(1, this.data.events ? this.data.events.length : 1)
                 }
             }]
         };
 
-        let loading = !this.state.events ? (
+        let loading = !this.state.recommendedIds || this.state.loading ? (
             <div className="ui active inverted text large loader">Loading Recommendations</div>
         ) : null;
 
-        let slider = this.state.events && this.state.events.length > 0 ? (
-            <Slider {...settings}>
-                {_.map(this.state.events, function (event) {
-                    return (
-                        <div key={'featured-' + event.id}>
-                            <div className={enoughEvents ? '' : 'featured-scaled-event'}>
-                                <FeaturedEvent event={event}/>
+        let slider = this.data.events && this.data.events.length > 0 ? (
+            <div className="featured-events">
+                <h1 className="ui header inverted centered">Recommended Events</h1>
+                <Slider {...settings}>
+                    {_.map(this.data.events, function (event) {
+                        return (
+                            <div key={'featured-' + event.id}>
+                                <div className={enoughEvents ? '' : 'featured-scaled-event'}>
+                                    <FeaturedEvent event={event}/>
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </Slider>
+                        );
+                    })}
+                </Slider>
+            </div>
         ) : (
             <div className="ui text container center aligned masthead-center">
                 <h2>We currently don't have any recommended events for you. Let us know what events you like.</h2>

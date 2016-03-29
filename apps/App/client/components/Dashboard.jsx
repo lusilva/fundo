@@ -10,7 +10,8 @@ import _ from 'lodash';
 
 import { isUserVerified } from 'App/helpers';
 import FeaturedEvents from './FeaturedEvents';
-import EventGrid from './EventGrid';
+import TopEventsCarousel from './TopEventsCarousel';
+import EventCarousel from './EventCarousel';
 import Filters from './Filters';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
@@ -44,13 +45,9 @@ export default class Dashboard extends React.Component {
             open: false
         },
         isSendingEmail: false,
-        loading: true,
-        page: 1,
-        totalPages: 1,
-        recommendedEvents: null
+        loading: false,
+        categoryLimit: 20
     };
-
-    eventSub = null;
 
 
     /**
@@ -67,59 +64,27 @@ export default class Dashboard extends React.Component {
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-        // Subscribe to events.
-        this.eventSub = Meteor.subscribe('events', new Date(), {
-            onReady: function () {
-                let eventCount = Counts.get('dashboard-event-count');
-                if (!this.state.recommendedEvents) {
-                    this._updateRecommendations();
-                }
-                this.setState({totalPages: Math.ceil(eventCount / 48)});
-            }.bind(this)
-        });
 
-        // Get events from the database.
-        let events = Event.getCollection().find(
+        Meteor.subscribe('categories');
+        //let categories = Category.getCollection().find().fetch();
+        let categories = Category.getCollection().find(
             {
-                _id: {
-                    $nin: this.state.recommendedEvents || []
-                },
-                // Do not show events that this user has already liked.
-                // These events should go in the 'My Events' page.
-                likes: {
-                    $nin: [this.props.currentUser._id]
-                },
-                // Do not show events that this user has already disliked.
-                dislikes: {
-                    $nin: [this.props.currentUser._id]
-                }
+                subcategory: false
             },
             {
-                // Assert limit and sorting for the events.
-                limit: 48,
-                reactive: false,
-                sort: {
-                    like_count: -1,
-                    dislike_count: 1,
-                    popularity_score: -1
-                },
-                skip: (this.state.page - 1) * 48
+                limit: this.state.categoryLimit,
+                sort: {category_id: 1}
             }
         ).fetch();
 
-        Meteor.subscribe('categories');
-
-        let categories = Category.getCollection().find().fetch();
+        let numCategories = Category.getCollection().find(
+            {
+                subcategory: false
+            }
+        ).count();
 
         // Return the preference and the user's events. This is available in this.data.
-        return {preferences, events, categories}
-    };
-
-    /** @inheritDoc */
-    componentWillUnmount() {
-        // Cleanup event subscription.
-        if (this.eventSub)
-            this.eventSub.stop();
+        return {preferences, categories, numCategories}
     };
 
 
@@ -142,76 +107,19 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
-        if (!this.data.events || this.data.events.length == 0) {
-            this._pollForEvents();
-        } else {
-            this.setState({loading: false});
-        }
-
-        /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
-        //Meteor.call('guessUserLocation', function (err, res) {
-        //    console.log(err);
-        //    console.log(res);
-        //});
+        $(rootNode).find('.dashboard .main-content')
+            .visibility({
+                once: false,
+                // update size when new content loads
+                observeChanges: true,
+                // load content on bottom edge visible
+                onBottomVisible: function () {
+                    if (this.data.categories.length < this.data.numCategories)
+                        this.setState({categoryLimit: this.state.categoryLimit + 20});
+                }.bind(this)
+            })
+        ;
     };
-
-
-    _pollForEvents() {
-        let that = this;
-        let prevCount = null;
-        let intervalId = Meteor.setInterval(function () {
-            let eventCount = Event.getCollection().find({}, {reactive: false}).count();
-            if (eventCount > 0 && eventCount == prevCount) {
-                that.setState({loading: false});
-                Meteor.clearInterval(intervalId);
-            } else if (eventCount > prevCount) {
-                prevCount = eventCount;
-            }
-        }, 500);
-
-    };
-
-    /**
-     * Loads the next page of events.
-     *
-     * @private
-     */
-    _loadNextPage() {
-        if (this.state.page < this.state.totalPages) {
-            $('#main-dashboard-container').scrollView();
-            this.setState({page: this.state.page + 1, loading: false});
-        }
-    };
-
-
-    /**
-     * Updated the event recommendations for this user.
-     *
-     * @private
-     */
-    _updateRecommendations() {
-        Meteor.call('getRecommendations', function (err, res) {
-            if (err) {
-                console.log(err);
-            }
-            console.log(res);
-            this.setState({recommendedEvents: res || []});
-        }.bind(this));
-    };
-
-
-    /**
-     * Loads the previous page of events.
-     *
-     * @private
-     */
-    _loadPreviousPage() {
-        if (this.state.page > 1) {
-            $('#main-dashboard-container').scrollView();
-            this.setState({page: this.state.page - 1, loading: false});
-        }
-    };
-
 
     /**
      * Toggles the filter menu sidebar.
@@ -282,7 +190,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _showHeadContent() {
-        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents}/>
+        return <FeaturedEvents/>
     };
 
 
@@ -293,7 +201,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
-        this.setState({page: 1});
+
     };
 
 
@@ -316,37 +224,10 @@ export default class Dashboard extends React.Component {
                 <div className="ui text large loader">Loading Events</div>
             </div> : null;
 
-        let getSelectLocationOverlay = this.data.preferences && !this.data.preferences.location ?
-            <div className="ui active dimmer">
-                <div className="content">
-                    <div className="center">
-                        <h2 className="ui inverted header container">
-                            Unfortunately we're not psychic.
-                            Please select a location for us to show you events for.
-                        </h2>
-                    </div>
-                </div>
-            </div> : null;
+        console.log(this.data.categories.length + '-' + this.data.numCategories);
 
-        let content = this.data.events && this.data.events.length > 0 ? (
-            <div>
-                <div className="ui attached">
-                    <EventGrid events={this.data.events}/>
-                </div>
-                <br/>
-                <div className="ui two bottom attached huge buttons">
-                    <button className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
-                            onClick={this._loadPreviousPage.bind(this)}>
-                        Previous Page
-                    </button>
-                    <button
-                        className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
-                        onClick={this._loadNextPage.bind(this)}>
-                        Next Page
-                    </button>
-                </div>
-            </div>
-        ) : null;
+        let bottomLoader = this.data.categories.length < this.data.numCategories ?
+            <div className="ui active centered inline loader"></div> : null;
 
         return (
             <div>
@@ -376,7 +257,20 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {loading || getSelectLocationOverlay || content}
+                            <TopEventsCarousel sizes={{large: 4, medium: 3, small: 2}}
+                                               category={{
+                                                    name: 'Top Events',
+                                                    category_id: 'top_events',
+                                                    subcategory: false
+                                                }}
+                            />
+                            {_.map(this.data.categories, function (category) {
+                                return <EventCarousel key={category.category_id+'-dashboard-events'}
+                                                      sizes={{large: 4, medium: 3, small: 2}}
+                                                      category={category}
+                                />
+                            }.bind(this))}
+                            {bottomLoader}
                         </div>
                     </div>
                 </div>
