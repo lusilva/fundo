@@ -79,6 +79,8 @@ export default class Dashboard extends React.Component {
                         {title: {$regex: this.state.searchValue, $options: 'i'}}
                     ]
                 }, {reactive: false}).fetch();
+        } else {
+            events = Event.getCollection().find({}, {reactive: false}).fetch();
         }
 
         // Find the preference set for the current user.
@@ -270,9 +272,8 @@ export default class Dashboard extends React.Component {
         let mapView = this.state.mapView ?
             (
                 <SimpleMapPage
-                    center={[59.938043, 30.337157]}
-                    zoom={9}
-                    greatPlaceCoords={{lat: 59.724465, lng: 30.080121}}
+                    zoom={11}
+                    events={this.data.events}
                 />
             ) : null;
 
