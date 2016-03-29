@@ -35,6 +35,9 @@ export default class Event {
         // Needed in order to sort events by number of likes.
         this._like_count = this._likes.length;
         this._dislike_count = this._dislikes.length;
+
+        if (doc.score)
+            console.log(doc.score);
     };
 
     get id() {

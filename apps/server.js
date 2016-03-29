@@ -1,7 +1,7 @@
 import { ReactRouterSSR } from 'meteor/reactrouter:react-router-ssr';
 
 import PreferenceSet from 'App/collections/PreferenceSet';
-import 'App/collections/Event';
+import Event from  'App/collections/Event';
 import 'App/collections/Category';
 import 'App/server/methods';
 import 'App/logger';
@@ -23,6 +23,12 @@ Accounts.onCreateUser(function (options, user) {
 });
 
 
+Event.getCollection()._ensureIndex({
+    "description": "text",
+    "title": "text"
+});
+
+
 // Do server-rendering only in production
 // Otherwise, it will break the hot-reload
 // DO NOT REMOVE THIS LINE TO TEST, use: meteor --production
@@ -37,7 +43,7 @@ if (process.env.NODE_ENV === 'production') {
     };
 
     // Load Webpack infos for SSR
-    ReactRouterSSR.LoadWebpackStats(WebpackStats);
-
-    require('./routes').default;
+    //ReactRouterSSR.LoadWebpackStats(WebpackStats);
+    //
+    //require('./routes').default;
 }

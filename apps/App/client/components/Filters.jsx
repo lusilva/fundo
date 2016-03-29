@@ -28,7 +28,8 @@ export default class Filters extends React.Component {
     state = {
         preferences: this.props.preferences,
         loading: !!this.props.preferences,
-        message: null
+        message: null,
+        googleReady: false
     };
 
     // The handle for message timeouts so that they can be cleared.
@@ -40,6 +41,14 @@ export default class Filters extends React.Component {
         // Update the state of the preferences when the props/database changes.
         if (nextProps.preferences != this.state.preferences)
             this.setState({preferences: nextProps.preferences, loading: false});
+    };
+
+    componentWillMount() {
+        let that = this;
+        let $script = require('scriptjs');
+        $script("//maps.googleapis.com/maps/api/js?libraries=places", function () {
+            that.setState({googleReady: true});
+        });
     };
 
 
@@ -162,9 +171,13 @@ export default class Filters extends React.Component {
             // there were no events and we have fetched some from eventful.
             if (!!res) {
                 let message = "Looks like we don't have any events for that area. Fetching them now, this may take a little while";
+                Meteor.setTimeout(function () {
+                    this._setLoading(false);
+                }.bind(this), 15000);
                 that._showMessage(false, message, 10000);
+            } else {
+                this._setLoading(false);
             }
-            this._setLoading(false);
         }.bind(this));
     };
 
@@ -186,7 +199,7 @@ export default class Filters extends React.Component {
         let initialLocation = (this.state.preferences && this.state.preferences.location) ?
             this.state.preferences.location : null;
 
-        let geosuggest = (typeof window != 'undefined') && window.google && window.google.maps && !this.state.loading ?
+        let geosuggest = !this.state.loading && this.state.googleReady ?
             (
                 <div className="ui item center">
                     <GeoSuggest country="us"

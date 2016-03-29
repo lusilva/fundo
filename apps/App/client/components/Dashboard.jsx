@@ -7,12 +7,14 @@ import Category from 'App/collections/Category';
 import Alert from 'react-s-alert';
 import ReactMixin from 'react-mixin';
 import _ from 'lodash';
-import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 import { isUserVerified } from 'App/helpers';
 import FeaturedEvents from './FeaturedEvents';
 import EventGrid from './EventGrid';
+import TopEventsCarousel from './TopEventsCarousel';
+import EventCarousel from './EventCarousel';
 import Filters from './Filters';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 
 /**
@@ -21,8 +23,8 @@ import Filters from './Filters';
  * @class
  * @extends React.Component
  */
-@ReactMixin.decorate(PureRenderMixin)
 @ReactMixin.decorate(ReactMeteorData)
+@ReactMixin.decorate(PureRenderMixin)
 export default class Dashboard extends React.Component {
 
     /**
@@ -38,21 +40,19 @@ export default class Dashboard extends React.Component {
     /**
      * The state of the dashboard.
      *
-     * @type {{filter: {open: boolean}, isSendingEmail: boolean, location: ?string}}
      */
     state = {
         filter: {
             open: false
         },
         isSendingEmail: false,
-        location: null,
         loading: false,
-        page: 1,
-        totalPages: 1,
-        recommendedEvents: null
+        categoryLimit: 20,
+        searchValue: null
     };
 
-    eventSub = null;
+    searchTimeout = null;
+
 
     /**
      * Function that runs automatically every time the data that its subscribed to changes.
@@ -65,52 +65,43 @@ export default class Dashboard extends React.Component {
         // Get all necessary subscriptions
         Meteor.subscribe('userpreferences');
 
+        Meteor.subscribe('events', new Date());
+
+        let events = [];
+        if (this.state.searchValue && this.state.searchValue.length > 0) {
+            events = Event.getCollection().find(
+                {
+                    $or: [
+                        {description: {$regex: this.state.searchValue, $options: 'i'}},
+                        {title: {$regex: this.state.searchValue, $options: 'i'}}
+                    ]
+                }, {reactive: false}).fetch();
+        }
+
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-        // Subscribe to events.
-        this.eventSub = Meteor.subscribe('events', new Date(), {
-            onReady: function () {
-                let eventCount = Counts.get('dashboard-event-count');
-                if (!this.state.recommendedEvents) {
-                    this._updateRecommendations();
-                }
-                this.setState({totalPages: Math.ceil(eventCount / 48)});
-            }.bind(this)
-        });
 
-        // Get events from the database.
-        let events = Event.getCollection().find(
+        Meteor.subscribe('categories');
+        //let categories = Category.getCollection().find().fetch();
+        let categories = Category.getCollection().find(
             {
-                _id: {
-                    $nin: this.state.recommendedEvents || []
-                }
+                subcategory: true
             },
             {
-                // Assert limit and sorting for the events.
-                limit: 48,
-                reactive: false,
-                sort: {
-                    like_count: -1,
-                    dislike_count: 1,
-                    popularity_score: -1
-                },
-                skip: (this.state.page - 1) * 48
+                limit: this.state.categoryLimit,
+                sort: {category_id: 1}
             }
         ).fetch();
 
-        Meteor.subscribe('categories');
-
-        let categories = Category.getCollection().find().fetch();
+        let numCategories = Category.getCollection().find(
+            {
+                subcategory: true
+            }
+        ).count();
 
         // Return the preference and the user's events. This is available in this.data.
-        return {preferences, events, categories}
-    };
-
-
-    componentWillUnmount() {
-        if (this.eventSub)
-            this.eventSub.stop();
+        return {preferences, categories, numCategories, events}
     };
 
 
@@ -133,54 +124,19 @@ export default class Dashboard extends React.Component {
                 }.bind(this)
             });
 
-        /**TODO: implement this maybe? This could try to guess the user's location based on IP address.*/
-        //Meteor.call('guessUserLocation', function (err, res) {
-        //    console.log(err);
-        //    console.log(res);
-        //});
+        $(rootNode).find('.dashboard .main-content')
+            .visibility({
+                once: false,
+                // update size when new content loads
+                observeChanges: true,
+                // load content on bottom edge visible
+                onBottomVisible: function () {
+                    if (this.data.categories.length < this.data.numCategories)
+                        this.setState({categoryLimit: this.state.categoryLimit + 20});
+                }.bind(this)
+            })
+        ;
     };
-
-    /**
-     * Loads the next page of events.
-     *
-     * @private
-     */
-    _loadNextPage() {
-        if (this.state.page < this.state.totalPages) {
-            $('#main-dashboard-container').scrollView();
-            this.setState({page: this.state.page + 1, loading: false});
-        }
-    };
-
-
-    /**
-     * Updated the event recommendations for this user.
-     *
-     * @private
-     */
-    _updateRecommendations() {
-        Meteor.call('getRecommendations', function (err, res) {
-            if (err) {
-                console.log(err);
-            }
-            console.log(res);
-            this.setState({recommendedEvents: res || []});
-        }.bind(this));
-    };
-
-
-    /**
-     * Loads the previous page of events.
-     *
-     * @private
-     */
-    _loadPreviousPage() {
-        if (this.state.page > 1) {
-            $('#main-dashboard-container').scrollView();
-            this.setState({page: this.state.page - 1, loading: false});
-        }
-    };
-
 
     /**
      * Toggles the filter menu sidebar.
@@ -251,7 +207,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _showHeadContent() {
-        return <FeaturedEvents recommendedEvents={this.state.recommendedEvents}/>
+        return <FeaturedEvents/>
     };
 
 
@@ -262,7 +218,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
-        this.setState({page: 1});
+        this.setState({categoryLimit: 20});
     };
 
 
@@ -274,6 +230,14 @@ export default class Dashboard extends React.Component {
     };
 
 
+    _updateSearch(event) {
+        Meteor.clearTimeout(this.searchTimeout);
+        this.searchTimeout = Meteor.setTimeout(function () {
+            this.setState({searchValue: event.target.value});
+        }.bind(this), 1500);
+    };
+
+
     /** @inheritDoc */
     render() {
         let mastheadContent = this.props.currentUser && isUserVerified(this.props.currentUser) ?
@@ -282,57 +246,67 @@ export default class Dashboard extends React.Component {
 
         let loading = this.state.loading ?
             <div className="ui active inverted dimmer">
-                <div className="ui text large loader">Loading Events</div>
+                <div className="ui text large loader">Fetching Events...</div>
             </div> : null;
 
-        let getSelectLocationOverlay = this.data.preferences && !this.data.preferences.location ?
-            <div className="ui active dimmer">
-                <div className="content">
-                    <div className="center">
-                        <h2 className="ui inverted header container">
-                            Unfortunately we're not psychic.
-                            Please select a location for us to show you events for.
-                        </h2>
-                    </div>
-                </div>
+        let bottomLoader = this.data.categories.length < this.data.numCategories ?
+            <div className="ui active centered inline text loader carousel-loader">
+                Loading More Categories...
             </div> : null;
 
-        let content = this.data.events && this.data.events.length > 0 ? (
-            <div>
-                <div className="ui attached">
+        let content = this.state.searchValue && this.state.searchValue.length > 0 ?
+            (   <div className="ui container">
+                    <h1 className="ui left floated header">
+                        {this.data.events && this.data.events.length > 0 ?
+                            'Showing results for "' + this.state.searchValue + '"' :
+                            'No events found'}
+
+                    </h1>
+                    <div className="ui clearing divider"></div>
                     <EventGrid events={this.data.events}/>
                 </div>
-                <br/>
-                <div className="ui two bottom attached huge buttons">
-                    <button className={"ui primary button " + (this.state.page > 1 ? '' : 'disabled')}
-                            onClick={this._loadPreviousPage.bind(this)}>
-                        Previous Page
-                    </button>
-                    <button
-                        className={"ui primary button " + (this.state.page < this.state.totalPages ? '' : 'disabled')}
-                        onClick={this._loadNextPage.bind(this)}>
-                        Next Page
-                    </button>
+            ) :
+            (
+                <div>
+                    <TopEventsCarousel sizes={{large: 4, medium: 3, small: 2}}
+                                       category={{
+                                                    name: 'Top Events',
+                                                    category_id: 'top_events',
+                                                    subcategory: false
+                                                }}
+                    />
+                    {_.map(this.data.categories, function (category) {
+                        return <EventCarousel key={category.category_id+'-dashboard-events'}
+                                              sizes={{large: 4, medium: 3, small: 2}}
+                                              category={category}
+                        />
+                    }.bind(this))}
+                    {bottomLoader}
                 </div>
-            </div>
-        ) : null;
+            );
 
         return (
             <div>
                 <div className="ui inverted vertical segment dashboard-masthead primary-color">
                     {mastheadContent}
                 </div>
-                <div className="ui menu attached secondary labeled icon filter-menu sticky">
-                    <a className={'item ' + (this.state.filter.open ? 'active' : '')}
-                       onClick={this._toggleFilterMenu.bind(this)}>
-                        <i className="options icon"/>
-                        Filters
-                    </a>
-                    <div className="right menu">
+                <div className="ui menu attached secondary filter-menu">
+                    <div className="ui labeled icon left menu">
+                        <a className={'item ' + (this.state.filter.open ? 'active' : '')}
+                           onClick={this._toggleFilterMenu.bind(this)}>
+                            <i className="options icon"/>
+                            Filters
+                        </a>
                         <a className="item">
                             <i className="map icon"/>
                             Map View
                         </a>
+                    </div>
+                    <div className="ui category search item">
+                        <div className="ui transparent icon input">
+                            <input className="prompt" type="text" placeholder="Search Events..."
+                                   onChange={this._updateSearch.bind(this)}/>
+                        </div>
                     </div>
                 </div>
                 <div className="ui bottom attached segment pushable" id="main-dashboard-container">
@@ -345,7 +319,7 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            {loading || getSelectLocationOverlay || content}
+                            {loading || content}
                         </div>
                     </div>
                 </div>
