@@ -5,6 +5,7 @@ import Event from 'App/collections/Event';
 import Slider from 'react-slick';
 import TextTruncate from 'react-text-truncate';
 import FeaturedEvent from './FeaturedEvent';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import _ from 'lodash';
 
 import ReactMixin from 'react-mixin';
@@ -17,6 +18,7 @@ import ReactMixin from 'react-mixin';
  *
  */
 @ReactMixin.decorate(ReactMeteorData)
+@ReactMixin.decorate(PureRenderMixin)
 export default class FeaturedEvents extends React.Component {
 
     state = {

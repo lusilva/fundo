@@ -25,6 +25,10 @@
     color: #5c6bc0;
 }
 
+.carousel-loader {
+    padding: 35px;
+}
+
 .masthead-center {
     left: 0;
     right: 0;

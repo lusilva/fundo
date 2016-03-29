@@ -101,6 +101,12 @@ export default class EventCarousel extends React.Component {
         };
 
         let that = this;
+
+        let loader = this.state.loading ? (
+            <div className="ui active centered inline text loader carousel-loader">
+                Loading {this.props.category.name}</div>
+        ) : null;
+
         let slider = this.data.events && this.data.events.length > 0 && !this.state.loading ? (
             <div>
                 <h1 className="ui left floated header">{this.props.category.name} ({this.data.events.length})</h1>
@@ -119,7 +125,7 @@ export default class EventCarousel extends React.Component {
 
         return (
             <div className="ui container">
-                {slider}
+                {loader || slider}
             </div>
         )
     }

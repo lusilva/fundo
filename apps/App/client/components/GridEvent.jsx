@@ -45,6 +45,7 @@ export default class GridEvent extends BaseEvent {
         if (event.start_time && event.stop_time) {
             time = time.twix(event.stop_time);
         }
+        console.log(time);
 
         //TODO: change this to be placeholder image based on category.
         let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";
@@ -141,7 +142,7 @@ export default class GridEvent extends BaseEvent {
                                     </h4>
                                     <div className="description center">
                                         <div className="date">
-                                            {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
+                                            {event.start_time && event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
                                         </div>
                                         <a target="_blank" href={event.venue.url}>{venueName}, {venueAddress}</a>
                                     </div>
