@@ -3,6 +3,13 @@
     background-color: white;
     max-width: 460px;
     display: block;
-    margin: 50px auto;
+    margin: 0 auto 50px;
     border-radius: 10px;
+}
+
+.welcome-message {
+    color: #E7D143;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
 }

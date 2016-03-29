@@ -10,14 +10,14 @@ import EventGrid from './EventGrid';
 
 
 /**
- * The dashboard view that the user sees upon logging in.
+ * The MyEvents view displaying the user's liked events.
  *
  * @class
  * @extends React.Component
  */
-@ReactMixin.decorate(PureRenderMixin)
 @ReactMixin.decorate(ReactMeteorData)
-export default class Dashboard extends React.Component {
+@ReactMixin.decorate(PureRenderMixin)
+export default class MyEvents extends React.Component {
 
     /**
      * The props that this component expects.
@@ -29,10 +29,8 @@ export default class Dashboard extends React.Component {
     };
 
     state = {
-        loading: true
+        loading: false
     };
-
-    eventSub = null;
 
 
     /**
@@ -42,18 +40,21 @@ export default class Dashboard extends React.Component {
      *
      */
     getMeteorData() {
-        // Subscribe to events.
-        if (this.eventSub) {
-            this.eventSub.stop();
-        }
-        this.eventSub = Meteor.subscribe('savedevents', this.state.limit, new Date(), {
-            onReady: function () {
-                this.setState({loading: false});
-            }.bind(this)
-        });
-
+        Meteor.subscribe('savedevents');
         // Get events from the database.
-        let savedEvents = Event.getCollection().find({}, {reactive: false}).fetch();
+        let savedEvents = Event.getCollection().find(
+            {
+                likes: {
+                    $in: [Meteor.userId()]
+                }
+            },
+            {
+                // Assert limit and sorting for the events.
+                sort: {
+                    start_time: 1
+                }
+            }
+        ).fetch();
 
         // Return the preference and the user's events. This is available in this.data.
         return {savedEvents}
@@ -61,15 +62,25 @@ export default class Dashboard extends React.Component {
 
 
     /** @inheritDoc */
-    componentWillUnmount() {
-        if (this.eventSub) {
-            this.eventSub.stop();
-        }
-    };
-
-
-    /** @inheritDoc */
     render() {
+
+        let grid = !this.data.savedEvents || this.data.savedEvents.length == 0 ?
+            (
+                <div className="ui active dimmer inverted">
+                    <div className="content">
+                        <div className="center">
+                            <h2 className="ui icon header">
+                                <i className="frown icon"/>
+                                You Haven't Liked Any Events Yet
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+            ) :
+            (
+                <EventGrid events={this.data.savedEvents}/>
+            );
 
         let content = this.state.loading ?
             (
@@ -77,10 +88,7 @@ export default class Dashboard extends React.Component {
                     <div className="ui text large loader">Loading Your Events</div>
                 </div>
 
-            ) :
-            (
-                <EventGrid events={this.data.savedEvents}/>
-            );
+            ) : grid;
 
         return (
             <div className="ui basic segment main-saved-events-content">

@@ -7,6 +7,11 @@
     margin: 0;
 }
 
+.filter-menu .menu {
+    border: none;
+    box-shadow: none;
+}
+
 .dashboard.header-content {
     display: block;
     margin: 0 auto;
@@ -14,6 +19,19 @@
 
 .dashboard .main-content {
     min-height: 500px;
+}
+
+.dashboard .main-content .slick-slide {
+    padding: 5px;
+}
+
+.dashboard .main-content .slick-prev:before,
+.dashboard .main-content .slick-next:before {
+    color: #5c6bc0;
+}
+
+.carousel-loader {
+    padding: 100px;
 }
 
 .masthead-center {

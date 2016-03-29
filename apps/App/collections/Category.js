@@ -13,6 +13,7 @@ export default class Category {
         this._id = doc._id;
         this._category_id = doc.category_id;
         this._name = doc.name;
+        this._subcategory = doc.subcategory;
     }
 
     get id() {
@@ -25,6 +26,10 @@ export default class Category {
 
     get category_id() {
         return this._category_id;
+    };
+
+    get subcategory() {
+        return this._subcategory;
     };
 
     static getCollection() {
@@ -47,7 +52,8 @@ export default class Category {
         // Create a doc to save or update to the MongoDB database.
         var doc = {
             name: this.name,
-            category_id: this.category_id
+            category_id: this.category_id,
+            subcategory: this.subcategory
         };
 
         // If this category already exists, then modify it.

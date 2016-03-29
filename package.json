@@ -19,6 +19,7 @@
     "react-slick": "^0.11.1",
     "react-text-truncate": "^0.3.7",
     "redis": "^2.4.2",
+    "scriptjs": "^2.5.8",
     "string-similarity": "^1.0.0",
     "truncate-html": "0.0.6"
   },

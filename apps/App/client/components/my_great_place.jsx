@@ -1,11 +1,11 @@
-import React, {PropTypes, Component} from 'react/addons';
+
 import shouldPureComponentUpdate from 'react-pure-render/function';
 
 import {greatPlaceStyle} from './my_great_place_styles.js';
 
-export default class MyGreatPlace extends Component {
+export default class MyGreatPlace extends React.Component {
   static propTypes = {
-    text: PropTypes.string
+    text: React.PropTypes.string
   };
 
   static defaultProps = {};

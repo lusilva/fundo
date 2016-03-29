@@ -169,8 +169,7 @@ Meteor.methods({
         if (this.userId) {
             if (Raccoon) {
                 let recommend = Meteor.wrapAsync(Raccoon.recommendFor, Raccoon);
-                let result = recommend(this.userId, 10);
-                return result;
+                return recommend(this.userId, 20);
             }
         } else {
             throw new Meteor.Error('invalid request');

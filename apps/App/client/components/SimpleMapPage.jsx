@@ -1,17 +1,16 @@
 /*
  * Base Google Map example
  */
-import React, {PropTypes, Component} from 'react/addons';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 
 import GoogleMap from 'google-map-react';
 import MyGreatPlace from './my_great_place.jsx';
 
-export default class SimpleMapPage extends Component {
+export default class SimpleMapPage extends React.Component {
   static propTypes = {
-    center: PropTypes.array,
-    zoom: PropTypes.number,
-    greatPlaceCoords: PropTypes.any
+    center: React.PropTypes.array,
+    zoom: React.PropTypes.number,
+    greatPlaceCoords: React.PropTypes.any
   };
 
   static defaultProps = {
