@@ -45,7 +45,6 @@ export default class GridEvent extends BaseEvent {
         if (event.start_time && event.stop_time) {
             time = time.twix(event.stop_time);
         }
-        console.log(time);
 
         //TODO: change this to be placeholder image based on category.
         let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";

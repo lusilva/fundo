@@ -21,7 +21,7 @@ export function refresh() {
     Event.getCollection().remove({expires: {$lt: new Date()}});
 
     // Update all categories from eventful.
-    updateAllCategories();
+    _.defer(Meteor.bindEnvironment(updateAllCategories));
 
     // Remove all categories that have expired.
     Category.getCollection().remove({expires: {$lt: new Date()}});
@@ -33,7 +33,7 @@ export function refresh() {
  */
 export function updateAllEventsForCity(city) {
     // Get all events for the city.
-    getAllEventsForCity(city, createEventfulEvent.bind(this, city), updateAllEventsForCityCallback.bind(this, city));
+    _.defer(Meteor.bindEnvironment(getAllEventsForCity), city, createEventfulEvent.bind(this, city), updateAllEventsForCityCallback.bind(this, city));
 }
 
 /**
@@ -42,7 +42,7 @@ export function updateAllEventsForCity(city) {
  */
 function updateAllEventsForCityCallback(city) {
     // Find similar events and mark them as similar.
-    findAndMarkSimilarEvents(city);
+    _.defer(Meteor.bindEnvironment(findAndMarkSimilarEvents), city);
 }
 
 /**

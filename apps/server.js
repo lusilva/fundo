@@ -1,7 +1,7 @@
 import { ReactRouterSSR } from 'meteor/reactrouter:react-router-ssr';
 
 import PreferenceSet from 'App/collections/PreferenceSet';
-import 'App/collections/Event';
+import Event from  'App/collections/Event';
 import 'App/collections/Category';
 import 'App/server/methods';
 import 'App/logger';
@@ -20,6 +20,12 @@ Accounts.onCreateUser(function (options, user) {
     let preferences = new PreferenceSet(null, user._id, null, null);
     preferences.save();
     return user;
+});
+
+
+Event.getCollection()._ensureIndex({
+    "description": "text",
+    "title": "text"
 });
 
 

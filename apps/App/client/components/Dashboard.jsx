@@ -10,6 +10,7 @@ import _ from 'lodash';
 
 import { isUserVerified } from 'App/helpers';
 import FeaturedEvents from './FeaturedEvents';
+import EventGrid from './EventGrid';
 import TopEventsCarousel from './TopEventsCarousel';
 import EventCarousel from './EventCarousel';
 import Filters from './Filters';
@@ -46,8 +47,11 @@ export default class Dashboard extends React.Component {
         },
         isSendingEmail: false,
         loading: false,
-        categoryLimit: 20
+        categoryLimit: 20,
+        searchValue: null
     };
+
+    searchTimeout = null;
 
 
     /**
@@ -61,6 +65,19 @@ export default class Dashboard extends React.Component {
         // Get all necessary subscriptions
         Meteor.subscribe('userpreferences');
 
+        Meteor.subscribe('events', new Date());
+
+        let events = [];
+        if (this.state.searchValue && this.state.searchValue.length > 0) {
+            events = Event.getCollection().find(
+                {
+                    $or: [
+                        {description: {$regex: this.state.searchValue, $options: 'i'}},
+                        {title: {$regex: this.state.searchValue, $options: 'i'}}
+                    ]
+                }, {reactive: false}).fetch();
+        }
+
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
@@ -69,7 +86,7 @@ export default class Dashboard extends React.Component {
         //let categories = Category.getCollection().find().fetch();
         let categories = Category.getCollection().find(
             {
-                subcategory: false
+                subcategory: true
             },
             {
                 limit: this.state.categoryLimit,
@@ -79,12 +96,12 @@ export default class Dashboard extends React.Component {
 
         let numCategories = Category.getCollection().find(
             {
-                subcategory: false
+                subcategory: true
             }
         ).count();
 
         // Return the preference and the user's events. This is available in this.data.
-        return {preferences, categories, numCategories}
+        return {preferences, categories, numCategories, events}
     };
 
 
@@ -201,7 +218,7 @@ export default class Dashboard extends React.Component {
      * @private
      */
     _filterChangeCallback() {
-
+        this.setState({categoryLimit: 20});
     };
 
 
@@ -213,6 +230,14 @@ export default class Dashboard extends React.Component {
     };
 
 
+    _updateSearch(event) {
+        Meteor.clearTimeout(this.searchTimeout);
+        this.searchTimeout = Meteor.setTimeout(function () {
+            this.setState({searchValue: event.target.value});
+        }.bind(this), 1500);
+    };
+
+
     /** @inheritDoc */
     render() {
         let mastheadContent = this.props.currentUser && isUserVerified(this.props.currentUser) ?
@@ -221,30 +246,67 @@ export default class Dashboard extends React.Component {
 
         let loading = this.state.loading ?
             <div className="ui active inverted dimmer">
-                <div className="ui text large loader">Loading Events</div>
+                <div className="ui text large loader">Fetching Events...</div>
             </div> : null;
 
-        console.log(this.data.categories.length + '-' + this.data.numCategories);
-
         let bottomLoader = this.data.categories.length < this.data.numCategories ?
-            <div className="ui active centered inline loader"></div> : null;
+            <div className="ui active centered inline text loader carousel-loader">
+                Loading More Categories...
+            </div> : null;
+
+        let content = this.state.searchValue && this.state.searchValue.length > 0 ?
+            (   <div className="ui container">
+                    <h1 className="ui left floated header">
+                        {this.data.events && this.data.events.length > 0 ?
+                            'Showing results for "' + this.state.searchValue + '"' :
+                            'No events found'}
+
+                    </h1>
+                    <div className="ui clearing divider"></div>
+                    <EventGrid events={this.data.events}/>
+                </div>
+            ) :
+            (
+                <div>
+                    <TopEventsCarousel sizes={{large: 4, medium: 3, small: 2}}
+                                       category={{
+                                                    name: 'Top Events',
+                                                    category_id: 'top_events',
+                                                    subcategory: false
+                                                }}
+                    />
+                    {_.map(this.data.categories, function (category) {
+                        return <EventCarousel key={category.category_id+'-dashboard-events'}
+                                              sizes={{large: 4, medium: 3, small: 2}}
+                                              category={category}
+                        />
+                    }.bind(this))}
+                    {bottomLoader}
+                </div>
+            );
 
         return (
             <div>
                 <div className="ui inverted vertical segment dashboard-masthead primary-color">
                     {mastheadContent}
                 </div>
-                <div className="ui menu attached secondary labeled icon filter-menu sticky">
-                    <a className={'item ' + (this.state.filter.open ? 'active' : '')}
-                       onClick={this._toggleFilterMenu.bind(this)}>
-                        <i className="options icon"/>
-                        Filters
-                    </a>
-                    <div className="right menu">
+                <div className="ui menu attached secondary filter-menu">
+                    <div className="ui labeled icon left menu">
+                        <a className={'item ' + (this.state.filter.open ? 'active' : '')}
+                           onClick={this._toggleFilterMenu.bind(this)}>
+                            <i className="options icon"/>
+                            Filters
+                        </a>
                         <a className="item">
                             <i className="map icon"/>
                             Map View
                         </a>
+                    </div>
+                    <div className="ui category search item">
+                        <div className="ui transparent icon input">
+                            <input className="prompt" type="text" placeholder="Search Events..."
+                                   onChange={this._updateSearch.bind(this)}/>
+                        </div>
                     </div>
                 </div>
                 <div className="ui bottom attached segment pushable" id="main-dashboard-container">
@@ -257,20 +319,7 @@ export default class Dashboard extends React.Component {
                     </div>
                     <div className="dashboard pusher">
                         <div className="ui basic segment main-content">
-                            <TopEventsCarousel sizes={{large: 4, medium: 3, small: 2}}
-                                               category={{
-                                                    name: 'Top Events',
-                                                    category_id: 'top_events',
-                                                    subcategory: false
-                                                }}
-                            />
-                            {_.map(this.data.categories, function (category) {
-                                return <EventCarousel key={category.category_id+'-dashboard-events'}
-                                                      sizes={{large: 4, medium: 3, small: 2}}
-                                                      category={category}
-                                />
-                            }.bind(this))}
-                            {bottomLoader}
+                            {loading || content}
                         </div>
                     </div>
                 </div>

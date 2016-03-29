@@ -28,17 +28,14 @@ export default class EventCarousel extends React.Component {
     };
 
     state = {
-        loading: true,
-        reactive: false
+        loading: true
     };
-
-    refreshHandle = null;
 
     getMeteorData() {
         Meteor.subscribe('events', new Date(), this.props.category.name, {
             onReady: function () {
                 if (this.state.loading)
-                    this.setState({loading: false, reactive: false});
+                    this.setState({loading: false});
             }.bind(this)
         });
 
@@ -53,22 +50,13 @@ export default class EventCarousel extends React.Component {
                 sort: {
                     start_time: 1
                 },
-                reactive: this.state.reactive
+                reactive: false
             }
         ).fetch();
 
         return {events}
     };
 
-    componentDidMount() {
-        this.refreshHandle = Meteor.setInterval(function () {
-            this.setState({reactive: true});
-        }.bind(this), 30000);
-    };
-
-    componentWillUnmount() {
-        Meteor.clearInterval(this.refreshHandle);
-    };
 
     render() {
         let sizes = this.props.sizes;
@@ -104,7 +92,8 @@ export default class EventCarousel extends React.Component {
 
         let loader = this.state.loading ? (
             <div className="ui active centered inline text loader carousel-loader">
-                Loading {this.props.category.name}</div>
+                Loading {this.props.category.name}
+            </div>
         ) : null;
 
         let slider = this.data.events && this.data.events.length > 0 && !this.state.loading ? (

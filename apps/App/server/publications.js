@@ -95,14 +95,17 @@ Meteor.publish('events', function (currentDate, category) {
             }
         }
 
+        let sortOrder = {
+            start_time: 1,
+            dislike_count: 1
+        };
+
+
         return Event.getCollection().find(
             eventFilters,
             {
                 // Assert limit and sorting for the events.
-                sort: {
-                    start_time: 1,
-                    dislike_count: 1
-                }
+                sort: sortOrder
             }
         );
     }

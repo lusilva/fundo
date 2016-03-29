@@ -6,7 +6,7 @@ import EventCarousel from './EventCarousel';
 
 export default class TopEventsCarousel extends EventCarousel {
     getMeteorData() {
-        Meteor.subscribe('events', new Date(), null, {
+        Meteor.subscribe('events', new Date(), null, this.props.searchValue, {
             onReady: function () {
                 if (this.state.loading)
                     this.setState({loading: false, reactive: false});
@@ -23,7 +23,7 @@ export default class TopEventsCarousel extends EventCarousel {
                     dislike_count: 1,
                     popularity_score: -1
                 },
-                reactive: this.state.reactive
+                reactive: false
             }
         ).fetch();
 

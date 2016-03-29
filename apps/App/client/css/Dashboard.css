@@ -7,6 +7,11 @@
     margin: 0;
 }
 
+.filter-menu .menu {
+    border: none;
+    box-shadow: none;
+}
+
 .dashboard.header-content {
     display: block;
     margin: 0 auto;
@@ -26,7 +31,7 @@
 }
 
 .carousel-loader {
-    padding: 35px;
+    padding: 100px;
 }
 
 .masthead-center {

@@ -64,16 +64,31 @@ export default class MyEvents extends React.Component {
     /** @inheritDoc */
     render() {
 
-        let content = this.state.loading ?
+        let grid = !this.data.savedEvents || this.data.savedEvents.length == 0 ?
             (
-                <div className="ui active inverted dimmer">
-                    <div className="ui text large loader">Loading Your Events</div>
+                <div className="ui active dimmer inverted">
+                    <div className="content">
+                        <div className="center">
+                            <h2 className="ui icon header">
+                                <i className="frown icon"/>
+                                You Haven't Liked Any Events Yet
+                            </h2>
+                        </div>
+                    </div>
                 </div>
 
             ) :
             (
                 <EventGrid events={this.data.savedEvents}/>
             );
+
+        let content = this.state.loading ?
+            (
+                <div className="ui active inverted dimmer">
+                    <div className="ui text large loader">Loading Your Events</div>
+                </div>
+
+            ) : grid;
 
         return (
             <div className="ui basic segment main-saved-events-content">

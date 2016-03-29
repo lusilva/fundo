@@ -28,7 +28,8 @@ export default class Filters extends React.Component {
     state = {
         preferences: this.props.preferences,
         loading: !!this.props.preferences,
-        message: null
+        message: null,
+        googleReady: false
     };
 
     // The handle for message timeouts so that they can be cleared.
@@ -40,6 +41,14 @@ export default class Filters extends React.Component {
         // Update the state of the preferences when the props/database changes.
         if (nextProps.preferences != this.state.preferences)
             this.setState({preferences: nextProps.preferences, loading: false});
+    };
+
+    componentWillMount() {
+        let that = this;
+        let $script = require('scriptjs');
+        $script("//maps.googleapis.com/maps/api/js?libraries=places", function () {
+            that.setState({googleReady: true});
+        });
     };
 
 
@@ -113,11 +122,103 @@ export default class Filters extends React.Component {
     };
 
 
+    /**
+     * Stop displaying the loading message.
+     *
+     * @private
+     */
+    _filterChangeCallback(newPreferences) {
+        this.props.filterChangeCallback(newPreferences);
+    };
+
+
+    _setLoading(isLoading) {
+        this.props.setLoadingCallback(isLoading);
+    };
+
+
+    /**
+     * Updates the user's location preference
+     *
+     * @param suggest {object} - The geosuggest suggest option.
+     * @private
+     */
+    _updateUserLocation(suggest) {
+        // Check is this is a valid place.
+        if (!suggest.placeId && suggest.label != this.state.preferences.location) {
+            this._showMessage(true, (suggest.label + ' is not a valid location!'));
+            this.refs.geosuggest.update(this.state.preferences.location || '');
+            return;
+        }
+        // Get the user's preferences, and make sure this place is different then the user's current location.
+        let preferences = this.state.preferences;
+        if (preferences && preferences.location == suggest.label)
+            return;
+
+        // Show the loading spinner while preferences are updated on the server.
+        preferences.location = suggest.label;
+        let that = this;
+        this._filterChangeCallback();
+        this._setLoading(true);
+        Meteor.call("updatePreferences", preferences, function (err, res) {
+            if (!err) {
+                let message = 'Location updated to ' + suggest.label;
+                that._showMessage(false, message, 5000);
+            } else {
+                Alert.error('Error occurred while updating location');
+            }
+            // Result returns if there are events for this area already, if this is true then
+            // there were no events and we have fetched some from eventful.
+            if (!!res) {
+                let message = "Looks like we don't have any events for that area. Fetching them now, this may take a little while";
+                Meteor.setTimeout(function () {
+                    this._setLoading(false);
+                }.bind(this), 15000);
+                that._showMessage(false, message, 10000);
+            } else {
+                this._setLoading(false);
+            }
+        }.bind(this));
+    };
+
+
+    /**
+     * Skips suggestions and don't show them to the user.
+     *
+     * @param suggest {object} - The geosuggest suggest object.
+     * @returns {boolean} - Whether or not to show this suggestion.
+     * @private
+     */
+    _skipSuggestFunc(suggest) {
+        return !!this.state.preferences && this.state.preferences.location == suggest.description;
+    };
+
+
     /** @inheritDoc */
     render() {
+        let initialLocation = (this.state.preferences && this.state.preferences.location) ?
+            this.state.preferences.location : null;
+
+        let geosuggest = !this.state.loading && this.state.googleReady ?
+            (
+                <div className="ui item center">
+                    <GeoSuggest country="us"
+                                types={['(cities)']}
+                                initialValue={initialLocation || ''}
+                                autoActivateFirstSuggest={true}
+                                onSuggestSelect={this._updateUserLocation.bind(this)}
+                                skipSuggest={this._skipSuggestFunc.bind(this)}
+                                ref='geosuggest'
+                    />
+                </div>
+            ) : null;
+
+
         return (
             <div className="ui container">
                 {this._getMessage()}
+                <div className="ui header item center">Select Location</div>
+                {geosuggest}
                 <div className="ui header item center">Categories</div>
                 <div className="ui container">
                     <div className="ui multiple search selection dropdown">

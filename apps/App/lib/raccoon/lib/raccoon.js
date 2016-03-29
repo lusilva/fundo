@@ -421,6 +421,7 @@ class Raccoon {
     };
 
     recommendFor(userId, numberOfRecs, callback) {
+        Logger.debug('contacting redis for recommendations!');
         this.client.zrevrange(
             [
                 this.config.className,
