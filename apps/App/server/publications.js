@@ -2,6 +2,7 @@ import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from 'App/collections/Event';
 import Category from 'App/collections/Category';
 
+
 // Publish only the preferences for the current user.
 Meteor.publish('userpreferences', function () {
     return PreferenceSet.getCollection().find({userId: this.userId});

@@ -279,7 +279,7 @@ export default class Dashboard extends React.Component {
 
 
         let content = this.state.searchValue && this.state.searchValue.length > 0 ?
-            (   <div className="ui container">
+            (   <div className="ui container" style={{display: this.state.mapView ? 'none' : 'block'}}>
                     <h1 className="ui left floated header">
                         {this.data.events && this.data.events.length > 0 ?
                         'Showing results for "' + this.state.searchValue + '"' :
@@ -291,7 +291,7 @@ export default class Dashboard extends React.Component {
                 </div>
             ) :
             (
-                <div>
+                <div style={{display: this.state.mapView ? 'none' : 'block'}}>
                     <TopEventsCarousel sizes={{large: 4, medium: 3, small: 2}}
                                        category={{
                                                     name: 'Top Events',
@@ -301,7 +301,7 @@ export default class Dashboard extends React.Component {
                     />
                     {_.map(this.data.categories, function (category) {
                         return <EventCarousel key={category.category_id+'-dashboard-events'}
-                                              sizes={{large: 4, medium: 3, small: 2}}
+                                              sizes={{large: 4, medium: 2, small: 1}}
                                               category={category}
                         />
                     }.bind(this))}
@@ -331,10 +331,10 @@ export default class Dashboard extends React.Component {
                         </div>
                     </div>
                     <div className="ui labeled icon right menu">
-                        <a className={"item "  + (this.state.mapView ? 'active' : '')}
+                        <a className="item"
                            onClick={this._toggleMapView.bind(this)}>
                             <i className="map icon"/>
-                            Map View
+                            {this.state.mapView ? 'Hide Map' : 'Show Map'}
 
                         </a>
                     </div>
@@ -352,7 +352,8 @@ export default class Dashboard extends React.Component {
 
 
                         <div className="ui basic segment main-content">
-                            {loading || mapView || content}
+                            {mapView}
+                            {loading || content}
                         </div>
                     </div>
                 </div>

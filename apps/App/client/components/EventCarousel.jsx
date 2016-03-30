@@ -24,8 +24,7 @@ export default class EventCarousel extends React.Component {
 
     static propTypes = {
         category: React.PropTypes.object.isRequired,
-        sizes: React.PropTypes.object.isRequired,
-        shouldHide: React.PropTypes.bool.isRequired
+        sizes: React.PropTypes.object.isRequired
     };
 
     state = {
@@ -134,7 +133,7 @@ export default class EventCarousel extends React.Component {
         ) : null;
 
         return (
-            <div className="ui container" style={{display: this.props.shouldHide ? 'none' : 'block'}}>
+            <div className="ui container">
                 {loader || slider}
             </div>
         )

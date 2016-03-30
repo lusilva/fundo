@@ -44,7 +44,7 @@ function validateWelcome(nextState, transitionFunc, done) {
                 // Find the preference set for the current user.
                 let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-                if (!Meteor.userId() || preferences.location) {
+                if (!Meteor.userId() || !preferences || preferences.location) {
                     transitionFunc(getPathsForUser()[0].path);
                 }
 

@@ -31,10 +31,6 @@ FastRender.route('/myevents', function (params) {
     this.subscribe('savedevents');
 });
 
-FastRender.onAllRoutes(function (path) {
-    this.subscribe('userpreferences');
-});
-
 
 // Do server-rendering only in production
 // Otherwise, it will break the hot-reload

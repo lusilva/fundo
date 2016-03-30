@@ -68,6 +68,11 @@ export default class GridEvent extends BaseEvent {
         let venueName = event.venue && event.venue.name ? event.venue.name : "unknown venue";
         let venueAddress = event.venue && event.venue.address ? event.venue.address : "unknown address";
 
+        let formattedTime = time && event.stop_time ? time.format() : (time ? time.format('MMM Do, h:mm a') : 'unknown time');
+        if (!formattedTime || formattedTime.length == 0) {
+            formattedTime = moment(event.start_time).format('MMM Do, h:mm a')
+        }
+
         return (
             <div className="ui card">
                 <div className="ui content">
@@ -106,7 +111,7 @@ export default class GridEvent extends BaseEvent {
                     </div>
                     <div className="meta">
                             <span className="date">
-                                {time && event.stop_time ? time.format() : (time ? time.format('MMM Do, h:mm a') : 'unknown time')}
+                                {formattedTime}
                             </span>
                     </div>
                     <div className="meta">
@@ -150,7 +155,7 @@ export default class GridEvent extends BaseEvent {
                                     </h4>
                                     <div className="description center">
                                         <div className="date">
-                                            {time && event.stop_time ? time.format() : (time ? time.format('MMM Do, h:mm a') : 'unknown time')}
+                                            {formattedTime}
                                         </div>
                                         <a target="_blank" href={event.venue.url}>{venueName}, {venueAddress}</a>
                                     </div>
