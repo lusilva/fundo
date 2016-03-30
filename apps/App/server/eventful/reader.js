@@ -36,7 +36,7 @@ export default function getEventsForCity(city, eventCreatorCallback, doneCallbac
                 sort_order: 'popularity',
                 page_number: page,
                 include: "price,categories,tickets,popularity,subcategories,mature",
-                image_sizes: "medium,block,large,edpborder250,dropshadow250,dropshadow170,block178",
+                image_sizes: "medium,block,large,edpborder250,dropshadow250,dropshadow170,block178,thumb,small",
                 mature: "normal",
                 languages: "1"
             }
