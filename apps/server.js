@@ -22,10 +22,17 @@ Accounts.onCreateUser(function (options, user) {
     return user;
 });
 
+FastRender.route('/dashboard', function (params) {
+    this.subscribe('events', new Date());
+    this.subscribe('categories');
+});
 
-Event.getCollection()._ensureIndex({
-    "description": "text",
-    "title": "text"
+FastRender.route('/myevents', function (params) {
+    this.subscribe('savedevents');
+});
+
+FastRender.onAllRoutes(function (path) {
+    this.subscribe('userpreferences');
 });
 
 

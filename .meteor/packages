@@ -44,3 +44,4 @@ semantic:ui
 webpack:json
 raix:eventemitter
 tmeasday:publish-counts
+meteorhacks:fast-render

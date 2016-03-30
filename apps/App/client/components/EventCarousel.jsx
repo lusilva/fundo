@@ -24,20 +24,28 @@ export default class EventCarousel extends React.Component {
 
     static propTypes = {
         category: React.PropTypes.object.isRequired,
-        sizes: React.PropTypes.object.isRequired
+        sizes: React.PropTypes.object.isRequired,
+        shouldHide: React.PropTypes.bool.isRequired
     };
 
     state = {
-        loading: true
+        loading: Event.getCollection().find(
+            {
+                categories: {
+                    $in: [this.props.category.name]
+                }
+            }, {reactive: false}).count() == 0
     };
 
     getMeteorData() {
-        Meteor.subscribe('events', new Date(), this.props.category.name, {
-            onReady: function () {
-                if (this.state.loading)
-                    this.setState({loading: false});
-            }.bind(this)
-        });
+        if (this.state.loading) {
+            Meteor.subscribe('events', new Date(), this.props.category.name, {
+                onReady: function () {
+                    if (this.state.loading)
+                        this.setState({loading: false});
+                }.bind(this)
+            });
+        }
 
         let events = Event.getCollection().find(
             {
@@ -57,6 +65,17 @@ export default class EventCarousel extends React.Component {
         return {events}
     };
 
+    componentDidMount() {
+        this.setState({
+            loading: Event.getCollection().find(
+                {
+                    categories: {
+                        $in: [this.props.category.name]
+                    }
+                }, {reactive: false}).count() == 0
+        });
+    };
+
 
     render() {
         let sizes = this.props.sizes;
@@ -70,20 +89,22 @@ export default class EventCarousel extends React.Component {
             slidesToScroll: Math.min(sizes.large, this.data.events ? this.data.events.length : sizes.large),
             centerMode: false,
             draggable: enoughEvents,
+            arrows: this.data.events.length > sizes.large,
             dots: false,
-            arrows: true,
             lazyLoad: enoughEvents,
             responsive: [{
                 breakpoint: 728,
                 settings: {
                     slidesToShow: Math.min(sizes.medium, this.data.events ? this.data.events.length : sizes.medium),
-                    slidesToScroll: Math.min(sizes.medium, this.data.events ? this.data.events.length : sizes.medium)
+                    slidesToScroll: Math.min(sizes.medium, this.data.events ? this.data.events.length : sizes.medium),
+                    arrows: this.data.events.length > sizes.medium
                 }
             }, {
                 breakpoint: 480,
                 settings: {
                     slidesToShow: Math.min(sizes.small, this.data.events ? this.data.events.length : sizes.small),
-                    slidesToScroll: Math.min(sizes.small, this.data.events ? this.data.events.length : sizes.small)
+                    slidesToScroll: Math.min(sizes.small, this.data.events ? this.data.events.length : sizes.small),
+                    arrows: this.data.events.length > sizes.small
                 }
             }]
         };
@@ -113,7 +134,7 @@ export default class EventCarousel extends React.Component {
         ) : null;
 
         return (
-            <div className="ui container">
+            <div className="ui container" style={{display: this.props.shouldHide ? 'none' : 'block'}}>
                 {loader || slider}
             </div>
         )

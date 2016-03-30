@@ -5,13 +5,20 @@ import EventCarousel from './EventCarousel';
 
 
 export default class TopEventsCarousel extends EventCarousel {
+
+    state = {
+        loading: Event.getCollection().find({}, {reactive: false}).count() == 0
+    };
+
     getMeteorData() {
-        Meteor.subscribe('events', new Date(), null, this.props.searchValue, {
-            onReady: function () {
-                if (this.state.loading)
-                    this.setState({loading: false, reactive: false});
-            }.bind(this)
-        });
+        if (this.state.loading) {
+            Meteor.subscribe('events', new Date(), null, this.props.searchValue, {
+                onReady: function () {
+                    if (this.state.loading)
+                        this.setState({loading: false, reactive: false});
+                }.bind(this)
+            });
+        }
 
         let events = Event.getCollection().find(
             {},
@@ -28,5 +35,10 @@ export default class TopEventsCarousel extends EventCarousel {
         ).fetch();
 
         return {events}
+    };
+
+    componentDidMount() {
+        if (this.state.loading && Event.getCollection().find({}, {reactive: false}).count() > 0)
+            this.setState({loading: false});
     };
 }

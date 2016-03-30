@@ -86,7 +86,7 @@ export default class Dashboard extends React.Component {
         //let categories = Category.getCollection().find().fetch();
         let categories = Category.getCollection().find(
             {
-                subcategory: true
+                subcategory: false
             },
             {
                 limit: this.state.categoryLimit,
@@ -96,7 +96,7 @@ export default class Dashboard extends React.Component {
 
         let numCategories = Category.getCollection().find(
             {
-                subcategory: true
+                subcategory: false
             }
         ).count();
 
@@ -258,7 +258,7 @@ export default class Dashboard extends React.Component {
             (   <div className="ui container">
                     <h1 className="ui left floated header">
                         {this.data.events && this.data.events.length > 0 ?
-                            'Showing results for "' + this.state.searchValue + '"' :
+                        'Showing results for "' + this.state.searchValue + '"' :
                             'No events found'}
 
                     </h1>

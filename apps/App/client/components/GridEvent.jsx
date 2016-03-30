@@ -22,6 +22,15 @@ export default class GridEvent extends BaseEvent {
     componentDidMount() {
         let rootNode = ReactDOM.findDOMNode(this);
 
+        // Lazy load the images until they are visible.
+        $(rootNode).find('.card-image')
+            .visibility({
+                type: 'image',
+                transition: 'fade in',
+                duration: 1000,
+                initialCheck: true
+            });
+
         // Make a popup for event titles that are longer and get cut off.
         $(rootNode).find('.event-title')
             .popup();
@@ -41,7 +50,7 @@ export default class GridEvent extends BaseEvent {
         let event = this.props.event;
 
         // Format the start and end time using moment.js
-        let time = event.start_time ? moment(event.start_time) : "unknown time";
+        let time = event.start_time ? moment(event.start_time) : null;
         if (event.start_time && event.stop_time) {
             time = time.twix(event.stop_time);
         }
@@ -97,7 +106,7 @@ export default class GridEvent extends BaseEvent {
                     </div>
                     <div className="meta">
                             <span className="date">
-                                {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
+                                {time && event.stop_time ? time.format() : (time ? time.format('MMM Do, h:mm a') : 'unknown time')}
                             </span>
                     </div>
                     <div className="meta">
@@ -141,7 +150,7 @@ export default class GridEvent extends BaseEvent {
                                     </h4>
                                     <div className="description center">
                                         <div className="date">
-                                            {event.start_time && event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
+                                            {time && event.stop_time ? time.format() : (time ? time.format('MMM Do, h:mm a') : 'unknown time')}
                                         </div>
                                         <a target="_blank" href={event.venue.url}>{venueName}, {venueAddress}</a>
                                     </div>
