@@ -315,24 +315,28 @@ export default class Dashboard extends React.Component {
                     {mastheadContent}
                 </div>
                 <div className="ui menu attached secondary filter-menu">
-                    <div className="ui labeled icon left menu">
+                    <div className="ui labeled icon menu">
                         <a className={'item ' + (this.state.filter.open ? 'active' : '')}
                            onClick={this._toggleFilterMenu.bind(this)}>
                             <i className="options icon"/>
                             Filters
                         </a>
+                    </div>
+                    <div className="ui left menu">
+                        <div className="ui category search item">
+                            <div className="ui icon input">
+                                <input className="prompt" type="text" placeholder="Quick Search..."
+                                       onChange={this._updateSearch.bind(this)}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ui labeled icon right menu">
                         <a className={"item "  + (this.state.mapView ? 'active' : '')}
                            onClick={this._toggleMapView.bind(this)}>
                             <i className="map icon"/>
                             Map View
 
                         </a>
-                    </div>
-                    <div className="ui category search item">
-                        <div className="ui transparent icon input">
-                            <input className="prompt" type="text" placeholder="Search Events..."
-                                   onChange={this._updateSearch.bind(this)}/>
-                        </div>
                     </div>
                 </div>
                 <div className="ui bottom attached segment pushable" id="main-dashboard-container">
