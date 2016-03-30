@@ -10,14 +10,14 @@ import _ from 'lodash';
 
 import { isUserVerified } from 'App/helpers';
 import FeaturedEvents from './FeaturedEvents';
-import EventGrid from './EventGrid';
+import EventGrid from '../EventGrid';
 import TopEventsCarousel from './TopEventsCarousel';
 import EventCarousel from './EventCarousel';
 import Filters from './Filters';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 
-import SimpleMapPage from './SimpleMapPage.jsx';
+import SimpleMapPage from './SimpleMapPage';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -67,8 +67,8 @@ export default class Dashboard extends React.Component {
     getMeteorData() {
         // Get all necessary subscriptions
         Meteor.subscribe('userpreferences');
-
         Meteor.subscribe('events', new Date());
+        Meteor.subscribe('categories');
 
         let events = [];
         if (this.state.searchValue && this.state.searchValue.length > 0) {
@@ -86,9 +86,6 @@ export default class Dashboard extends React.Component {
         // Find the preference set for the current user.
         let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
-
-        Meteor.subscribe('categories');
-        //let categories = Category.getCollection().find().fetch();
         let categories = Category.getCollection().find(
             {
                 subcategory: false

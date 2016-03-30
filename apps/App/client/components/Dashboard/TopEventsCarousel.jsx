@@ -34,6 +34,7 @@ export default class TopEventsCarousel extends EventCarousel {
             }
         ).fetch();
 
+        events = !this.data.events || events.length > this.data.events ? events : this.data.events;
         return {events}
     };
 

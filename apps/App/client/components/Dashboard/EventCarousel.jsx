@@ -8,7 +8,7 @@ import ReactMixin from 'react-mixin';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import _ from 'lodash';
 
-import GridEvent from './GridEvent';
+import GridEvent from '../Event/GridEvent';
 
 /**
  * Represents the featured events shown at the top of the page.
@@ -61,6 +61,7 @@ export default class EventCarousel extends React.Component {
             }
         ).fetch();
 
+        events = !this.data.events || events.length > this.data.events ? events : this.data.events;
         return {events}
     };
 

@@ -4,7 +4,7 @@ import Event from 'App/collections/Event';
 
 import Slider from 'react-slick';
 import TextTruncate from 'react-text-truncate';
-import FeaturedEvent from './FeaturedEvent';
+import FeaturedEvent from '../Event/FeaturedEvent';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import _ from 'lodash';
 
