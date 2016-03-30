@@ -13,6 +13,7 @@
     "parse-link": "^0.3.0",
     "react": "~0.14.1",
     "react-geosuggest": "^1.18.1",
+    "react-infinite": "^0.9.0",
     "react-mixin": "^3.0.3",
     "react-render-html": "^0.1.3",
     "react-s-alert": "^1.0.2",
@@ -43,6 +44,8 @@
     "react-transform-hmr": "^1.0.1",
     "react-transform-catch-errors": "^1.0.0",
     "redbox-react": "^1.2.0",
-    "json-loader": "^0.5.4"
+    "json-loader": "^0.5.4",
+    "google-map-react": "^0.10.5",
+    "react-pure-render": "^1.0.2"
   }
 }

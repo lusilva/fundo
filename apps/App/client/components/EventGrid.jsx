@@ -26,6 +26,67 @@ export default class EventGrid extends React.Component {
 
 
     /** @inheritDoc */
+// <<<<<<< HEAD
+//     componentWillReceiveProps(nextProps) {
+//         if (!_.isEqual(nextProps.preferences, this.state.preferences)) {
+//             this.setState({preferences: nextProps.preferences});
+//         }
+//         if (!_.isEqual(nextProps.events, this.state.events)) {
+//             this._updateEventsSet(nextProps.events);
+//         }
+//     };
+
+//     componentWillUnmount() {
+//         //this.resetEvents();
+//     };
+
+
+//     /**
+//      * Resets the event set, removing all events.
+//      */
+//     resetEvents() {
+//         this.setState({eventsSet: {}});
+//     };
+
+
+//     /**
+//      * Updates the hashed set of events and prevents duplicates from showing.
+//      *
+//      * @param newEvents - The array of new events to add to the DOM.
+//      * @private
+//      */
+//     _updateEventsSet(newEvents) {
+//         let newEventsSet = this.state.eventsSet;
+
+//         if (!this.state.preferences || !this.state.preferences.location) {
+//             this.resetEvents();
+//             return;
+//         }
+
+//         // Remove all events where city does not correspond with current city.
+//         _.each(_.keys(newEventsSet), function (key) {
+//             let event = newEventsSet[key];
+//             if (!_.includes(event.relevant_cities, this.state.preferences.location)) {
+//                 delete newEventsSet[key];
+//             }
+//         }.bind(this));
+
+//         // Add all new events.
+//         _.each(newEvents, function (event) {
+//             if (!_.has(newEventsSet, event.id) &&
+//                 _.includes(event.relevant_cities, this.state.preferences.location)) {
+//                 newEventsSet[event.id] = event;
+//             }
+//         }.bind(this));
+
+//         // Finally, update the state.
+//         this.setState({eventsSet: newEventsSet});
+//     };
+
+
+//     /** @inheritDoc */
+// =======
+// >>>>>>> 50894bcd43512f417332f8ed6f865a8ff3d3e8cf
     render() {
         return (
             <div className="ui container">

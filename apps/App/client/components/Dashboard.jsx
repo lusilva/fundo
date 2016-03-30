@@ -17,6 +17,8 @@ import Filters from './Filters';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 
+import SimpleMapPage from './SimpleMapPage.jsx';
+
 /**
  * The dashboard view that the user sees upon logging in.
  *
@@ -48,7 +50,8 @@ export default class Dashboard extends React.Component {
         isSendingEmail: false,
         loading: false,
         categoryLimit: 20,
-        searchValue: null
+        searchValue: null,
+        mapView: false
     };
 
     searchTimeout = null;
@@ -76,6 +79,8 @@ export default class Dashboard extends React.Component {
                         {title: {$regex: this.state.searchValue, $options: 'i'}}
                     ]
                 }, {reactive: false}).fetch();
+        } else {
+            events = Event.getCollection().find({}, {reactive: false}).fetch();
         }
 
         // Find the preference set for the current user.
@@ -147,6 +152,16 @@ export default class Dashboard extends React.Component {
         // Same thing as before, might want to store this as a variable.
         let rootNode = ReactDOM.findDOMNode(this);
         $(rootNode).find('.ui.sidebar').sidebar('toggle');
+    };
+
+
+    /**
+     * Toggles the google map view
+     *
+     * @private
+     */
+    _toggleMapView() {
+        this.setState({mapView: !this.state.mapView});
     };
 
 
@@ -254,6 +269,15 @@ export default class Dashboard extends React.Component {
                 Loading More Categories...
             </div> : null;
 
+        let mapView = this.state.mapView ?
+            (
+                <SimpleMapPage
+                    zoom={11}
+                    events={this.data.events}
+                />
+            ) : null;
+
+
         let content = this.state.searchValue && this.state.searchValue.length > 0 ?
             (   <div className="ui container">
                     <h1 className="ui left floated header">
@@ -291,22 +315,28 @@ export default class Dashboard extends React.Component {
                     {mastheadContent}
                 </div>
                 <div className="ui menu attached secondary filter-menu">
-                    <div className="ui labeled icon left menu">
+                    <div className="ui labeled icon menu">
                         <a className={'item ' + (this.state.filter.open ? 'active' : '')}
                            onClick={this._toggleFilterMenu.bind(this)}>
                             <i className="options icon"/>
                             Filters
                         </a>
-                        <a className="item">
+                    </div>
+                    <div className="ui left menu">
+                        <div className="ui category search item">
+                            <div className="ui icon input">
+                                <input className="prompt" type="text" placeholder="Quick Search..."
+                                       onChange={this._updateSearch.bind(this)}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ui labeled icon right menu">
+                        <a className={"item "  + (this.state.mapView ? 'active' : '')}
+                           onClick={this._toggleMapView.bind(this)}>
                             <i className="map icon"/>
                             Map View
+
                         </a>
-                    </div>
-                    <div className="ui category search item">
-                        <div className="ui transparent icon input">
-                            <input className="prompt" type="text" placeholder="Search Events..."
-                                   onChange={this._updateSearch.bind(this)}/>
-                        </div>
                     </div>
                 </div>
                 <div className="ui bottom attached segment pushable" id="main-dashboard-container">
@@ -317,9 +347,12 @@ export default class Dashboard extends React.Component {
                                  setLoadingCallback={this._setLoadingCallback.bind(this)}
                         />
                     </div>
+
                     <div className="dashboard pusher">
+
+
                         <div className="ui basic segment main-content">
-                            {loading || content}
+                            {loading || mapView || content}
                         </div>
                     </div>
                 </div>
