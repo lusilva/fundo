@@ -7,7 +7,7 @@ import EventCarousel from './EventCarousel';
 export default class TopEventsCarousel extends EventCarousel {
 
     state = {
-        loading: Event.getCollection().find({}, {reactive: false}).count() == 0
+        loading: true
     };
 
     getMeteorData() {

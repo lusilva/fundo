@@ -28,12 +28,7 @@ export default class EventCarousel extends React.Component {
     };
 
     state = {
-        loading: Event.getCollection().find(
-            {
-                categories: {
-                    $in: [this.props.category.name]
-                }
-            }, {reactive: false}).count() == 0
+        loading: true
     };
 
     getMeteorData() {

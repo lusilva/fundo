@@ -17,7 +17,7 @@ import Filters from './Filters';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 
 
-import SimpleMapPage from './SimpleMapPage';
+import MapView from './MapView';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -268,7 +268,7 @@ export default class Dashboard extends React.Component {
 
         let mapView = this.state.mapView ?
             (
-                <SimpleMapPage
+                <MapView
                     zoom={11}
                     events={this.data.events}
                 />
