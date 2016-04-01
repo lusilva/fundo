@@ -32,6 +32,8 @@ export default class MyEvents extends React.Component {
         loading: false
     };
 
+    sub = null;
+
 
     /**
      * Function that runs automatically everytime the data that its subscribed to changes.
@@ -40,7 +42,8 @@ export default class MyEvents extends React.Component {
      *
      */
     getMeteorData() {
-        Meteor.subscribe('savedevents');
+        if (!this.sub || !this.sub.ready())
+            Meteor.subscribe('savedevents');
         // Get events from the database.
         let savedEvents = Event.getCollection().find(
             {
@@ -58,6 +61,13 @@ export default class MyEvents extends React.Component {
 
         // Return the preference and the user's events. This is available in this.data.
         return {savedEvents}
+    };
+
+
+    componentWillUnmount() {
+        if (this.sub) {
+            this.sub.stop();
+        }
     };
 
 

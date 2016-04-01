@@ -45,6 +45,12 @@ export default class EventCarousel extends React.Component {
             {
                 categories: {
                     $in: [this.props.category.name]
+                },
+                likes: {
+                    $nin: [Meteor.userId()]
+                },
+                dislikes: {
+                    $nin: [Meteor.userId()]
                 }
             },
             {
@@ -58,17 +64,6 @@ export default class EventCarousel extends React.Component {
 
         events = !this.data.events || events.length > this.data.events ? events : this.data.events;
         return {events}
-    };
-
-    componentDidMount() {
-        this.setState({
-            loading: Event.getCollection().find(
-                {
-                    categories: {
-                        $in: [this.props.category.name]
-                    }
-                }, {reactive: false}).count() == 0
-        });
     };
 
 

@@ -5,23 +5,25 @@ import EventCarousel from './EventCarousel';
 
 
 export default class TopEventsCarousel extends EventCarousel {
-
-    state = {
-        loading: true
-    };
-
     getMeteorData() {
         if (this.state.loading) {
             Meteor.subscribe('events', new Date(), null, this.props.searchValue, {
                 onReady: function () {
                     if (this.state.loading)
-                        this.setState({loading: false, reactive: false});
+                        this.setState({loading: false});
                 }.bind(this)
             });
         }
 
         let events = Event.getCollection().find(
-            {},
+            {
+                likes: {
+                    $nin: [Meteor.userId()]
+                },
+                dislikes: {
+                    $nin: [Meteor.userId()]
+                }
+            },
             {
                 // Assert limit and sorting for the events.
                 limit: 25,
@@ -36,10 +38,5 @@ export default class TopEventsCarousel extends EventCarousel {
 
         events = !this.data.events || events.length > this.data.events ? events : this.data.events;
         return {events}
-    };
-
-    componentDidMount() {
-        if (this.state.loading && Event.getCollection().find({}, {reactive: false}).count() > 0)
-            this.setState({loading: false});
     };
 }
