@@ -172,7 +172,7 @@ export default class MapView extends React.Component {
                 >
                     {_.map(events, function (marker) {
 
-                        let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";
+                        let eventImage = require("../../img/fundo-default-event-img.png");
                         // First check if event has a medium image, if not then check if it has a large image.
                         if (marker.image && marker.image.thumb && marker.image.thumb.url) {
                             eventImage = marker.image.thumb.url;

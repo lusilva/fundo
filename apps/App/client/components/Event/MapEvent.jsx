@@ -1,6 +1,5 @@
 /* global Meteor, React */
 
-import TextTruncate from 'react-text-truncate';
 import parseLink from 'parse-link';
 import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import ReactMixin from 'react-mixin';
@@ -50,20 +49,12 @@ export default class MapEvent extends BaseEvent {
             <div className="ui card">
                 <div className="ui content">
                     <div className="container header event-title" data-content={event.title}>
-                        <TextTruncate
-                            line={1}
-                            truncateText="…"
-                            text={event.title}
-                            showTitle={false}/>
+                        {event.title}
                     </div>
                 </div>
                 <div className="content">
                     <div className="header">
-                        <TextTruncate
-                            line={1}
-                            truncateText="…"
-                            text={venueName}
-                            showTitle={false}/>
+                        {venueName}
                     </div>
                     <div className="meta">
                             <span className="date">

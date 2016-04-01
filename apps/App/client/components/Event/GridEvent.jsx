@@ -57,7 +57,7 @@ export default class GridEvent extends BaseEvent {
 
         //TODO: change this to be placeholder image based on category.
         // let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";
-        let eventImage = "../img/fundo-default-event-img.png";
+        let eventImage = require("../../img/fundo-default-event-img.png");
         // First check if event has a medium image, if not then check if it has a large image.
         if (event.image && event.image.large) {
             eventImage = event.image.large.url;

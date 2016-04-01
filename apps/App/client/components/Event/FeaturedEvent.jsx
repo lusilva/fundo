@@ -23,7 +23,7 @@ export default class FeaturedEvent extends BaseEvent {
         let event = this.props.event;
 
         //TODO: change this to be placeholder image based on category.
-        let eventImage = "http://semantic-ui.com/images/avatar/large/elliot.jpg";
+        let eventImage = require("../../img/fundo-default-event-img.png");
         // First check if event has a medium image, if not then check if it has a large image.
         if (event.image && event.image.large) {
             eventImage = event.image.large.url;
