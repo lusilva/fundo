@@ -6,7 +6,7 @@ import PreferenceSet from 'App/collections/PreferenceSet';
 import Layout from './Layout';
 import Home from './components/Home';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/Dashboard/Dashboard';
 import MyEvents from './components/MyEvents';
 import Welcome from './components/Welcome';
 

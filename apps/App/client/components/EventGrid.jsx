@@ -1,6 +1,6 @@
 /* global React, Meteor */
 
-import GridEvent from './GridEvent';
+import GridEvent from './Event/GridEvent';
 
 import Alert from 'react-s-alert';
 import _ from 'lodash';

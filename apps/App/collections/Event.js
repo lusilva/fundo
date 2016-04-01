@@ -134,6 +134,10 @@ export default class Event {
         this._relevant_cities = relevant_cities;
     };
 
+    set position(position) {
+        this._position = position;
+    };
+
     static getCollection() {
         return Events;
     };

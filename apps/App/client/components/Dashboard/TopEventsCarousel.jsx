@@ -7,7 +7,7 @@ import EventCarousel from './EventCarousel';
 export default class TopEventsCarousel extends EventCarousel {
 
     state = {
-        loading: Event.getCollection().find({}, {reactive: false}).count() == 0
+        loading: true
     };
 
     getMeteorData() {
@@ -34,6 +34,7 @@ export default class TopEventsCarousel extends EventCarousel {
             }
         ).fetch();
 
+        events = !this.data.events || events.length > this.data.events ? events : this.data.events;
         return {events}
     };
 
