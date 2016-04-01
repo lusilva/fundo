@@ -17,88 +17,99 @@ import ReactMixin from 'react-mixin';
  * @extends React.Component
  *
  */
-@ReactMixin.decorate(ReactMeteorData)
 @ReactMixin.decorate(PureRenderMixin)
 export default class FeaturedEvents extends React.Component {
 
     state = {
-        recommendedIds: null,
-        loading: true
+        events: null
     };
 
-    getMeteorData() {
-        Meteor.subscribe('recommended', this.state.recommendedIds, {
-            onReady: function () {
-                if (this.state.loading) {
-                    this.setState({loading: false});
-                }
-            }.bind(this)
-        });
-
-        let events = Event.getCollection().find(
-            {
-                _id: {
-                    $in: this.state.recommendedIds || []
-                }
-            },
-            {
-                limit: 20,
-                sort: {
-                    start_time: 1
-                },
-                reactive: false
-            }).fetch();
-
-        return {events}
-    };
+    sub = null;
 
     componentDidMount() {
         Meteor.call('getRecommendations', function (err, res) {
             if (err) {
-                console.log(err);
+                this._setEvents(null);
+            } else {
+                this._setEvents(res);
             }
-            this.setState({recommendedIds: res || [], loading: false});
         }.bind(this));
     };
 
+    _setEvents(recommendedIds) {
+        if ((!this.sub || !this.sub.ready()) && recommendedIds && recommendedIds.length > 0) {
+            this.sub = Meteor.subscribe('recommendedIds', recommendedIds, {
+                onReady: function () {
+                    if (!this.state.events) {
+                        this._setEvents(recommendedIds);
+                    }
+                }.bind(this)
+            });
+        }
+
+        if (this.state.events) {
+            return;
+        }
+
+        let events = Event.getCollection().find(
+            {
+                _id: {
+                    $in: recommendedIds || []
+                }
+            },
+            {
+                sort: {
+                    start_time: 1
+                },
+                reactive: false
+            }
+        ).fetch();
+
+        this.setState({events: events});
+    };
+
     render() {
-        let enoughEvents = !!this.data.events && this.data.events.length > 2;
+        if (!this.state.events) {
+            return (
+                <div className="ui container">
+                    <div className="ui active inverted text large loader">Loading Recommendations</div>
+                </div>
+            );
+        }
+
+        let enoughEvents = !!this.state.events && this.state.events.length > 2;
 
         let settings = {
             infinite: true,
             speed: 500,
-            slidesToShow: Math.min(3, this.data.events ? this.data.events.length : 3),
+            slidesToShow: Math.min(3, this.state.events ? this.state.events.length : 3),
             centerMode: enoughEvents,
             draggable: enoughEvents,
             centerPadding: '20px',
             autoplay: enoughEvents,
             autoplaySpeed: 5000,
             pauseOnHover: true,
-            dots: enoughEvents,
+            dots: false,
             arrows: enoughEvents,
-            lazyLoad: enoughEvents,
+            lazyLoad: false,
             responsive: [{
                 breakpoint: 728,
                 settings: {
-                    slidesToShow: Math.min(2, this.data.events ? this.data.events.length : 2)
+                    slidesToShow: Math.min(2, this.state.events ? this.state.events.length : 2)
                 }
             }, {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: Math.min(1, this.data.events ? this.data.events.length : 1)
+                    slidesToShow: Math.min(1, this.state.events ? this.state.events.length : 1)
                 }
             }]
         };
 
-        let loading = !this.state.recommendedIds || this.state.loading ? (
-            <div className="ui active inverted text large loader">Loading Recommendations</div>
-        ) : null;
-
-        let slider = this.data.events && this.data.events.length > 0 ? (
+        let slider = this.state.events && this.state.events.length > 0 ? (
             <div className="featured-events">
                 <h1 className="ui header inverted centered">Recommended Events</h1>
                 <Slider {...settings}>
-                    {_.map(this.data.events, function (event) {
+                    {_.map(this.state.events, function (event) {
                         return (
                             <div key={'featured-' + event.id}>
                                 <div className={enoughEvents ? '' : 'featured-scaled-event'}>
@@ -117,7 +128,7 @@ export default class FeaturedEvents extends React.Component {
 
         return (
             <div className="ui container">
-                {loading || slider}
+                {slider}
             </div>
         )
     }

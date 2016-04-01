@@ -1,20 +1,21 @@
-import Event from 'App/collections/Event';
 import _ from 'lodash';
 
+import Event from 'App/collections/Event';
 import EventCarousel from './EventCarousel';
 
-
 export default class TopEventsCarousel extends EventCarousel {
-    getMeteorData() {
-        if (this.state.loading) {
-            Meteor.subscribe('events', new Date(), null, this.props.searchValue, {
+
+    _setEvents() {
+        if (!this.sub || !this.sub.ready()) {
+            this.sub = Meteor.subscribe('events', null, {
                 onReady: function () {
-                    if (this.state.loading)
-                        this.setState({loading: false});
+                    if (!this.state.events || this.state.events.length == 0) {
+                        this._setEvents();
+                    }
                 }.bind(this)
             });
         }
-
+        
         let events = Event.getCollection().find(
             {
                 likes: {
@@ -36,7 +37,6 @@ export default class TopEventsCarousel extends EventCarousel {
             }
         ).fetch();
 
-        events = !this.data.events || events.length > this.data.events ? events : this.data.events;
-        return {events}
+        this.setState({events: events});
     };
 }

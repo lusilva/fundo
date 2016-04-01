@@ -1,13 +1,13 @@
 /* global React, Meteor */
 
-import Event from 'App/collections/Event';
-
 import Slider from 'react-slick';
 import TextTruncate from 'react-text-truncate';
-import ReactMixin from 'react-mixin';
-import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import _ from 'lodash';
 
+import ReactMixin from 'react-mixin';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
+
+import Event from 'App/collections/Event';
 import GridEvent from '../Event/GridEvent';
 
 /**
@@ -18,9 +18,7 @@ import GridEvent from '../Event/GridEvent';
  *
  */
 @ReactMixin.decorate(PureRenderMixin)
-@ReactMixin.decorate(ReactMeteorData)
 export default class EventCarousel extends React.Component {
-
 
     static propTypes = {
         category: React.PropTypes.object.isRequired,
@@ -28,17 +26,30 @@ export default class EventCarousel extends React.Component {
     };
 
     state = {
-        loading: true
+        events: null
     };
 
-    getMeteorData() {
-        if (this.state.loading) {
-            Meteor.subscribe('events', new Date(), this.props.category.name, {
+    sub = null;
+
+    componentDidMount() {
+        if (!this.state.events) {
+            _.defer(this._setEvents.bind(this));
+        }
+    };
+
+    _setEvents() {
+        if (!this.sub || !this.sub.ready() && !this.state.events) {
+            this.sub = Meteor.subscribe('events', this.props.category.name, {
                 onReady: function () {
-                    if (this.state.loading)
-                        this.setState({loading: false});
+                    if (!this.state.events) {
+                        this._setEvents();
+                    }
                 }.bind(this)
             });
+        }
+
+        if (this.state.events) {
+            return;
         }
 
         let events = Event.getCollection().find(
@@ -62,57 +73,61 @@ export default class EventCarousel extends React.Component {
             }
         ).fetch();
 
-        events = !this.data.events || events.length > this.data.events ? events : this.data.events;
-        return {events}
+        this.setState({events: events});
     };
 
 
     render() {
         let sizes = this.props.sizes;
-        let enoughEvents = !!this.data.events && this.data.events.length >= sizes.large;
+
+        if (!this.state.events) {
+            return (
+                <div className="ui container">
+                    <div className="ui active centered inline text loader carousel-loader">
+                        Loading {this.props.category.name}
+                    </div>
+                </div>
+            )
+        }
+
+        let enoughEvents = this.state.events.length >= sizes.large;
 
         let settings = {
             infinite: false,
             autoplay: false,
             speed: 500,
             slidesToShow: sizes.large,
-            slidesToScroll: Math.min(sizes.large, this.data.events ? this.data.events.length : sizes.large),
+            slidesToScroll: Math.min(sizes.large, this.state.events ? this.state.events.length : sizes.large),
             centerMode: false,
             draggable: enoughEvents,
-            arrows: this.data.events.length > sizes.large,
+            arrows: this.state.events.length > sizes.large,
             dots: false,
             lazyLoad: enoughEvents,
             responsive: [{
                 breakpoint: 728,
                 settings: {
-                    slidesToShow: Math.min(sizes.medium, this.data.events ? this.data.events.length : sizes.medium),
-                    slidesToScroll: Math.min(sizes.medium, this.data.events ? this.data.events.length : sizes.medium),
-                    arrows: this.data.events.length > sizes.medium
+                    slidesToShow: Math.min(sizes.medium, this.state.events ? this.state.events.length : sizes.medium),
+                    slidesToScroll: Math.min(sizes.medium, this.state.events ? this.state.events.length : sizes.medium),
+                    arrows: this.state.events.length > sizes.medium
                 }
             }, {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: Math.min(sizes.small, this.data.events ? this.data.events.length : sizes.small),
-                    slidesToScroll: Math.min(sizes.small, this.data.events ? this.data.events.length : sizes.small),
-                    arrows: this.data.events.length > sizes.small
+                    slidesToShow: Math.min(sizes.small, this.state.events ? this.state.events.length : sizes.small),
+                    slidesToScroll: Math.min(sizes.small, this.state.events ? this.state.events.length : sizes.small),
+                    arrows: this.state.events.length > sizes.small
                 }
             }]
         };
 
         let that = this;
 
-        let loader = this.state.loading ? (
-            <div className="ui active centered inline text loader carousel-loader">
-                Loading {this.props.category.name}
-            </div>
-        ) : null;
-
-        let slider = this.data.events && this.data.events.length > 0 && !this.state.loading ? (
+        let slider = this.state.events && this.state.events.length > 0 ? (
             <div>
-                <h1 className="ui left floated header">{this.props.category.name} ({this.data.events.length})</h1>
+                <h1 className="ui left floated header">{this.props.category.name} ({this.state.events.length})</h1>
                 <div className="ui clearing divider"></div>
                 <Slider {...settings}>
-                    {_.map(this.data.events, function (event) {
+                    {_.map(this.state.events, function (event) {
                         return (
                             <div key={that.props.category.category_id + '-' + event.id + '-' + 'event-carousel'}>
                                 <GridEvent event={event}/>
@@ -125,7 +140,7 @@ export default class EventCarousel extends React.Component {
 
         return (
             <div className="ui container">
-                {loader || slider}
+                {slider}
             </div>
         )
     }

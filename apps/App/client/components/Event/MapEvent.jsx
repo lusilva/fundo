@@ -19,8 +19,6 @@ export default class MapEvent extends BaseEvent {
 
     /** @inheritDoc */
     componentDidMount() {
-        let rootNode = ReactDOM.findDOMNode(this);
-
         this.setState({
             liked: _.includes(this.props.event.likes, Meteor.userId()),
             disliked: _.includes(this.props.event.dislikes, Meteor.userId())

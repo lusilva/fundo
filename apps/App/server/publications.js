@@ -45,11 +45,17 @@ Meteor.publish('savedevents', function () {
 
 Meteor.publish('recommended', function (recommendedIds) {
     if (this.userId && recommendedIds && recommendedIds.length > 0) {
+        let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
+
         return Event.getCollection().find(
             {
                 // Only show events that this user has liked.
                 _id: {
                     $in: recommendedIds
+                },
+                // Get events in the user's city.
+                relevant_cities: {
+                    $in: [preferences.location]
                 }
             },
             {
@@ -65,7 +71,7 @@ Meteor.publish('recommended', function (recommendedIds) {
 
 
 // Publish events.
-Meteor.publish('events', function (currentDate, category) {
+Meteor.publish('events', function (category) {
     if (this.userId) {
         let preferences = PreferenceSet.getCollection().findOne({userId: this.userId});
 
@@ -74,10 +80,6 @@ Meteor.publish('events', function (currentDate, category) {
             // Get events in the user's city.
             relevant_cities: {
                 $in: [preferences.location]
-            },
-            // Get events that have not yet started.
-            start_time: {
-                $gte: new Date(currentDate)
             },
             // Do not show events that this user has already liked.
             // These events should go in the 'My Events' page.

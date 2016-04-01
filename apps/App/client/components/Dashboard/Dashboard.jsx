@@ -67,7 +67,7 @@ export default class Dashboard extends React.Component {
     getMeteorData() {
         // Get all necessary subscriptions
         Meteor.subscribe('userpreferences');
-        Meteor.subscribe('events', new Date());
+        Meteor.subscribe('events');
         Meteor.subscribe('categories');
 
         let events = [];
@@ -289,7 +289,7 @@ export default class Dashboard extends React.Component {
             ) :
             (
                 <div style={{display: this.state.mapView ? 'none' : 'block'}}>
-                    <TopEventsCarousel sizes={{large: 4, medium: 3, small: 2}}
+                    <TopEventsCarousel sizes={{large: 4, medium: 2, small: 1}}
                                        category={{
                                                     name: 'Top Events',
                                                     category_id: 'top_events',
