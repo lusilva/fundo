@@ -70,6 +70,11 @@ Meteor.publish('recommended', function (recommendedIds) {
 });
 
 
+Meteor.publish('allEvents', function () {
+    return Event.getCollection().find();
+});
+
+
 // Publish events.
 Meteor.publish('events', function (category) {
     if (this.userId) {

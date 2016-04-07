@@ -7,12 +7,11 @@ import _ from 'lodash';
  * @param city The queried city that this is an event for.
  * @param event The eventful formatted event.
  */
-export default function createEvent(city, event) {
+export default function createEvent(city, event, existingEvent) {
 
     // If this event already exists, then make the owners and the relevant cities the union of
     // what already exists and the new information. THIS IS VERY IMPORTANT TO CATEGORIZE CITIES AND
     // KEEP TRACK OF SAVED EVENTS.
-    let existingEvent = Event.getCollection().findOne({_id: event.id});
     let owners = [];
     let likes = [];
     let dislikes = [];

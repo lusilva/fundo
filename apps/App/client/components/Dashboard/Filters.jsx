@@ -1,4 +1,5 @@
 import Alert from 'react-s-alert';
+import Event from 'App/collections/Event';
 import GeoSuggest from 'react-geosuggest';
 import ReactMixin from 'react-mixin';
 import _ from 'lodash';
@@ -171,10 +172,16 @@ export default class Filters extends React.Component {
             // there were no events and we have fetched some from eventful.
             if (!!res) {
                 let message = "Looks like we don't have any events for that area. Fetching them now, this may take a little while";
-                Meteor.setTimeout(function () {
-                    this._setLoading(false);
-                }.bind(this), 15000);
-                that._showMessage(false, message, 10000);
+                let handler = Meteor.setInterval(function () {
+                    JOB_QUEUE.getJob(res, function (err, job) {
+                        if (job.doc.status == 'completed') {
+                            Meteor.clearInterval(handler);
+                            that._clearMessage();
+                            that._setLoading(false);
+                        }
+                    });
+                    that._showMessage(false, message, 10000);
+                }, 1000);
             } else {
                 this._setLoading(false);
             }

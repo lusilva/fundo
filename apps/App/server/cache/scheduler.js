@@ -1,25 +1,54 @@
-import { refresh } from './refresh';
+const Jobs = JobCollection('fundoQueue');
 
 // Refresh when the server first starts up.
 Meteor.startup(function () {
-    refresh();
+    Jobs.startJobServer();
+    JobScheduler.runRefresh();
+
+    Jobs.allow({
+        admin: function (userId, method, params) {
+            return userId;
+        }
+    });
+
+    Meteor.publish('allJobs', function () {
+        return Jobs.find({});
+    });
 });
 
-Meteor.methods({
-    "refresh": refresh
-});
+class JobScheduler {
 
-// Add a cron job to run periodically and run the refresh function to refresh the cache.
-// This mainly just checks for expired events and removes them.
-SyncedCron.add({
-    name: 'refresh',
-    schedule: function (parser) {
-        // parser is a later.parse object
-        return parser.text(Meteor.settings.refreshEventsEvery || 'every 12 hours');
-    },
-    job: refresh
-});
+    static runRefresh() {
+        // Create a job:
+        var job = new Job(Jobs, 'refresh', {});
 
+        // Set some properties of the job and then submit it
+        job.priority('normal')
+            .retry({
+                retries: 5,
+                wait: 15 * 60 * 1000
+            })  // 15 minutes between attempts
+            .save();               // Commit it to the server
 
-// Start the scheduler.
-SyncedCron.start();
+        return job;
+    }
+
+    static getCity(city) {
+        var job = new Job(Jobs, 'fetchCity', {
+            page: 0,
+            city: city
+        });
+
+        // Set some properties of the job and then submit it
+        job.priority('critical')
+            .retry({
+                retries: 5,
+                wait: 1000
+            })
+            .save();
+
+        return job;
+    }
+}
+
+export default JobScheduler;

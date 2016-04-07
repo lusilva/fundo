@@ -108,12 +108,12 @@ Categories.before.remove(function (userId, doc) {
 
 Categories.allow({
     insert: function (userId, doc) {
-        return false;
+        return userId && Roles.userIsInRole(userId, 'admin', 'default-group');
     },
     update: function (userId, doc, fields, modifier) {
-        return false;
+        return userId && Roles.userIsInRole(userId, 'admin', 'default-group');
     },
     remove: function (userId, doc) {
-        return false;
+        return userId && Roles.userIsInRole(userId, 'admin', 'default-group');
     }
 });

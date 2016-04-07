@@ -1,5 +1,7 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
+import Event from 'App/collections/Event';
 import GeoSuggest from 'react-geosuggest';
+import { Link } from 'react-router';
 
 export default class Welcome extends React.Component {
 
@@ -9,6 +11,7 @@ export default class Welcome extends React.Component {
 
     state = {
         loading: true,
+        done: false,
         preferences: PreferenceSet.getCollection().findOne({userId: Meteor.userId()})
     };
 
@@ -25,14 +28,13 @@ export default class Welcome extends React.Component {
         // Add the dark purple background to the body, and remove it when
         // going to another page.
         document.body.classList.add('primary-color');
-    }
-    ;
+    };
 
     /** @inheritDoc */
     componentWillUnmount() {
         document.body.classList.remove('primary-color');
-    }
-    ;
+    };
+
 
     /**
      * Updates the user's location preference
@@ -56,40 +58,74 @@ export default class Welcome extends React.Component {
         let that = this;
         this.setState({loading: true});
         Meteor.call("updatePreferences", preferences, function (err, res) {
-            that.setState({loading: false});
-            that.context.router.replace('/dashboard');
+            if (!!res) {
+                let handler = Meteor.setInterval(function () {
+                    JOB_QUEUE.getJob(res, function (err, job) {
+                        if (job.doc.status == 'completed') {
+                            Meteor.clearInterval(handler);
+                            that.setState({loading: false, done: true});
+                        }
+                    });
+                }, 1000);
+            } else {
+                that.setState({loading: false, done: true});
+            }
         });
-    }
-    ;
+    };
 
 
     render() {
         let geosuggest = !this.state.loading ?
             (
-                <div className="ui item center">
-                    <GeoSuggest country="us"
-                                types={['(cities)']}
-                                autoActivateFirstSuggest={true}
-                                onSuggestSelect={this._updateUserLocation.bind(this)}
-                                ref='geosuggest'
-                    />
+                <h2 className="ui icon header centered">
+                    <i className="circular map icon"/>
+                    <div className="content">
+                        Select A City
+                        <div className="sub header">
+                            Howdy! Before we can show you events, we need to know where you'd like to see events
+                            for.
+                        </div>
+                        <div className="ui item center">
+                            <GeoSuggest country="us"
+                                        types={['(cities)']}
+                                        autoActivateFirstSuggest={true}
+                                        onSuggestSelect={this._updateUserLocation.bind(this)}
+                                        ref='geosuggest'
+                            />
+                        </div>
+                    </div>
+                </h2>
+            ) : (
+            <div className="ui active centered inline text large loader">
+                Gettings things ready...
+            </div>
+        );
+
+        let nextButton = this.state.done ? (
+            <h2 className="ui icon header centered">
+                <i className="circular map icon"/>
+                <div className="content">
+                    Done!
+                    <div className="sub header">
+                        We've found some events for your area. You can always change your location in the filters
+                        menu on the dashboard.
+                    </div>
+                    <br/>
+                    <div className="ui item center">
+                        <Link to="/dashboard">
+                            <button className="ui animated button primary" tabIndex="0">
+                                <div className="content">Next</div>
+                            </button>
+                        </Link>
+                    </div>
                 </div>
-            ) : null;
+            </h2>
+        ) : null;
 
         return (
             <div className="ui container">
                 <div className="login-form">
-                    <h2 className="ui icon header centered">
-                        <i className="circular map icon"/>
-                        <div className="content">
-                            Select A City
-                            <div className="sub header">
-                                Howdy! Before we can show you events, we need to know where you'd like to see events
-                                for.
-                            </div>
-                            {geosuggest}
-                        </div>
-                    </h2>
+                    {nextButton || geosuggest}
                 </div>
             </div>
         )

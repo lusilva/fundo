@@ -1,6 +1,5 @@
 // Create Preference collection
 import Event from './Event';
-import{ updateAllEventsForCity } from 'App/server/cache/refresh';
 import Logger from 'App/logger';
 import _ from 'lodash';
 
@@ -95,27 +94,6 @@ export default class PreferenceSet {
 
             // Check if location has changed.
             if (existingSet.location != this.location) {
-
-                // If there are no events for this city, then fetch some.
-                let eventsAlreadyExistForNewLocation = Event.numEventsInCity(this.location) > 0;
-
-                // If there are no events for this city yet, then fetch events for it.
-                if (!eventsAlreadyExistForNewLocation) {
-
-                    // Fetch more events for this city
-                    updateAllEventsForCity(this.location);
-
-                    // Add a cron job to automatically refresh this city every 24 hours.
-                    SyncedCron.add({
-                        name: 'eventful-' + this.location,
-                        schedule: function (parser) {
-                            // parser is a later.parse object
-                            return parser.text(Meteor.settings.refreshEventsEvery || 'every 2 hours');
-                        },
-                        job: updateAllEventsForCity.bind(this, this.location)
-                    });
-                }
-
                 // Check if the old city still has any users. If not, then remove the cron job for it, and remove
                 // it from the list of relevant cities.
                 if (existingSet.location && PreferenceSets.find({location: existingSet.location}).count() == 1) {
@@ -158,12 +136,6 @@ export default class PreferenceSet {
         }
     };
 
-
-    hideCategory(category) {
-        let category_id = category.category_id;
-
-
-    };
 
     resetPreference(category) {
         for (var i = 0; i < this.indices.length; ++i) {

@@ -1,8 +1,12 @@
 import PreferenceSet from 'App/collections/PreferenceSet';
 import Event from "App/collections/Event";
+import Category from 'App/collections/Category';
 import Logger from 'App/logger';
+import Scheduler from './cache/scheduler';
+import createEventfulEvent from 'App/collections/EventfulEventCreator';
 
 import _ from 'lodash';
+import truncate from 'truncate-html';
 import Raccoon from '../lib/raccoon/index';
 
 
@@ -36,18 +40,10 @@ Meteor.methods({
             return !!this.userId;
     },
     /**
-     * TODO: maybe guess the user's location based on their ip address.
-     */
-    "guessUserLocation": function () {
-        let ip = this.connection.clientAddress;
-        console.log(ip);
-    },
-    /**
      * Method to update user preferences.
      *
      * @param preferences
      * @param eventsReadyCallback
-     * @returns {boolean}
      */
     "updatePreferences": function (preferences) {
 
@@ -70,7 +66,24 @@ Meteor.methods({
             }
         }.bind(this));
 
-        return Event.findEventsInCity(preferences._location).count() == 0;
+        // If there are no events in the user's current city, then fetch some.
+        if (Event.findEventsInCity(preferences._location).count() == 0) {
+
+            // Add a cron job to automatically refresh this city every 24 hours.
+            SyncedCron.add({
+                name: 'eventful-' + preferences._location,
+                schedule: function (parser) {
+                    // parser is a later.parse object
+                    return parser.text(Meteor.settings.refreshEventsEvery || 'every 2 hours');
+                },
+                job: Scheduler.getCity.bind(this, preferences._location)
+            });
+
+            let job = Scheduler.getCity(preferences._location);
+            return job._doc._id;
+        } else {
+            return null;
+        }
     },
     /**
      * Method to like an event.
@@ -174,5 +187,26 @@ Meteor.methods({
         } else {
             throw new Meteor.Error('invalid request');
         }
+    },
+    "addCategory": function (category) {
+        let categoryDoc = new Category({
+            name: truncate(category.name, {
+                length: 100,
+                stripTags: true,
+                ellipsis: '...',
+                excludes: ['img', 'br'],
+                decodeEntities: true
+            }),
+            category_id: category.id,
+            subcategory: category.name.indexOf(':') > -1
+        });
+        categoryDoc.save(function (err, res) {
+            if (err) {
+                Logger.error(err);
+            }
+        });
+    },
+    "addEvent": function (event, existingEvent, city) {
+        createEventfulEvent(city, event, existingEvent);
     }
 });
