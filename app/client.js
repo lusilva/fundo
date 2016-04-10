@@ -5,6 +5,8 @@ import 'scriptjs';
 
 import './routes';
 
-if (typeof window != 'undefined') {
+if (typeof window !== 'undefined') {
+  /*eslint-disable */
   window.JOB_QUEUE = JobCollection('fundoQueue');
+  /*eslint-enable */
 }

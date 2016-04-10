@@ -26,21 +26,10 @@ import MapView from '../map/MapView';
 @ReactMixin.decorate(ReactMeteorData)
 @ReactMixin.decorate(PureRenderMixin)
 export default class Dashboard extends React.Component {
-
-  /**
-   * The props that this component expects.
-   *
-   * @type {{currentUser: *}}
-   */
   static propTypes = {
     currentUser: React.PropTypes.object
   };
 
-
-  /**
-   * The state of the dashboard.
-   *
-   */
   state = {
     filter: {
       open: false
@@ -224,7 +213,6 @@ export default class Dashboard extends React.Component {
   /**
    * The callback function called when a user updates his/her preferences via the filters.
    *
-   * @param newPrefs {PreferenceSet} - The user's new preference set.
    * @private
    */
   _filterChangeCallback() {

@@ -1,3 +1,5 @@
+/* global Meteor */
+
 /**
  * Logger to log information, using Winston. All logs are server-side.
  */

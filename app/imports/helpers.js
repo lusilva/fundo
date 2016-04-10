@@ -1,30 +1,30 @@
-import Paths from './client/paths';
+/* global Meteor */
 
+import Paths from './client/paths';
 
 /**
  * Check if this user has verified their email.
  *
- * @param user
- * @returns {*}
+ * @param {Meteor.user} user - The user to check if verified.
+ * @returns {boolean}
  */
 export function isUserVerified(user) {
-  if (!!user && user.emails && user.emails.length > 0)
-    return user.emails[0].verified;
+  if (Boolean(user) && user.emails && user.emails.length > 0)
+    return Boolean(user.emails[0].verified);
   return false;
 }
-
 
 /**
  * Get all the paths that this user is allowed to see.
  *
- * @returns {Array}
+ * @return {Array} The paths that valid for the user.
  */
 export function getPathsForUser() {
   let loggedIn = false;
   if (Meteor.isClient) {
-    loggedIn = !!Meteor.userId() || Meteor.loggingIn();
+    loggedIn = Boolean(Meteor.userId()) || Meteor.loggingIn();
   } else {
-    loggedIn = !!Meteor.userId();
+    loggedIn = Boolean(Meteor.userId());
   }
 
   if (loggedIn) {
@@ -34,12 +34,11 @@ export function getPathsForUser() {
   }
 }
 
-
 /**
  * Check if a path is valid for the current user.
  *
- * @param path
- * @returns {boolean}
+ * @param {string} path - The path to check.
+ * @return {boolean} Whether this path is valid for the user or not.
  */
 export function pathIsValidForUser(path) {
   let validPaths = getPathsForUser();

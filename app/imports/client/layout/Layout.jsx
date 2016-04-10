@@ -1,6 +1,9 @@
+/* global Meteor ReactMeteorData */
+
 import Helmet from 'react-helmet';
 import { Link } from 'react-router';
 import ReactMixin from 'react-mixin';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import Alert from 'react-s-alert';
 import _ from 'lodash';
 
@@ -11,10 +14,11 @@ import Logger from 'imports/logger';
 /**
  * The main Layout for the entire app.
  *
- * @className
+ * @class
  * @extends React.Component
  */
 @ReactMixin.decorate(ReactMeteorData)
+@ReactMixin.decorate(PureRenderMixin)
 export default class Layout extends React.Component {
   static propTypes = {
     children: React.PropTypes.any.isRequired
@@ -24,13 +28,12 @@ export default class Layout extends React.Component {
     router: React.PropTypes.object.isRequired
   };
 
-  intervalId = null;
 
   /**
    * Get the current user of the application, or null if no user is logged in.
    * This method is reactive and runs every time the user changes.
    *
-   * @returns {{currentUser: any}}
+   * @returns {{currentUser: ?Meteor.user}} The current logged-in user.
    */
   getMeteorData() {
     return {
@@ -38,7 +41,10 @@ export default class Layout extends React.Component {
     }
   };
 
+
+  /** @inheritDoc */
   componentWillMount() {
+    // Require all necessary semantic-ui modules.
     require('imports/lib/semantic-ui/definitions/modules/sidebar');
     require('imports/lib/semantic-ui/definitions/modules/dimmer');
     require('imports/lib/semantic-ui/definitions/modules/transition');
@@ -48,6 +54,8 @@ export default class Layout extends React.Component {
     require('imports/lib/semantic-ui/definitions/behaviors/visibility');
   };
 
+
+  /** @inheritDoc */
   componentDidMount() {
     // Localize the selector instead of having jQuery search globally
     var rootNode = ReactDOM.findDOMNode(this);
@@ -59,37 +67,47 @@ export default class Layout extends React.Component {
       })
       .sidebar('setting', 'transition', 'overlay');
 
+    // Listen to the log in event, and redirect the user to the dashboard.
     AccountsEvents.on('loggedIn', function() {
       Logger.debug('Logged In! Redirecting to /dashboard');
       this.context.router.replace('/dashboard');
     }.bind(this));
   };
 
+
+  /**
+   * Toggles the sidebar menu in mobile view.
+   *
+   * @private
+   */
   _toggleSideMenu() {
     // Same thing as before, might want to store this as a variable
     var rootNode = ReactDOM.findDOMNode(this);
     $(rootNode).find('#sidebar-menu').sidebar('toggle');
   };
 
-  _getSidebar() {
+
+  /**
+   * Get the links for the sidebar.
+   *
+   * @returns {Array.<!React.Component>}
+   * @private
+   */
+  _getSidebarContent() {
     return this._getLinks('sidebar', 'active', 'ui inverted item large', this._toggleSideMenu.bind(this));
   };
 
-  _getLinks(keyPrefix, activeClassName, className, onClickCallback) {
-    return _.map(getPathsForUser(), function(path, index) {
-      return (
-        <Link to={path.path}
-              key={keyPrefix+index}
-              activeClassName={activeClassName}
-              className={className}
-              onClick={onClickCallback || function(){}}>{path.title}</Link>
-      );
-    }.bind(this))
-  };
 
+  /**
+   * Get the navbar component.
+   *
+   * @returns {!React.Component} The navbar component, with all navigation links.
+   * @private
+   */
   _getNavBar() {
     let logo = null;
 
+    // If we are not on the home page, then display the small logo.
     if (!this.context.router.isActive('/')) {
       logo = (
         <Link to="/">
@@ -115,6 +133,32 @@ export default class Layout extends React.Component {
     )
   };
 
+
+  /**
+   * Get links for the current user, depending on what pages the user
+   * is allowed to see.
+   *
+   * @param {string} keyPrefix - The prefix for the React key prop for the links.
+   * @param {string} activeClassName - The name of the class that an active link has.
+   * @param {string} className - The name of the class that a link has.
+   * @param {func} onClickCallback - The callback function for clicking a link.
+   * @returns {Array.<Link>} - An array of link components.
+   * @private
+   */
+  _getLinks(keyPrefix, activeClassName, className, onClickCallback) {
+    return _.map(getPathsForUser(), function(path, index) {
+      return (
+        <Link to={path.path}
+              key={keyPrefix+index}
+              activeClassName={activeClassName}
+              className={className}
+              onClick={onClickCallback || function(){}}>{path.title}</Link>
+      );
+    }.bind(this))
+  };
+
+
+  /** @inheritDoc */
   render() {
     return (
       <div>
@@ -135,7 +179,7 @@ export default class Layout extends React.Component {
         />
 
         <div className="ui vertical inverted sidebar menu primary-color" id="sidebar-menu">
-          {this._getSidebar()}
+          {this._getSidebarContent()}
         </div>
 
         <div className="pusher">
