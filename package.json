@@ -3,8 +3,8 @@
   "private": "true",
   "version": "1.0.0",
   "description": "Find nearby events that interest you without getting bogged down by those who don't.",
-  "main": "apps/server.js",
-  "browser": "apps/client.js",
+  "main": "app/server.js",
+  "browser": "app/client.js",
   "dependencies": {
     "async": "^1.5.2",
     "get-urls": "^5.0.0",
