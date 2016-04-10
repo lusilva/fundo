@@ -37,11 +37,13 @@ momentjs:twix
 infinitedg:winston
 kadira:debug
 matb33:collection-hooks
-useraccounts:semantic-ui
 meteorhacks:kadira
 appcache
-semantic:ui
 webpack:json
 raix:eventemitter
 tmeasday:publish-counts
 meteorhacks:fast-render
+vsivsi:job-collection
+alanning:roles
+semantic:ui
+useraccounts:semantic-ui

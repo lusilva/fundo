@@ -3,6 +3,12 @@
 
 This is a project for RCOS (Rensselaer Center for Open Source), built with Meteor and React.
 
+#### Related Project
+
+This project relies on separate workers to process eventful data. This was an architectural choice that was made
+to reduce the load of the main server. The worker server can be found [here](https://github.com/lusilva/fundo-worker). 
+Any number of workers may connect to the main server via DDP, and they process event fetching jobs.
+
 ### Description
 fundo is a web application which will allow users to discover nearby events. It's main focus is on being an event discovery tool, and the plan is for it to be tinder-like. Users will be able to upvote and like events, and the system will learn user preferences and recommend nearby events that the user is likely to attend. In time, the event suggestions should improve as users provide more data points for the recommendation algorithm. We will also recommend events to users based on what other users with similar preferences have also liked. The goal of this project is to create a one-stop shop to find something to do if you’re bored, and only provide events that users are interested in attending.
 
@@ -13,9 +19,9 @@ fundo is a web application which will allow users to discover nearby events. It'
 
 - [x] Weeks 5-6: Play around with recommendation systems. Improve app infrastructure. Test recommendations using mock users with different preferences.
 
-- [ ] Weeks 7-8: Implement bulk of recommendation system. Plug into recommendation apis and figure out how to parse events to extract important/relevant data.
+- [x] Weeks 7-8: Implement bulk of recommendation system. Plug into recommendation apis and figure out how to parse events to extract important/relevant data.
 
-- [ ] Weeks 9-10: Get a working frontend up. Fix backend issues, continued development. Fine tune recommendations.
+- [x] Weeks 9-10: Get a working frontend up. Fix backend issues, continued development. Fine tune recommendations.
 
 - [ ] Week 11: Squash dem bugs by thoroughly testing features. Continued work on frontend features and backend recommendations. Possibly look at more apis to plug into.
 
@@ -66,7 +72,6 @@ Redis holds the entire dataset in memory.
                 "authKey": <KADIRA_AUTH_KEY_GOES_HERE>
                 }
             },
-            "debugEnabled": <true OR false>,
             "eventfulAPIKey": <EVENTFUL_API_KEY_GOES_HERE>,
             "maxPagesPerCity": <NUMBER>,
             "hoursEventsExpiresIn": <NUMBER>,
@@ -82,6 +87,10 @@ Redis holds the entire dataset in memory.
                "port": <NUMBER>,
                "url": <STRING>,
                "password": <STRING or null if no password needed>
+            },
+            "admin": {
+               "email": <STRING>,
+               "password": <STRING>
             }
         }
 
@@ -92,7 +101,7 @@ Redis holds the entire dataset in memory.
 `meteor build .`
 
 
-##### A little note about SSR
+##### A little note about SSR (EDIT: THIS HAS BEEN TEMPORARILY DISABLED DUE TO UNKNOWN ERRORS)
 This application uses SSR (Server Side Rendering) in production. Therefore, all code that relies on the global `window` object in any view must be wrapped in a conditional such as `if (typeof window != 'undefined') { code block } `, since `window` exists only on the browser and not on the server. This does not apply to code inside functions that are only run on the browser, such as `componentDidMount`.
 
 
