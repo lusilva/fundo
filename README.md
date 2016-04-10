@@ -13,7 +13,7 @@ fundo is a web application which will allow users to discover nearby events. It'
 
 - [x] Weeks 5-6: Play around with recommendation systems. Improve app infrastructure. Test recommendations using mock users with different preferences.
 
-- [ ] Weeks 7-8: Implement bulk of recommendation system. Plug into recommendation apis and figure out how to parse events to extract important/relevant data.
+- [x] Weeks 7-8: Implement bulk of recommendation system. Plug into recommendation apis and figure out how to parse events to extract important/relevant data.
 
 - [ ] Weeks 9-10: Get a working frontend up. Fix backend issues, continued development. Fine tune recommendations.
 
