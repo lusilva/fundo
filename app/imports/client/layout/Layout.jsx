@@ -38,6 +38,16 @@ export default class Layout extends React.Component {
     }
   };
 
+  componentWillMount() {
+    require('imports/lib/semantic-ui/definitions/modules/sidebar');
+    require('imports/lib/semantic-ui/definitions/modules/dimmer');
+    require('imports/lib/semantic-ui/definitions/modules/transition');
+    require('imports/lib/semantic-ui/definitions/modules/modal');
+    require('imports/lib/semantic-ui/definitions/modules/popup');
+    require('imports/lib/semantic-ui/definitions/modules/dropdown');
+    require('imports/lib/semantic-ui/definitions/behaviors/visibility');
+  };
+
   componentDidMount() {
     // Localize the selector instead of having jQuery search globally
     var rootNode = ReactDOM.findDOMNode(this);
