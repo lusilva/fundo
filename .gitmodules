@@ -1,0 +1,3 @@
+[submodule ".submodules/fundo-worker"]
+	path = .submodules/fundo-worker
+	url = https://github.com/lusilva/fundo-worker
