@@ -22,7 +22,8 @@ export default class EventCarousel extends React.Component {
 
   static propTypes = {
     category: React.PropTypes.object.isRequired,
-    sizes: React.PropTypes.object.isRequired
+    sizes: React.PropTypes.object.isRequired,
+    city: React.PropTypes.string.isRequired
   };
 
   state = {

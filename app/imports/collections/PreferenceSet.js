@@ -93,31 +93,12 @@ export default class PreferenceSet {
       let existingSet = PreferenceSets.findOne({_id: this.id});
 
       // Check if location has changed.
-      if (existingSet.location != this.location) {
+      if (existingSet.location !== this.location) {
         // Check if the old city still has any users. If not, then remove the cron job for it, and remove
         // it from the list of relevant cities.
         if (existingSet.location && PreferenceSets.find({location: existingSet.location}).count() == 1) {
           // Remove the cron job.
           SyncedCron.remove('eventful-' + existingSet.location);
-
-          // Remove the old location from the list of relevant cities for events.
-          _.each(Event.findEventsInCity(existingSet.location).fetch(), function(event) {
-            let newRelevantCities = _.without(event.relevant_cities, existingSet.location);
-            if (newRelevantCities.length > 0) {
-              event.relevant_cities = newRelevantCities;
-              event.save(function(err, res) {
-                if (err) {
-                  Logger.error('error saving event %s', event.id, event, err);
-                }
-              });
-            } else {
-              event.remove(function(err, res) {
-                if (err) {
-                  Logger.error('error deleting event %s', event.id, event, err);
-                }
-              });
-            }
-          });
         }
       }
 
