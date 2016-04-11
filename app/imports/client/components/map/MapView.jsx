@@ -1,6 +1,7 @@
 import { GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import { default as MarkerClusterer } from "react-google-maps/lib/addons/MarkerClusterer";
 import _ from 'lodash';
+import ReactList from 'react-list';
 
 import MapEvent from '../events/MapEvent';
 
@@ -10,7 +11,9 @@ export default class MapView extends React.Component {
   };
 
   state = {
-    activeMarker: null
+    activeMarker: null,
+    activeCluster: null,
+    clusteredEvents: []
   };
 
 
@@ -119,7 +122,7 @@ export default class MapView extends React.Component {
 
   _handleMarkerClick(marker) {
     if (this.state.activeMarker != marker.id)
-      this.setState({activeMarker: marker.id});
+      this.setState({activeMarker: marker.id, activeCluster: null});
     else
       this.setState({activeMarker: null});
   };
@@ -134,7 +137,69 @@ export default class MapView extends React.Component {
         <MapEvent event={marker}/>
       </InfoWindow>
     );
-  }
+  };
+
+  _closeClusterInfo() {
+    this.setState({activeCluster: null, clusteredEvents: []});
+  };
+
+
+  _renderItem(index, key) {
+    return (
+      <div key={key}>
+        <MapEvent event={this.state.clusteredEvents[index]}/>
+        {index < this.state.clusteredEvents.length - 1 ? <br/> : null}
+      </div>
+    );
+  };
+
+  _handleClusterClick(cluster) {
+    this.setState({activeCluster: null, clusteredEvents: []});
+
+    if (cluster.getMarkers().length == 0) {
+      return;
+    }
+    let firstPosition = cluster.getMarkers()[0].position;
+    let position = [firstPosition.lat(), firstPosition.lng()];
+    // If all markers are not at the same position, then return.
+    for (var i = 1; i < cluster.getMarkers().length; ++i) {
+      let thisPosition = cluster.getMarkers()[i].position;
+      if (thisPosition.lat() !== position[0] || thisPosition.lng() !== position[1]) {
+        this.setState({activeCluster: null, clusteredEvents: []});
+        return;
+      }
+    }
+
+    let clusteredEvents = [];
+    _.each(this.props.events, function(event) {
+      if (Math.abs(event.position.lat - position[0]) < 0.0001 && Math.abs(event.position.lng - position[1]) < 0.0001) {
+        clusteredEvents.push(event);
+      }
+    });
+    this.setState({activeCluster: position, clusteredEvents});
+  };
+
+
+  _displayOverview() {
+    if (!this.state.activeCluster)
+      return;
+
+    let lat = this.state.activeCluster[0];
+    let lng = this.state.activeCluster[1];
+
+    return (
+      <InfoWindow position={{lat, lng}}
+                  onCloseClick={this._closeClusterInfo.bind(this)}>
+        <div style={{maxHeight: '200px'}}>
+          <ReactList
+            itemRenderer={this._renderItem.bind(this)}
+            length={this.state.clusteredEvents.length}
+          />
+        </div>
+      </InfoWindow>
+    )
+  };
+
 
   render() {
     let events = this.props.events;
@@ -170,6 +235,7 @@ export default class MapView extends React.Component {
           averageCenter
           enableRetinaIcons
           gridSize={ 30 }
+          onClick={this._handleClusterClick.bind(this)}
         >
           {_.map(events, function(marker) {
 
@@ -205,6 +271,9 @@ export default class MapView extends React.Component {
             )
           }.bind(this))}
         </MarkerClusterer>
+
+        {this.state.activeCluster ? this._displayOverview() : null }
+
       </GoogleMap>
     );
   }

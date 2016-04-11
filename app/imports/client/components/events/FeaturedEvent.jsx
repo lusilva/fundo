@@ -5,6 +5,7 @@ import ReactMixin from 'react-mixin';
 import _ from 'lodash';
 
 import BaseEvent from './BaseEvent';
+import DetailedEvent from './DetailedEvent';
 
 @ReactMixin.decorate(PureRenderMixin)
 export default class FeaturedEvent extends BaseEvent {
@@ -38,10 +39,6 @@ export default class FeaturedEvent extends BaseEvent {
       time = time.twix(event.stop_time);
     }
 
-    // Get the venue information, doing all necessary null checking.
-    let venueName = event.venue && event.venue.name ? event.venue.name : "unknown venue";
-    let venueAddress = event.venue && event.venue.address ? event.venue.address : "unknown address";
-
     return (
       <div className="ui fluid card featured-event">
         <div className="content">
@@ -69,51 +66,7 @@ export default class FeaturedEvent extends BaseEvent {
         <div className="ui bottom attached primary button more-info-button">
           More Info
         </div>
-        <div className="ui modal event-details">
-          <i className="close icon"/>
-          <div className="header">
-            {event.title}
-          </div>
-          <br/>
-          <div className="ui grid container">
-            <div className="ui content four wide column">
-              <div className="ui fluid image">
-                <img src={eventImage}/>
-              </div>
-              <div className="eventful-badge eventful-small">
-                <img src="http://api.eventful.com/images/powered/eventful_58x20.gif"
-                     alt="Local Events, Concerts, Tickets"
-                />
-                <p><a href="http://eventful.com/">Events</a> by Eventful</p>
-              </div>
-            </div>
-            <div className="ui content twelve wide column">
-              <h4 className="ui ui horizontal section divider hidden">Description</h4>
-              <div className="description">
-                {renderHTML(event.description || "No Description Available")}
-              </div>
-              <div className="ui horizontal section divider"></div>
-
-              <div className="ui two column grid">
-                <div className="column">
-                  <h4 className="ui horizontal section divider header">
-                    <i className="home icon"/>
-                    Venue
-                  </h4>
-                  <div className="description center">
-                    <div className="date">
-                      {event.stop_time ? time.format() : time.format('MMM Do, h:mm a')}
-                    </div>
-                    <a target="_blank" href={event.venue.url}>{venueName}, {venueAddress}</a>
-                  </div>
-                </div>
-                {this._getRelevantLinks()}
-                {this._getTicketInfo()}
-              </div>
-            </div>
-          </div>
-          <br/>
-        </div>
+        <DetailedEvent event={event}/>
       </div>
     )
   }

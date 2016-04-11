@@ -8,6 +8,7 @@ import renderHTML from 'react-render-html';
 import _ from 'lodash';
 
 import BaseEvent from './BaseEvent';
+import DetailedEvent from './DetailedEvent';
 
 /**
  * The view component for an event card.
@@ -123,51 +124,7 @@ export default class GridEvent extends BaseEvent {
         <div className="ui bottom attached primary button more-info-button">
           More Info
         </div>
-        <div className="ui modal event-details">
-          <i className="close icon"/>
-          <div className="header">
-            {event.title}
-          </div>
-          <br/>
-          <div className="ui grid container">
-            <div className="ui content four wide column">
-              <div className="ui fluid image">
-                <img src={eventImage}/>
-              </div>
-              <div className="eventful-badge eventful-small">
-                <img src="http://api.eventful.com/images/powered/eventful_58x20.gif"
-                     alt="Local Events, Concerts, Tickets"
-                />
-                <p><a href="http://eventful.com/">Events</a> by Eventful</p>
-              </div>
-            </div>
-            <div className="ui content twelve wide column">
-              <h4 className="ui ui horizontal section divider hidden">Description</h4>
-              <div className="description">
-                {renderHTML(event.description || "No Description Available")}
-              </div>
-              <div className="ui horizontal section divider"></div>
-
-              <div className="ui two column grid">
-                <div className="column">
-                  <h4 className="ui horizontal section divider header">
-                    <i className="home icon"/>
-                    Venue
-                  </h4>
-                  <div className="description center">
-                    <div className="date">
-                      {formattedTime}
-                    </div>
-                    <a target="_blank" href={event.venue.url}>{venueName}, {venueAddress}</a>
-                  </div>
-                </div>
-                {this._getRelevantLinks()}
-                {this._getTicketInfo()}
-              </div>
-            </div>
-          </div>
-          <br/>
-        </div>
+        <DetailedEvent event={event}/>
       </div>
     );
   };

@@ -23,7 +23,8 @@ export default class EventCarousel extends React.Component {
   static propTypes = {
     category: React.PropTypes.object.isRequired,
     sizes: React.PropTypes.object.isRequired,
-    city: React.PropTypes.string.isRequired
+    city: React.PropTypes.string.isRequired,
+    events: React.PropTypes.array
   };
 
   state = {
@@ -33,7 +34,7 @@ export default class EventCarousel extends React.Component {
   sub = null;
 
   componentDidMount() {
-    if (!this.state.events) {
+    if (!this.state.events && !this.props.events) {
       _.defer(this._setEvents.bind(this));
     }
   };
