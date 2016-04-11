@@ -22,7 +22,8 @@ export default class EventCarousel extends React.Component {
 
   static propTypes = {
     category: React.PropTypes.object.isRequired,
-    sizes: React.PropTypes.object.isRequired
+    sizes: React.PropTypes.object.isRequired,
+    city: React.PropTypes.string.isRequired
   };
 
   state = {
@@ -33,6 +34,13 @@ export default class EventCarousel extends React.Component {
 
   componentDidMount() {
     if (!this.state.events) {
+      _.defer(this._setEvents.bind(this));
+    }
+  };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.category.name !== this.props.category.name || this.props.city !== nextProps.city) {
+      this.setState({events: null});
       _.defer(this._setEvents.bind(this));
     }
   };
@@ -62,6 +70,9 @@ export default class EventCarousel extends React.Component {
         },
         dislikes: {
           $nin: [Meteor.userId()]
+        },
+        relevant_cities: {
+          $in: [this.props.city]
         }
       },
       {

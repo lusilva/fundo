@@ -23,6 +23,10 @@ export default class TopEventsCarousel extends EventCarousel {
         },
         dislikes: {
           $nin: [Meteor.userId()]
+        },
+        // Get events in the user's city.
+        relevant_cities: {
+          $in: [this.props.city]
         }
       },
       {

@@ -7,6 +7,7 @@ import renderHTML from 'react-render-html';
 import _ from 'lodash';
 
 import BaseEvent from './BaseEvent';
+import DetailedEvent from './DetailedEvent';
 
 /**
  * The view component for an event card.
@@ -19,6 +20,12 @@ export default class MapEvent extends BaseEvent {
 
   /** @inheritDoc */
   componentDidMount() {
+    let rootNode = ReactDOM.findDOMNode(this);
+
+    $(rootNode).find('.ui.modal.event-details')
+      .modal('setting', 'transition', 'horizontal flip')
+      .modal('attach events', $(rootNode).find(".more-info-button"), 'show');
+
     this.setState({
       liked: _.includes(this.props.event.likes, Meteor.userId()),
       disliked: _.includes(this.props.event.dislikes, Meteor.userId())
@@ -64,6 +71,10 @@ export default class MapEvent extends BaseEvent {
             {this._getLikes()}
           </div>
         </div>
+        <div className="ui bottom attached primary button more-info-button">
+          More Info
+        </div>
+        <DetailedEvent event={event}/>
       </div>
     );
   };

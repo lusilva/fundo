@@ -30,7 +30,7 @@ export default class EventGrid extends React.Component {
         <div className="ui four stackable doubling cards">
           {_.map(this.props.events, function(event) {
             return (
-              <GridEvent key={event.id}
+              <GridEvent key={'grid-' + event.id}
                          event={event}/>);
           })}
         </div>

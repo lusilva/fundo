@@ -1,4 +1,3 @@
-import Logger from 'imports/logger';
 import _ from 'lodash';
 
 // Create Events MongoDB collection
@@ -6,6 +5,13 @@ const Events = new Meteor.Collection("events", {
   transform: function(doc) {
     return new Event(doc);
   }
+});
+
+const EventsIndex = new EasySearch.Index({
+  collection: Events,
+  fields: ['title', 'description'],
+  allowedFields: ['title', 'description'],
+  engine: new EasySearch.Minimongo()
 });
 
 // A Event class that takes a document in its constructor
@@ -142,8 +148,12 @@ export default class Event {
     return Events;
   };
 
+  static getSearchIndex() {
+    return EventsIndex;
+  };
+
   static numEventsInCity(city) {
-    return Event.findEventsInCity(city).count() > 0;
+    return Event.findEventsInCity(city).count();
   };
 
   static findEventsInCity(city) {

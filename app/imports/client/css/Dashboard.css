@@ -12,6 +12,15 @@
     box-shadow: none;
 }
 
+.gm-style-iw {
+    max-height: 200px;
+    overflow: scroll !important;
+}
+
+.gm-style-iw::-webkit-scrollbar {
+    display: none;
+}
+
 .dashboard.header-content {
     display: block;
     margin: 0 auto;

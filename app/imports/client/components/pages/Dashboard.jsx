@@ -43,6 +43,7 @@ export default class Dashboard extends React.Component {
 
   searchTimeout = null;
 
+  eventSub = null;
 
   /**
    * Function that runs automatically every time the data that its subscribed to changes.
@@ -54,24 +55,28 @@ export default class Dashboard extends React.Component {
   getMeteorData() {
     // Get all necessary subscriptions
     Meteor.subscribe('userpreferences');
-    Meteor.subscribe('events');
+    this.eventSub = Meteor.subscribe('events');
     Meteor.subscribe('categories');
-
-    let events = [];
-    if (this.state.searchValue && this.state.searchValue.length > 0) {
-      events = Event.getCollection().find(
-        {
-          $or: [
-            {description: {$regex: this.state.searchValue, $options: 'i'}},
-            {title: {$regex: this.state.searchValue, $options: 'i'}}
-          ]
-        }, {reactive: false}).fetch();
-    } else {
-      events = Event.getCollection().find({}, {reactive: false}).fetch();
-    }
 
     // Find the preference set for the current user.
     let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
+
+    let events = [];
+    if (this.state.searchValue && this.state.searchValue.length > 0) {
+      events = _.map(Event.getSearchIndex().search(this.state.searchValue).fetch(), function(event) {
+        return new Event(event);
+      });
+      events = _.filter(events, function(event) {
+        return _.indexOf(event.relevant_cities, preferences.location) > -1
+      });
+    } else {
+      events = Event.getCollection().find({
+        // Get events in the user's city.
+        relevant_cities: {
+          $in: [preferences.location]
+        }
+      }, {reactive: false}).fetch();
+    }
 
     let categories = Category.getCollection().find(
       {
@@ -123,8 +128,7 @@ export default class Dashboard extends React.Component {
           if (this.data.categories.length < this.data.numCategories)
             this.setState({categoryLimit: this.state.categoryLimit + 20});
         }.bind(this)
-      })
-    ;
+      });
   };
 
   /**
@@ -206,7 +210,7 @@ export default class Dashboard extends React.Component {
    * @private
    */
   _showHeadContent() {
-    return <FeaturedEvents/>
+    return <FeaturedEvents city={this.data.preferences.location}/>
   };
 
 
@@ -216,23 +220,18 @@ export default class Dashboard extends React.Component {
    * @private
    */
   _filterChangeCallback() {
+    if (this.eventSub) this.eventSub.stop();
     this.setState({categoryLimit: 20});
   };
 
 
-  /**
-   *
-   */
   _setLoadingCallback(isLoading) {
     this.setState({loading: isLoading});
   };
 
 
   _updateSearch(event) {
-    Meteor.clearTimeout(this.searchTimeout);
-    this.searchTimeout = Meteor.setTimeout(function() {
-      this.setState({searchValue: event.target.value});
-    }.bind(this), 1500);
+    this.setState({searchValue: event.target.value});
   };
 
 
@@ -276,6 +275,7 @@ export default class Dashboard extends React.Component {
       (
         <div style={{display: this.state.mapView ? 'none' : 'block'}}>
           <TopEventsCarousel sizes={{large: 4, medium: 2, small: 1}}
+                             city={this.data.preferences.location}
                              category={{
                                                     name: 'Top Events',
                                                     category_id: 'top_events',
@@ -284,6 +284,7 @@ export default class Dashboard extends React.Component {
           />
           {_.map(this.data.categories, function(category) {
             return <EventCarousel key={category.category_id+'-dashboard-events'}
+                                  city={this.data.preferences.location}
                                   sizes={{large: 4, medium: 2, small: 1}}
                                   category={category}
             />
@@ -305,11 +306,11 @@ export default class Dashboard extends React.Component {
               Filters
             </a>
           </div>
-          <div className="ui left menu">
+          <div className="ui left menu desktop-only">
             <div className="ui category search item">
               <div className="ui icon input">
                 <input className="prompt" type="text" placeholder="Quick Search..."
-                       onChange={this._updateSearch.bind(this)}/>
+                       onChange={_.debounce(this._updateSearch.bind(this), 500)}/>
               </div>
             </div>
           </div>
@@ -335,7 +336,7 @@ export default class Dashboard extends React.Component {
 
 
             <div className="ui basic segment main-content">
-              {mapView}
+              {!this.state.loading ? mapView : null}
               {loading || content}
             </div>
           </div>

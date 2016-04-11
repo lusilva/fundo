@@ -113,8 +113,8 @@ export default class Welcome extends React.Component {
           <br/>
           <div className="ui item center">
             <Link to="/dashboard">
-              <button className="ui animated button primary" tabIndex="0">
-                <div className="content">Next</div>
+              <button className="ui button primary" tabIndex="0">
+                Next
               </button>
             </Link>
           </div>

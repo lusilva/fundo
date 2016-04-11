@@ -19,6 +19,9 @@ import ReactMixin from 'react-mixin';
  */
 @ReactMixin.decorate(PureRenderMixin)
 export default class FeaturedEvents extends React.Component {
+  static propTypes = {
+    city: React.PropTypes.string.isRequired
+  };
 
   state = {
     events: null
@@ -55,6 +58,10 @@ export default class FeaturedEvents extends React.Component {
       {
         _id: {
           $in: recommendedIds || []
+        },
+        // Get events in the user's city.
+        relevant_cities: {
+          $in: [this.props.city]
         }
       },
       {

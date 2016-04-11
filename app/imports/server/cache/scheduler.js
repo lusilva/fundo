@@ -1,3 +1,5 @@
+/* global Meteor */
+
 const Jobs = JobCollection('fundoQueue');
 
 // Refresh when the server first starts up.
@@ -7,12 +9,18 @@ Meteor.startup(function() {
 
   Jobs.allow({
     admin: function(userId, method, params) {
-      return userId;
+      return userId && Roles.userIsInRole(userId, 'admin', 'default-group');
+    },
+    getJob: function(userId) {
+      return Boolean(userId);
     }
   });
 
   Meteor.publish('allJobs', function() {
-    return Jobs.find({});
+    if (this.userId && Roles.userIsInRole(this.userId, 'admin', 'default-group')) {
+      return Jobs.find({});
+    }
+    return null;
   });
 });
 

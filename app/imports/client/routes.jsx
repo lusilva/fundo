@@ -12,7 +12,7 @@ import Welcome from './components/pages/Welcome';
 
 export default (
   <Route component={Layout} history={browserHistory}>
-    <Route path="/" component={Home}/>
+    <Route path="/" component={Home} onEnter={validateNotUser}/>
     <Route path="/login" component={Login} onEnter={validateNotUser}/>
     <Route path="/welcome" component={Welcome} onEnter={validateWelcome}/>
     <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
