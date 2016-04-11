@@ -67,7 +67,7 @@ export default class Dashboard extends React.Component {
         return new Event(event);
       });
       events = _.filter(events, function(event) {
-        return _.indexOf(event.relevant_cities, preferences.location) > 0
+        return _.indexOf(event.relevant_cities, preferences.location) > -1
       });
     } else {
       events = Event.getCollection().find({
