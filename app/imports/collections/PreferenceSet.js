@@ -89,19 +89,6 @@ export default class PreferenceSet {
 
     // If the preference object already exists, modify it
     if (this.id) {
-
-      let existingSet = PreferenceSets.findOne({_id: this.id});
-
-      // Check if location has changed.
-      if (existingSet.location !== this.location) {
-        // Check if the old city still has any users. If not, then remove the cron job for it, and remove
-        // it from the list of relevant cities.
-        if (existingSet.location && PreferenceSets.find({location: existingSet.location}).count() == 1) {
-          // Remove the cron job.
-          SyncedCron.remove('eventful-' + existingSet.location);
-        }
-      }
-
       PreferenceSets.update(this.id, {$set: _.omit(doc, '_id')}, callback);
       // Else create new
     } else {

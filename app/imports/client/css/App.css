@@ -2,3 +2,13 @@
     background-color: #5c6bc0 !important;
     border: none !important;
 }
+
+@media (max-width: 991px) {
+    .mobile-only {
+        display: block !important;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+}

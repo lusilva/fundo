@@ -1,3 +1,5 @@
+/* global Meteor */
+
 import PreferenceSet from 'imports/collections/PreferenceSet';
 import Event from 'imports/collections/Event';
 import Category from 'imports/collections/Category';
@@ -8,7 +10,6 @@ import EventfulFactory from 'imports/factories/EventfulFactory';
 import _ from 'lodash';
 import truncate from 'truncate-html';
 import Raccoon from '../lib/raccoon/index';
-
 
 Meteor.methods({
   /**
@@ -46,6 +47,8 @@ Meteor.methods({
    * @param eventsReadyCallback
    */
   "updatePreferences": function(preferences) {
+    if (!this.userId)
+      return null;
 
     //TODO: sanitize the incoming preferences object for security.
 
@@ -57,6 +60,33 @@ Meteor.methods({
       preferences._location
     );
 
+    let oldPrefs = PreferenceSet.getCollection().findOne({userId: this.userId});
+
+    if (oldPrefs.location === newPrefs.location)
+      return null;
+
+    let jobId = null;
+    // If this is the last user in this location, stop fetching new events for this city.
+    if (oldPrefs.location && PreferenceSet.getCollection().find({location: oldPrefs.location}).count() === 1) {
+      SyncedCron.remove('eventful-' + oldPrefs.location);
+    }
+    // If this is the first user in the new location, then schedule fetches for this city.
+    if (PreferenceSet.getCollection().find({location: newPrefs.location}).count() === 0) {
+      // Add a cron job to automatically refresh this city every 24 hours.
+      SyncedCron.add({
+        name: 'eventful-' + newPrefs.location,
+        schedule: function(parser) {
+          // parser is a later.parse object
+          return parser.text(Meteor.settings.refreshEventsEvery || 'every 2 hours');
+        },
+        job: Scheduler.getCity.bind(this, newPrefs.location)
+      });
+    }
+
+    if (Event.numEventsInCity(newPrefs.location) < 20) {
+      jobId = Scheduler.getCity(newPrefs.location)._doc._id;
+    }
+
     // save it in the database.
     newPrefs.save(function(err, res) {
       if (err) {
@@ -66,24 +96,7 @@ Meteor.methods({
       }
     }.bind(this));
 
-    // If there are no events in the user's current city, then fetch some.
-    if (Event.findEventsInCity(preferences._location).count() == 0) {
-
-      // Add a cron job to automatically refresh this city every 24 hours.
-      SyncedCron.add({
-        name: 'eventful-' + preferences._location,
-        schedule: function(parser) {
-          // parser is a later.parse object
-          return parser.text(Meteor.settings.refreshEventsEvery || 'every 2 hours');
-        },
-        job: Scheduler.getCity.bind(this, preferences._location)
-      });
-
-      let job = Scheduler.getCity(preferences._location);
-      return job._doc._id;
-    } else {
-      return null;
-    }
+    return jobId;
   },
   /**
    * Method to like an event.

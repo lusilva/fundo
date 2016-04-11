@@ -223,7 +223,7 @@ export default class Filters extends React.Component {
 
 
     return (
-      <div className="ui container">
+      <div className="ui container filters-container">
         {this._getMessage()}
         <div className="ui header item center">Select Location</div>
         {geosuggest}
