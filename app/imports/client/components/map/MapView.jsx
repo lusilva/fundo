@@ -7,7 +7,7 @@ import ReactList from 'react-list';
 
 import MapEvent from '../events/MapEvent';
 
-//@ReactMixin.decorate(PureRenderMixin)
+@ReactMixin.decorate(PureRenderMixin)
 export default class MapView extends React.Component {
   static propTypes = {
     events: React.PropTypes.array.isRequired
