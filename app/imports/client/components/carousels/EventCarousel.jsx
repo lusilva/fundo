@@ -40,7 +40,6 @@ export default class EventCarousel extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.category.name !== this.props.category.name || this.props.city !== nextProps.city) {
-      console.log('refretching!');
       this.setState({events: null});
       _.defer(this._setEvents.bind(this));
     }

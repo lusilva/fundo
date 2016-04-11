@@ -336,7 +336,7 @@ export default class Dashboard extends React.Component {
 
 
             <div className="ui basic segment main-content">
-              {mapView}
+              {!this.state.loading ? mapView : null}
               {loading || content}
             </div>
           </div>

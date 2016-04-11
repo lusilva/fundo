@@ -1,10 +1,13 @@
 import { GoogleMap, Marker, InfoWindow } from "react-google-maps";
 import { default as MarkerClusterer } from "react-google-maps/lib/addons/MarkerClusterer";
+import ReactMixin from 'react-mixin';
+import PureRenderMixin from 'react/lib/ReactComponentWithPureRenderMixin';
 import _ from 'lodash';
 import ReactList from 'react-list';
 
 import MapEvent from '../events/MapEvent';
 
+//@ReactMixin.decorate(PureRenderMixin)
 export default class MapView extends React.Component {
   static propTypes = {
     events: React.PropTypes.array.isRequired
@@ -205,7 +208,7 @@ export default class MapView extends React.Component {
     let events = this.props.events;
 
     events = _.omitBy(_.map(events, function(event) {
-      if (event.position && event.position.lat && event.position.lng) {
+      if (event && event.position && event.position.lat && event.position.lng) {
         event.position = {
           lat: parseFloat(event.position.lat),
           lng: parseFloat(event.position.lng)
@@ -214,6 +217,14 @@ export default class MapView extends React.Component {
       }
       return null;
     }), _.isNull);
+
+
+    events = _.filter(events, function(event) {
+      return Boolean(event);
+    });
+
+    if (!events || events.length == 0)
+      return null;
 
     return (
       <GoogleMap
@@ -238,6 +249,9 @@ export default class MapView extends React.Component {
           onClick={this._handleClusterClick.bind(this)}
         >
           {_.map(events, function(marker) {
+            if (!marker) {
+              return null;
+            }
 
             let eventImage = require("../../img/fundo-default-event-img.png");
             // First check if event has a medium image, if not then check if it has a large image.
@@ -271,9 +285,7 @@ export default class MapView extends React.Component {
             )
           }.bind(this))}
         </MarkerClusterer>
-
         {this.state.activeCluster ? this._displayOverview() : null }
-
       </GoogleMap>
     );
   }
