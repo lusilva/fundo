@@ -46,7 +46,10 @@ fundo is a web application which will allow users to discover nearby events. It'
 3. Start up a redis server instance for the app to connect to. For more info, see next section.
 4. Run `npm install` to install all npm packages.
 5. Run `meteor run --settings settings.json`, which will install all dependencies and start up the meteor server.
-6. Go to `localhost:3000` in your web browser.
+6. run fundo worker [here.](https://github.com/lusilva/fundo-worker)
+7. run worker with same example settings from #2 above and different port than main meteor server
+		`meteor run --settings settings.json --port 4000`, this separate meteor server fetches events without delaying main site functionality 
+8. Go to `localhost:3000` in your web browser.
 
 
 ### Redis
