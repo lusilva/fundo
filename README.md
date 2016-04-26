@@ -68,6 +68,9 @@ Redis holds the entire dataset in memory.
 ### Example settings.json
     
         {
+            "public": {
+           	"dashboardPageSize": <NUMBER>
+            },
             "kadira": {
                 "appId": <KADIRA_APP_KEY_GOES_HERE>,
                 "appSecret": <KADIRA_SECRET_KEY_GOES_HERE>,
@@ -95,6 +98,7 @@ Redis holds the entire dataset in memory.
                "email": <STRING>,
                "password": <STRING>
             }
+            "remote": <REMOTE HOST  (eg "localhost:3000")>
         }
 
 #### Run in production mode (with SSR enabled)
