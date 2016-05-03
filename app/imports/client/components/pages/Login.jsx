@@ -2,9 +2,7 @@
 
 import ReactMixin from 'react-mixin';
 
-
 const LoginForm = BlazeToReact('fullPageAtForm');
-
 
 /**
  * The login view with the login form.

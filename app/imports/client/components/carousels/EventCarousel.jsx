@@ -31,6 +31,11 @@ export default class EventCarousel extends React.Component {
   };
 
   sub = null;
+  startTime = null;
+
+  componentWillMount() {
+    this.startTime = new Date().getTime();
+  }
 
   componentDidMount() {
     if (!this.state.events) {
@@ -73,6 +78,9 @@ export default class EventCarousel extends React.Component {
         },
         relevant_cities: {
           $in: [this.props.city]
+        },
+        start_time: {
+          $gt: new Date()
         }
       },
       {

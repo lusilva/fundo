@@ -1,3 +1,4 @@
+/* global Meteor AccountsEvents */
 /**
  * This file runs at startup, and has a special name. It contains all of the
  * accounts configurations for the built-in user package. This provides
@@ -44,7 +45,7 @@ AccountsTemplates.configure({
   // Hooks
   //onLogoutHook: myLogoutFunc,
   onSubmitHook: function(err, state) {
-    if (!err && Meteor.isClient) {
+    if (!err && Meteor.isClient && state !== 'changePwd') {
       AccountsEvents.emit('loggedIn');
     }
     return true;

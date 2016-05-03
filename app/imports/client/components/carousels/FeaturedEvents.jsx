@@ -59,6 +59,9 @@ export default class FeaturedEvents extends React.Component {
         _id: {
           $in: recommendedIds || []
         },
+        start_time: {
+          $gt: new Date()
+        },
         // Get events in the user's city.
         relevant_cities: {
           $in: [this.props.city]

@@ -9,6 +9,7 @@ import Login from './components/pages/Login';
 import Dashboard from './components/pages/Dashboard';
 import MyEvents from './components/pages/MyEvents';
 import Welcome from './components/pages/Welcome';
+import AccountSettings from './components/pages/AccountSettings';
 
 export default (
   <Route component={Layout} history={browserHistory}>
@@ -17,6 +18,7 @@ export default (
     <Route path="/welcome" component={Welcome} onEnter={validateWelcome}/>
     <Route path="/dashboard" component={Dashboard} onEnter={validateUser}/>
     <Route path="/myevents" component={MyEvents} onEnter={validateUser}/>
+    <Route path="/myaccount" component={AccountSettings} onEnter={validateUser}/>
     <Route path="/logout" onEnter={logoutUser}/>
   </Route>
 );

@@ -16,6 +16,7 @@ import TopEventsCarousel from '../carousels/TopEventsCarousel';
 import EventCarousel from '../carousels/EventCarousel';
 import Filters from '../filters/Filters';
 import MapView from '../map/MapView';
+import MainMenu from '../menus/MainMenu';
 
 /**
  * The dashboard view that the user sees upon logging in.
@@ -36,14 +37,14 @@ export default class Dashboard extends React.Component {
     },
     isSendingEmail: false,
     loading: false,
-    categoryLimit: 20,
+    categoryLimit: 10,
     searchValue: null,
     mapView: false
   };
 
-  searchTimeout = null;
-
   eventSub = null;
+
+  searchTimeout = null;
 
   /**
    * Function that runs automatically every time the data that its subscribed to changes.
@@ -67,13 +68,16 @@ export default class Dashboard extends React.Component {
         return new Event(event);
       });
       events = _.filter(events, function(event) {
-        return _.indexOf(event.relevant_cities, preferences.location) > -1
+        return _.indexOf(event.relevant_cities, preferences.location) > -1 && event.start_time.getTime() > new Date().getTime();
       });
     } else {
       events = Event.getCollection().find({
         // Get events in the user's city.
         relevant_cities: {
           $in: [preferences.location]
+        },
+        start_time: {
+          $gt: new Date()
         }
       }, {reactive: false}).fetch();
     }
@@ -221,7 +225,7 @@ export default class Dashboard extends React.Component {
    */
   _filterChangeCallback() {
     if (this.eventSub) this.eventSub.stop();
-    this.setState({categoryLimit: 20});
+    this.setState({categoryLimit: 10});
   };
 
 
@@ -230,8 +234,8 @@ export default class Dashboard extends React.Component {
   };
 
 
-  _updateSearch(event) {
-    this.setState({searchValue: event.target.value});
+  _updateSearch(newValue) {
+    this.setState({searchValue: newValue});
   };
 
 
@@ -241,9 +245,9 @@ export default class Dashboard extends React.Component {
       this._showHeadContent() :
       this._getVerifyEmailHeader();
 
-    let loading = this.state.loading ?
+    let loading = this.state.loading || this.data.categories.length == 0 ?
       <div className="ui active inverted dimmer">
-        <div className="ui text large loader">Fetching Events...</div>
+        <div className="ui text large loader">{this.state.loading ? 'Fetching Events...' : 'Getting Ready...'}</div>
       </div> : null;
 
     let bottomLoader = this.data.categories.length < this.data.numCategories ?
@@ -264,8 +268,8 @@ export default class Dashboard extends React.Component {
       (   <div className="ui container" style={{display: this.state.mapView ? 'none' : 'block'}}>
           <h1 className="ui left floated header">
             {this.data.events && this.data.events.length > 0 ?
-            'Showing results for "' + this.state.searchValue + '"' :
-              'No events found'}
+            'Showing ' + this.data.events.length + ' results for "' + this.state.searchValue + '"' :
+            'No events found for "' + this.state.searchValue + '"'}
 
           </h1>
           <div className="ui clearing divider"></div>
@@ -298,31 +302,13 @@ export default class Dashboard extends React.Component {
         <div className="ui inverted vertical segment dashboard-masthead primary-color">
           {mastheadContent}
         </div>
-        <div className="ui menu attached secondary filter-menu">
-          <div className="ui labeled icon menu">
-            <a className={'item ' + (this.state.filter.open ? 'active' : '')}
-               onClick={this._toggleFilterMenu.bind(this)}>
-              <i className="options icon"/>
-              Filters
-            </a>
-          </div>
-          <div className="ui left menu desktop-only">
-            <div className="ui category search item">
-              <div className="ui icon input">
-                <input className="prompt" type="text" placeholder="Quick Search..."
-                       onChange={_.debounce(this._updateSearch.bind(this), 500)}/>
-              </div>
-            </div>
-          </div>
-          <div className="ui labeled icon right menu">
-            <a className="item"
-               onClick={this._toggleMapView.bind(this)}>
-              <i className="map icon"/>
-              {this.state.mapView ? 'Hide Map' : 'Show Map'}
+        <MainMenu filter={this.state.filter}
+                  mapView={this.state.mapView}
+                  filterMenuCallback={this._toggleFilterMenu.bind(this)}
+                  searchInputChangeCallback={_.throttle(this._updateSearch.bind(this), 1000)}
+                  mapViewCallback={this._toggleMapView.bind(this)}
+        />
 
-            </a>
-          </div>
-        </div>
         <div className="ui bottom attached segment pushable" id="main-dashboard-container">
           <div className="ui left vertical sidebar menu">
             <Filters preferences={this.data.preferences}
@@ -333,8 +319,6 @@ export default class Dashboard extends React.Component {
           </div>
 
           <div className="dashboard pusher">
-
-
             <div className="ui basic segment main-content">
               {!this.state.loading ? mapView : null}
               {loading || content}

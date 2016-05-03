@@ -3,6 +3,7 @@ export default {
   loggedIn: [
     {title: "Dashboard", path: "/dashboard"},
     {title: "My Events", path: "/myevents"},
+    {title: "My Account", path: "/myaccount"},
     {title: "Logout", path: "/logout"}
   ],
   // The paths the user can see while not logged in.
