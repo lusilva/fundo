@@ -18,7 +18,8 @@ export default class Filters extends React.Component {
     filterChangeCallback: React.PropTypes.func.isRequired,
     setLoadingCallback: React.PropTypes.func.isRequired,
     preferences: React.PropTypes.object,
-    categories: React.PropTypes.array
+    categories: React.PropTypes.array,
+    time: React.PropTypes.array
   };
 
 
@@ -146,7 +147,7 @@ export default class Filters extends React.Component {
    * @private
    */
   _updateUserLocation(suggest) {
-    // Check is this is a valid place.
+    // Check if this is a valid place.
     if (!suggest.placeId && suggest.label != this.state.preferences.location) {
       this._showMessage(true, (suggest.label + ' is not a valid location!'));
       this.refs.geosuggest.update(this.state.preferences.location || '');
@@ -221,6 +222,32 @@ export default class Filters extends React.Component {
         </div>
       ) : null;
 
+    let timesuggest = !this.state.loading ?
+        (
+            <div className="ui item center">
+              <div class="inline fields">
+                <div class="field">
+                  <div class="ui checkbox">
+                    <input type="checkbox" name="timeMorning"/>
+                    <label>Morning</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui checkbox">
+                    <input type="checkbox" name="timeAfternoon"/>
+                    <label>Afternoon</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui checkbox">
+                    <input type="checkbox" name="timeNight"/>
+                    <label>Night</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+        ) : null;
+
 
     return (
       <div className="ui container filters-container">
@@ -228,7 +255,7 @@ export default class Filters extends React.Component {
         <div className="ui header item center">Select Location</div>
         {geosuggest}
         <div className="ui header item center">Categories</div>
-        <div className="ui container">
+        <div className="ui item center">
           <div className="ui multiple search selection dropdown">
             <input name="favorite-categories" type="hidden" value=""/>
             <i className="dropdown icon"/>
@@ -246,6 +273,11 @@ export default class Filters extends React.Component {
             </div>
           </div>
         </div>
+        <div className="ui header item center"> Time of Event </div>
+        {timesuggest}
+        <div className="ui header item center"> Date </div>
+
+        <div className="ui header item center"> Sort </div>
       </div>
     );
   }
