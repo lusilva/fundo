@@ -50,6 +50,10 @@ export default class MapEvent extends BaseEvent {
       formattedTime = moment(event.start_time).format('MMM Do, h:mm a')
     }
 
+    /**
+     * return formatted ui card
+     */
+
     return (
       <div className="ui card">
         <div className="ui content">
