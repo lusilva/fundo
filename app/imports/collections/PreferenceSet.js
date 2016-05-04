@@ -12,7 +12,8 @@ const PreferenceSets = new Meteor.Collection("preferencesets", {
       doc.indices,
       doc.location,
       doc.hidden_categories,
-      doc.filtered_categories
+      doc.filtered_categories,
+      doc.time_of_events
     );
   }
 });
@@ -32,20 +33,32 @@ export default class PreferenceSet {
     if (!aUserId) {
       aUserId = Meteor.userId();
     }
+    //id of user
     this._userId = aUserId;
+
     this._indices = aIndices;
     if (!this._indices) {
       this._indices = [];
     }
+
+    //location preference of user
     this._location = aLocation;
     if (!hidden_categories) {
       hidden_categories = [];
     }
+
+    //TODO: categories user does not want to see. yet to be implemented
     this._hidden_categories = hidden_categories;
-    this._filtered_categories = filtered_categories
+
+    //categories user wants to filter results by
+    this._filtered_categories = filtered_categories;
+
+    //time of events user wants to filter by
+    this._time_of_events = 0;
 
   };
 
+  //access methods
   get id() {
     return this._id;
   };
@@ -67,9 +80,15 @@ export default class PreferenceSet {
   };
 
   get filtered_categories() {
-    return this._filtered_categories
+    return this._filtered_categories;
+  };
+
+  get time_of_events() {
+    return this._time_of_events;
   }
 
+
+  // modify methods
   set location(location) {
     this._location = location;
   };
@@ -98,7 +117,8 @@ export default class PreferenceSet {
       indices: this.indices,
       location: this.location,
       hidden_categories: this.hidden_categories,
-      filtered_categories: this.filtered_categories
+      filtered_categories: this.filtered_categories,
+      time_of_events: this.time_of_events
     };
 
     // If the preference object already exists, modify it
@@ -118,7 +138,7 @@ export default class PreferenceSet {
     }
   };
 
-
+  //TODO used to reset defaults for account. 
   resetPreference(category) {
     for (var i = 0; i < this.indices.length; ++i) {
       if (this.indices[i].category == category) {

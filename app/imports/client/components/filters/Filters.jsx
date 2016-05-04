@@ -203,6 +203,49 @@ export default class Filters extends React.Component {
   };
 
 
+  /**
+   * Updates the user's filtered categories
+   *
+   * @param categories {map} - Map of categories the user has liked.
+   * @private
+   */
+  _updateUserFilteredCategories(categories) {
+    // Get the user's preferences, and make sure this place is different then the user's current filtered events.
+    let preferences = this.state.preferences;
+    if (preferences.filtered_categories = categories) {
+      return;
+    }
+    preferences.filtered_categories = categories;
+    this._filterChangeCallback();
+    this._setLoading(true);
+    Meteor.call("updatePreferences", preferences, function(err, res) {
+      if (!err) {
+        let message = 'Categories updated to ' + categories;
+        that._showMessage(false, message, 5000);
+      } else {
+        Alert.error('Error occurred while updating categories');
+      }
+      // Result returns if there are events for this area already, if this is true then
+      // there were no events and we have fetched some from eventful.
+      if (!!res) {
+        let message = "No events meet your criteria .  Try modifying your filters";
+        let handler = Meteor.setInterval(function() {
+          JOB_QUEUE.getJob(res, function(err, job) {
+            if (job.doc.status == 'completed') {
+              Meteor.clearInterval(handler);
+              that._clearMessage();
+              that._setLoading(false);
+            }
+          });
+          that._showMessage(false, message, 10000);
+        }, 1000);
+      } else {
+        this._setLoading(false);
+      }
+    }.bind(this));
+  }
+
+
   /** @inheritDoc */
   render() {
     let initialLocation = (this.state.preferences && this.state.preferences.location) ?
