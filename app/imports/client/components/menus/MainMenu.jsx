@@ -1,3 +1,11 @@
+/* global React */
+
+/**
+ * The Main Menu user sees at the top of the Dashboard
+ *
+ * @class
+ * @extends React.Component
+ */
 export default class MainMenu extends React.Component {
   static propTypes = {
     filterMenuCallback: React.PropTypes.func.isRequired,
