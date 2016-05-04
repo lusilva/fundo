@@ -11,7 +11,8 @@ const PreferenceSets = new Meteor.Collection("preferencesets", {
       doc.userId,
       doc.indices,
       doc.location,
-      doc.hidden_categories
+      doc.hidden_categories,
+      doc.filtered_categories
     );
   }
 });
@@ -23,7 +24,8 @@ export default class PreferenceSet {
               aUserId,
               aIndices,
               aLocation,
-              hidden_categories) {
+              hidden_categories,
+              filtered_categories) {
 
     this._id = aId;
     // Make the ID for the current user if no userId is defined.
@@ -40,6 +42,7 @@ export default class PreferenceSet {
       hidden_categories = [];
     }
     this._hidden_categories = hidden_categories;
+    this._filtered_categories = filtered_categories
 
   };
 
@@ -63,9 +66,19 @@ export default class PreferenceSet {
     return this._hidden_categories;
   };
 
+  get filtered_categories() {
+    return this._filtered_categories
+  }
+
   set location(location) {
     this._location = location;
   };
+
+  set filtered_categories(categories) {
+    this._filtered_categories = categories;
+  }
+
+
 
   static getCollection() {
     return PreferenceSets;
@@ -84,7 +97,8 @@ export default class PreferenceSet {
       userId: this.user,
       indices: this.indices,
       location: this.location,
-      hidden_categories: this.hidden_categories
+      hidden_categories: this.hidden_categories,
+      filtered_categories: this.filtered_categories
     };
 
     // If the preference object already exists, modify it

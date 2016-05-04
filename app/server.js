@@ -13,7 +13,7 @@ import 'imports/server/cache/scheduler';
 // Every time a user account is created, create an empty preference set for that user. This ensures that a user
 // always has a preference set associated with them, since it is impossible for a user to delete a preference set.
 Accounts.onCreateUser(function(options, user) {
-  let preferences = new PreferenceSet(null, user._id, null, null);
+  let preferences = new PreferenceSet(null, user._id, null, null, null);
   preferences.save();
   return user;
 });

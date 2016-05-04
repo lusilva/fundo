@@ -63,19 +63,26 @@ export default class Dashboard extends React.Component {
     let preferences = PreferenceSet.getCollection().findOne({userId: Meteor.userId()});
 
     let events = [];
+      // Checks to see if there is text in the search box
     if (this.state.searchValue && this.state.searchValue.length > 0) {
+        //console.log(this.state.searchValue);
       events = _.map(Event.getSearchIndex().search(this.state.searchValue).fetch(), function(event) {
         return new Event(event);
       });
       events = _.filter(events, function(event) {
         return _.indexOf(event.relevant_cities, preferences.location) > -1 && event.start_time.getTime() > new Date().getTime();
       });
+        //Runs if there is nothing in the search box
     } else {
+        //console.log("No search");
       events = Event.getCollection().find({
         // Get events in the user's city.
         relevant_cities: {
           $in: [preferences.location]
         },
+          categories: {
+              $in: [preferences.categories]
+          },
         start_time: {
           $gt: new Date()
         }
