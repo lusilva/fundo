@@ -133,6 +133,7 @@ export default class MapView extends React.Component {
 
   };
 
+  // on event click, focus and popup event info
   _handleMarkerClick(marker) {
     if (this.state.activeMarker != marker.id)
       this.setState({activeMarker: marker.id, activeCluster: null});
@@ -140,9 +141,10 @@ export default class MapView extends React.Component {
       this.setState({activeMarker: null});
   };
 
+  // info windo for event clicked on
   _renderInfoWindow(ref, marker) {
     return (
-      //You can nest components inside of InfoWindow!
+      // You can nest components inside of InfoWindow!
       <InfoWindow
         key={`${ref}_info_window`}
         onCloseClick={this._handleMarkerClick.bind(this, marker)}
@@ -151,6 +153,7 @@ export default class MapView extends React.Component {
       </InfoWindow>
     );
   };
+
 
   _closeClusterInfo() {
     this.setState({activeCluster: null, clusteredEvents: []});
@@ -166,6 +169,7 @@ export default class MapView extends React.Component {
     );
   };
 
+  // 
   _handleClusterClick(cluster) {
     this.setState({activeCluster: null, clusteredEvents: []});
 
