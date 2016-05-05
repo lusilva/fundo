@@ -1,12 +1,18 @@
 import Logger from 'imports/logger';
 
-// Create Categories MongoDB collection
+/**
+ * Create MongoDB collection: Categories
+ */ 
 const Categories = new Meteor.Collection("categories", {
   transform: function(doc) {
     return new Category(doc);
   }
 });
 
+/**
+ *  a Category is definied by a category id, name, and sub-category name
+ *  mongo db is updated with new category or modified if category already exists
+ */
 export default class Category {
 
   constructor(doc) {
