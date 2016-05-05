@@ -27,7 +27,9 @@ export default class MapView extends React.Component {
     clusteredEvents: []
   };
 
-
+  /**
+   * getMapStyles defines styles defined in Google Maps
+   */
   _getMapStyles() {
     return [
       {
