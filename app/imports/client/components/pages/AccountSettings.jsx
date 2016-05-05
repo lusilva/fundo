@@ -23,13 +23,24 @@ export default class AccountSettings extends React.Component {
     currentUser: React.PropTypes.object
   };
 
+  _clearRecommendations() {
+    // TODO: implement code to delete recommended events.  This shoudl unlike/dislike all past events
+    alert("Warning, this will remove all recommended events.");
+  }
 
   /** @inheritDoc */
   render() {
     return (
-      <div className="ui basic segment main-saved-events-content">
-        <UserForm state={'changePwd'} />
+      <div className="ui container center aligned">
+        <div className="ui basic segment">
+          <UserForm state={'changePwd'} />
+        </div>
+        <h1>Clear Recommendations</h1>
+        <button className="negative ui button" onClick={this._clearRecommendations.bind(this)}>
+          Clear Recommendations
+        </button>
       </div>
+      
     )
   }
 }
