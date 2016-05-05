@@ -154,12 +154,12 @@ export default class MapView extends React.Component {
     );
   };
 
-
+  // close cluster
   _closeClusterInfo() {
     this.setState({activeCluster: null, clusteredEvents: []});
   };
 
-
+  // render event click on clustered events
   _renderItem(index, key) {
     return (
       <div key={key}>
@@ -169,7 +169,7 @@ export default class MapView extends React.Component {
     );
   };
 
-  // 
+  // handles user clicks on event clusters
   _handleClusterClick(cluster) {
     this.setState({activeCluster: null, clusteredEvents: []});
 
@@ -196,7 +196,7 @@ export default class MapView extends React.Component {
     this.setState({activeCluster: position, clusteredEvents});
   };
 
-
+  // displays overview of events
   _displayOverview() {
     if (!this.state.activeCluster)
       return;
