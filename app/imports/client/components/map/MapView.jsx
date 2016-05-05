@@ -7,6 +7,14 @@ import ReactList from 'react-list';
 
 import MapEvent from '../events/MapEvent';
 
+/**
+ * The map view that the user sees after 
+ * clicking "Show Map" from the main Dashboard page
+ *
+ * @class
+ * @extends React.Component
+ */
+
 @ReactMixin.decorate(PureRenderMixin)
 export default class MapView extends React.Component {
   static propTypes = {
